@@ -1,0 +1,76 @@
+repos:
+  - repo: local
+    hooks:
+      - id: eslint
+        name: eslint
+        stages: [commit]
+        language: system
+        entry: eslint --fix
+        types_or: [ts, tsx, javascript, jsx]
+        files: "^jasmine-webui/"
+
+      - id: prettier
+        name: prettier
+        stages: [commit]
+        language: system
+        entry: prettier -w --tab-width 4
+        files: "^jasmine-webui/"
+
+      - id: npm-test
+        name: npm-test
+        stages: [commit]
+        language: system
+        entry: npm test -- --passWithNoTests --watchAll=false
+        types_or: [ts, tsx, javascript, jsx]
+        files: "^jasmine-webui/"
+
+      - id: gen_sql_parser
+        name: gen_sql_parser
+        stages: [commit]
+        language: system
+        entry: python jasmine-sql/setup.py gen_parser
+        types: [python]
+        pass_filenames: false
+        files: "^jasmine-sql/"
+
+      - id: isort
+        name: isort
+        stages: [commit]
+        language: system
+        entry: isort
+        types: [python]
+        files: "^jasmine-(sql|webserver)/"
+
+      - id: black
+        name: black
+        stages: [commit]
+        language: system
+        entry: black
+        types: [python]
+        files: "^jasmine-(sql|webserver)/"
+
+      - id: flake8
+        name: flake8
+        stages: [commit]
+        language: system
+        entry: flake8
+        types: [python]
+        exclude: 'setup.py'
+        files: "^jasmine-(sql|webserver)/"
+
+      - id: mypy
+        name: mypy
+        stages: [commit]
+        language: system
+        entry: mypy
+        types: [python]
+        pass_filenames: false
+        files: "^jasmine-(sql|webserver)/"
+
+      - id: pytest
+        name: pytest
+        stages: [commit]
+        language: system
+        entry: pytest
+        types: [python]
+        files: "^jasmine-(sql|webserver)/"

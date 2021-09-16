@@ -1,0 +1,5 @@
+jasmine-webui/build/**/*
+jasmine-webui/node_modules/**/*
+jasmine-webui/**/*.min.*
+jasmine-webserver/**/*
+jasmine-sql/**/*

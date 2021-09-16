@@ -1,0 +1,10 @@
+{
+    "extends": [
+        "react-app",
+        "react-app/jest"
+    ],
+    "excludedFiles": [
+        "**/build/**",
+        "**/node_modules/**"
+    ]
+}

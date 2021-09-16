@@ -1,0 +1,21 @@
+Approximate list of changes from originals:
+- Convert C++-style header comments to python
+- Change ternary conditionals to python `true if cond then false` format
+- All ` && `s => ` and `s
+- All '{!'s  => `{not `s
+- Add self.*
+- Change `setType()` to `self.type = `
+- Remove `;`s
+- inVersionComment => self.inVersionComment, emitDot() => self.emitDot()
+- isSqlModeActive => self.isSqlModeActive
+- serverVersion => self.serverVersion
+- getText => self.getText
+
+- `= determine` => `= self.determine`
+    - determineNumericType, determineFunction
+- checkVersion => self.checkVersion
+- checkCharset => self.checkCharset
+- determineFunction(*_SYMBOL) => determineFunction(self.*_SYMBOL)
+- Refactor query into `sqlProgram` and `statement` to handle multiple statements in a file.
+
+This brings us to the initial commit. Use git log to see all future changes, upgrades, and improvements.

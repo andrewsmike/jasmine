@@ -1,0 +1,45 @@
+.App {
+    text-align: center;
+    display: flex;
+    height: 100vh;
+    flex-direction: column;
+}
+
+.header-navbar {
+    background-color: #1abc9c;
+    /*
+    text-align: left;
+    font-size: calc(12px + 2vh);
+    padding: 15px;
+    color: black; */
+}
+/*
+@media only screen and (min-size: 768px) .header-navbar a {
+    font-size: calc(12px + 1vh);
+}*/
+
+.header-navbar img {
+    height: calc(20px + 1vh);
+    width: calc(20px + 1vh);
+    padding-right: 5px;
+}
+
+.header-navbar .container .collapse .nav-link {
+    text-decoration: none;
+    color: black;
+}
+/*
+.header-navbar .navbar-nav {
+    display: inline;
+}
+*/
+.content {
+    flex-grow: 1;
+    background-color: #282c34;
+    justify-content: center;
+}
+
+.Home,
+.About {
+    color: white;
+}
