@@ -12,6 +12,7 @@ from sqlalchemy.orm import relationship
 
 from jasmine.webserver.models.model_registry import orm_registry
 
+
 @orm_registry.mapped
 class Organization:
     __tablename__ = "organizations"
@@ -53,7 +54,7 @@ class User:
     )
 
     organization = relationship("Organization", backref="users")
-    default_project = relationship("User", backref="users_using_as_default")
+    default_project = relationship("Project", backref="users_using_as_default")
 
 
 team_membership = Table(

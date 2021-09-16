@@ -3,18 +3,8 @@ from typing import Optional
 
 from ariadne import ObjectType
 
-from jasmine.sql.pretty_print import pretty_printed_sql_str
-from jasmine.webserver.app_base import app_db_engine_session
 from jasmine.webserver.graphql_models.query import with_sqla_session
-from jasmine.webserver.models import (
-    Backend,
-    Organization,
-    Project,
-    Query,
-    Team,
-    User,
-    orm_registry,
-)
+from jasmine.webserver.models import Project, Query, User
 from jasmine.webserver.random_phrase import random_hex, random_phrase
 
 mutation_type_defs = """

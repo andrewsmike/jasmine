@@ -2,8 +2,8 @@ from functools import wraps
 from typing import Optional
 
 from ariadne import ObjectType
-
 from jasmine.sql.pretty_print import pretty_printed_sql_str
+
 from jasmine.webserver.app_base import app_db_engine_session
 from jasmine.webserver.models import (
     Backend,
