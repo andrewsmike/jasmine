@@ -25,6 +25,7 @@ from sqlalchemy.orm import registry
 
 orm_registry = registry()
 
+
 def orm_model(cls):
     """
     Stand-in for @orm_registry.mapped.
