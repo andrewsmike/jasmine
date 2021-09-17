@@ -1,6 +1,6 @@
+from enum import Enum
+
 from sqlalchemy import (
-    BigInteger,
-    Column,
     ForeignKeyConstraint,
     Index,
     PrimaryKeyConstraint,
@@ -8,9 +8,15 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
+from sqlalchemy import Enum as EnumColumn
+from sqlalchemy import JSON, BigInteger, Column
 from sqlalchemy.orm import relationship
 
 from jasmine.webserver.models.model_registry import orm_registry
+
+
+class BackendType(Enum):
+    mysql = 1
 
 
 @orm_registry.mapped
@@ -19,8 +25,11 @@ class Backend:
 
     backend_id = Column(BigInteger, nullable=False)
     name = Column(String(length=64), nullable=False)
+
+    backend_type = Column(EnumColumn(BackendType), nullable=False)
+    spec = Column(JSON, nullable=False)
+
     organization_id = Column(BigInteger, nullable=False)
-    # TODO: What specifies a backend?
 
     __table_args__ = (
         PrimaryKeyConstraint("backend_id"),

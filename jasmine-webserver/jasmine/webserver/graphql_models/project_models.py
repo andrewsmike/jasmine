@@ -1,10 +1,10 @@
-from ariadne import ObjectType
-
 project_models_type_defs = """
 type Backend {
     backend_id: ID!
     organization: Organization!
     name: String!
+    backend_type: String!
+    spec: JSON!
     projects: [Project]!
 }
 
