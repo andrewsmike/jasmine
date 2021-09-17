@@ -8,9 +8,6 @@ from jasmine.webserver.models import Project, Query, User
 from jasmine.webserver.random_phrase import random_hex, random_phrase
 
 mutation_type_defs = """
-
-scalar JSON
-
 interface OperationResult {
     success: Boolean!
     error: String

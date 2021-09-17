@@ -16,29 +16,31 @@ from jasmine.webserver.models import (
 )
 
 query_type_defs = """
-    type Query {
-        "Defaults to current user's organization."
-        organization(id: ID): Organization!
+scalar JSON
 
-        "Defaults to current user."
-        user(id: ID): User!
+type Query {
+    "Defaults to current user's organization."
+    organization(id: ID): Organization!
 
-        team(id: ID!): Team!
-        backend(id: ID!): Backend!
-        project(id: ID!): Project!
+    "Defaults to current user."
+    user(id: ID): User!
 
-        sql_query(id: ID!): SqlQuery!
+    team(id: ID!): Team!
+    backend(id: ID!): Backend!
+    project(id: ID!): Project!
 
-        "Defaults to the current organization."
-        sql_query_from_path(
-            project_name: String!,
-            query_path: String!,
-            organization_id: ID
-        ): SqlQuery!
+    sql_query(id: ID!): SqlQuery!
 
-        "Get an autoformatted version of the given SQL query."
-        formatted_query_text(query_text: String!): String!
-    }
+    "Defaults to the current organization."
+    sql_query_from_path(
+        project_name: String!,
+        query_path: String!,
+        organization_id: ID
+    ): SqlQuery!
+
+"Get an autoformatted version of the given SQL query."
+formatted_query_text(query_text: String!): String!
+}
 """
 query_obj = ObjectType("Query")
 
@@ -49,10 +51,12 @@ def with_sqla_session(func):
         engine, session = app_db_engine_session(orm_registry)
 
         try:
-            return func(session, obj, info, *args, **kwargs)
+            result = func(session, obj, info, *args, **kwargs)
             session.commit()
+            return result
         except Exception as e:
             session.rollback()
+            raise e
 
     return wrapped
 
