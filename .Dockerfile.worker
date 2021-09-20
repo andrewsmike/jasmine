@@ -1,0 +1,20 @@
+FROM python:3.9.7
+
+RUN mkdir -p /opt/jasmine-sql
+RUN mkdir -p /opt/jasmine-etl
+WORKDIR /opt/jasmine-etl
+
+RUN apt-get update
+
+# These are overwritten when docker-compose mounts live volumes.
+COPY jasmine-etl /opt/jasmine-etl/
+COPY jasmine-sql /opt/jasmine-sql/
+
+# TODO: Replace with docker-requirements.txt.
+RUN pip install -e '.[dev]'
+RUN pip install -e '../jasmine-sql[dev]'
+
+COPY ./config/dev/jasmine_worker.cfg /root/.jasmine_worker.cfg
+COPY ./config/dev/launch_celery.sh /opt/launch_celery.sh
+
+CMD ["/opt/launch_celery.sh"]

@@ -10,7 +10,6 @@ services:
     volumes:
       - "./jasmine-webui:/opt/jasmine-webui"
 
-
   database:
     image: mysql:8.0.22
     command: --default-authentication-plugin=mysql_native_password
@@ -22,6 +21,29 @@ services:
     ports:
       - "3305:3306"
 
+  worker_router:
+    image: rabbitmq:3.9-management
+    environment:
+        - RABBITMQ_DEFAULT_USER=username
+        - RABBITMQ_DEFAULT_PASS=password
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+
+  workers:
+    build:
+      context: .
+      dockerfile: .Dockerfile.worker
+    volumes:
+      - "./jasmine-sql:/opt/jasmine-sql"
+      - "./jasmine-etl:/opt/jasmine-etl"
+      - "./config/dev/jasmine_worker.cfg:/root/.jasmine_worker.cfg:ro"
+      - "./config/dev/launch_celery.sh:/opt/launch_celery.sh"
+    ports:
+    - "5555:5555"
+    depends_on:
+      - database
+      - worker_router
 
   backend:
     build:
@@ -32,11 +54,12 @@ services:
     volumes:
       - "./jasmine-webserver:/opt/jasmine-webserver"
       - "./jasmine-sql:/opt/jasmine-sql"
+      - "./jasmine-etl:/opt/jasmine-etl"
       - "./config/dev/jasmine_webserver.cfg:/root/.jasmine_webserver.cfg:ro"
-      - "./config/dev/jasmine_webserver.cfg:/opt/jasmine-webserver/jasmine_webserver.cfg:ro"
+      - "./config/dev/jasmine_worker.cfg:/root/.jasmine_worker.cfg:ro"
     depends_on:
       - database
-
+      - workers
 
   nginx:
     image: nginx:stable

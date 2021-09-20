@@ -39,7 +39,7 @@ repos:
         language: system
         entry: isort
         types: [python]
-        files: "^jasmine-(sql|webserver)/"
+        files: "^jasmine-(sql|webserver|etl)/"
 
       - id: black
         name: black
@@ -47,7 +47,7 @@ repos:
         language: system
         entry: black
         types: [python]
-        files: "^jasmine-(sql|webserver)/"
+        files: "^jasmine-(sql|webserver|etl)/"
 
       - id: flake8
         name: flake8
@@ -56,7 +56,7 @@ repos:
         entry: flake8
         types: [python]
         exclude: 'setup.py'
-        files: "^jasmine-(sql|webserver)/"
+        files: "^jasmine-(sql|webserver|etl)/"
 
       - id: mypy
         name: mypy
@@ -65,7 +65,7 @@ repos:
         entry: mypy
         types: [python]
         pass_filenames: false
-        files: "^jasmine-(sql|webserver)/"
+        files: "^jasmine-(sql|webserver|etl)/"
 
       - id: pytest
         name: pytest
@@ -73,4 +73,4 @@ repos:
         language: system
         entry: pytest
         types: [python]
-        files: "^jasmine-(sql|webserver)/"
+        files: "^jasmine-(sql|webserver|etl)/"

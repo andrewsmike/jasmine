@@ -27,6 +27,9 @@ Useful links
 - `mysql://127.0.0.1:3305`: The webapp's database server.
 - `http://localhost:8001`: Direct access to the npm development webserver.
 - `http://localhost:8002`: Direct access to the GraphQL webserver.
+- `http://localhost:5555/`: Task manager (celery) monitoring app ("flowey"). You can see task arguments, status, and results here.
+- `http://localhost:15672`: Worker router (RabbitMQ) monitoring app. (Username/pass: 'username'/'password').
+
 
 Maintenance
 ===========
@@ -45,11 +48,12 @@ jasmine-webserver/ $ alembic upgrade head
 Architecture
 ============
 Jasmine is split into a few components:
+- Nginx: Reverse proxies requests between the jasmine-webui's npm static resource server and jasmine-webserver's python/uvicorn GraphQL API server.
 - Webapp: The React and Material-UI based frontend. Uses typescript, the Apollo GraphQL client, and a variety of other packages.
     Served using `npm start` from the `jasmine-webui` directory and is responsible for most static resources.
-- Nginx: Reverse proxies requests between the jasmine-webui's npm static resource server and jasmine-webserver's python/uvicorn API server.
     Config in `config/dev/nginx.config`.
-- API: The Ariadne GraphQL based python webserver. Services API calls, as well as the GraphQL API debugging webapp.
+- GraphQL API: The Ariadne GraphQL based python webserver. Services API calls, as well as the GraphQL API debugging webapp.
     Served using uvicorn, located in the `jasmine-webserver/` directory, and connects to the database.
-- Database: MySQL based database.
+- Database: MySQL backend database.
+- Jasmine-ETL: RabbitMQ-based celery worker pool for running ETL and management jobs. Includes celery beat cron-like scheduler.
 - jasmine-sql: Utility package for SQL manipulation.
