@@ -7,7 +7,6 @@ from os import getenv
 from os.path import expanduser
 from typing import Any
 
-from flask import Flask
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
@@ -28,17 +27,6 @@ def app_config() -> ConfigParser:
     config_parser.read(config_file_paths)
 
     return config_parser
-
-
-def debug_mode():
-    return bool(
-        int(
-            getenv(
-                "DEBUG",
-                app_config()["flask"].get("DEBUG", "0"),
-            )
-        )
-    )
 
 
 def sqla_uri_from_config_section(config_section) -> str:
