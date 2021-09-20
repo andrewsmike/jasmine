@@ -1,5 +1,9 @@
 Jasmine Web: Putting the 'T' in 'ETL'.
 ==================================
+[![Imports: isort](https://img.shields.io/badge/%20imports-isort-%231674b1?style=flat&labelColor=ef8336)](https://pycqa.github.io/isort/)
+[![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
+[![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
+
 Jasmine Web is a web-app and backend service that automatically translates your SQL queries into optimized ETL patterns.
 Jasmine is uses a variety of ETL strategies, along with a SQL manipulation library, to make your analyses easy, near-realtime, and performant.
 
