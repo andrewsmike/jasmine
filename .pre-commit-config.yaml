@@ -20,8 +20,9 @@ repos:
         name: npm-test
         stages: [commit]
         language: system
-        entry: npm test -- --passWithNoTests --watchAll=false
+        entry: bash -c 'cd jasmine-webui && npm test -- --passWithNoTests --watchAll=false'
         types_or: [ts, tsx, javascript, jsx]
+        pass_filenames: false
         files: "^jasmine-webui/"
 
       - id: gen_sql_parser

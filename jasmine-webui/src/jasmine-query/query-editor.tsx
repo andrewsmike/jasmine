@@ -5,13 +5,16 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
 import TextField from "@material-ui/core/TextField";
+import FeedbackIcon from "@material-ui/icons/Feedback";
 import FlashAuto from "@material-ui/icons/FlashAuto";
 import SaveIcon from "@material-ui/icons/Save";
 import SettingsIcon from "@material-ui/icons/Settings";
 import { useState } from "react";
+import { useDispatch } from "react-redux";
 import { Prompt } from "react-router";
 
 import SqlEditor from "jasmine-query/sql-editor";
+import { toggleFeedback } from "jasmine-query/state";
 
 const useStyles = makeStyles((theme) => ({
     editorPaper: {
@@ -39,6 +42,9 @@ const useStyles = makeStyles((theme) => ({
         paddingLeft: theme.spacing(2),
         paddingRight: theme.spacing(2),
         minWidth: "0%",
+    },
+    feedbackButton: {
+        marginLeft: theme.spacing(1.5),
     },
     queryBar: {
         display: "flex",
@@ -83,7 +89,9 @@ export default function JasmineQuery({
     queryText: string;
     refetchQueries: any[];
 }) {
+    const dispatch = useDispatch();
     const classes = useStyles();
+
     const narrowMode = useMediaQuery((theme: any) =>
         theme.breakpoints.down("sm")
     );
@@ -143,6 +151,13 @@ export default function JasmineQuery({
                         variant="contained"
                     >
                         <SettingsIcon fontSize="medium" />
+                    </Button>
+                    <Button
+                        className={classes.feedbackButton}
+                        variant="contained"
+                        onClick={() => dispatch(toggleFeedback())}
+                    >
+                        <FeedbackIcon fontSize="medium" />
                     </Button>
                 </div>
 

@@ -2,6 +2,7 @@ import { gql, useQuery } from "@apollo/client";
 import { useLocation } from "react-router-dom";
 
 import QueryEditor from "jasmine-query/query-editor";
+import QueryFeedbackBar from "jasmine-query/query-feedback-bar";
 
 const sqlQueryFromPathQuery = gql`
     query SqlQuery(
@@ -113,12 +114,15 @@ export default function JasmineQuery() {
     } = queryData;
 
     return (
-        <QueryEditor
-            queryId={queryId}
-            projectName={projectName}
-            queryPath={queryPath}
-            queryText={queryText}
-            refetchQueries={[sqlQueryFromIdQuery, sqlQueryFromPathQuery]}
-        />
+        <>
+            <QueryEditor
+                queryId={queryId}
+                projectName={projectName}
+                queryPath={queryPath}
+                queryText={queryText}
+                refetchQueries={[sqlQueryFromIdQuery, sqlQueryFromPathQuery]}
+            />
+            <QueryFeedbackBar queryId={queryId} queryText={queryText} />
+        </>
     );
 }
