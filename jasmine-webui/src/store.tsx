@@ -3,21 +3,21 @@ import { configureStore } from "@reduxjs/toolkit";
 
 import { appAction, appReducer, appState } from "jasmine-web/state-reducers";
 import {
-    queryAction,
-    queryReducer,
-    queryState,
-} from "jasmine-query/state-reducers";
+    viewAction,
+    viewReducer,
+    viewState,
+} from "jasmine-view/state-reducers";
 
 export type rootState = {
     app: appState;
-    query: queryState;
+    view: viewState;
 };
 
-export type rootAction = appAction | queryAction;
+export type rootAction = appAction | viewAction;
 
 const rootReducer = combineReducers({
     app: appReducer,
-    query: queryReducer,
+    view: viewReducer,
 });
 
 export default configureStore({

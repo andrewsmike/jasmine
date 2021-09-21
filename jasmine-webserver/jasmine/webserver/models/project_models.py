@@ -1,22 +1,17 @@
-from enum import Enum
-
 from sqlalchemy import (
+    JSON,
+    BigInteger,
+    Column,
+    Enum,
     ForeignKeyConstraint,
     Index,
     PrimaryKeyConstraint,
     String,
-    Text,
     UniqueConstraint,
 )
-from sqlalchemy import Enum as EnumColumn
-from sqlalchemy import JSON, BigInteger, Column
 from sqlalchemy.orm import relationship
 
 from jasmine.webserver.models.model_registry import orm_registry
-
-
-class BackendType(Enum):
-    mysql = 1
 
 
 @orm_registry.mapped
@@ -26,7 +21,7 @@ class Backend:
     backend_id = Column(BigInteger, nullable=False)
     name = Column(String(length=64), nullable=False)
 
-    backend_type = Column(EnumColumn(BackendType), nullable=False)
+    backend_type = Column(Enum("mysql"), nullable=False)
     spec = Column(JSON, nullable=False)
 
     organization_id = Column(BigInteger, nullable=False)
@@ -72,30 +67,29 @@ class Project:
 
 
 @orm_registry.mapped
-class Query:
-    __tablename__ = "queries"
+class View:
+    __tablename__ = "views"
 
-    query_id = Column(BigInteger, nullable=False)
+    view_id = Column(BigInteger, nullable=False)
 
-    query_text = Column(Text, nullable=False)
+    view_type = Column(Enum("query"), nullable=False)
 
-    # Everything starts as 'scratch/2021-09-01 baby avocado'
-    # or maybe 'scratch/2021-09-01 43252352'.
-    # All renames must move query out of scratch.
+    spec = Column(JSON, nullable=False)
+
+    # Everything starts as '[proj]/scratch/baby_avocado'
     path = Column(String(256), nullable=False)
     project_id = Column(BigInteger, nullable=False)
 
     __table_args__ = (
-        PrimaryKeyConstraint("query_id"),
+        PrimaryKeyConstraint("view_id"),
         UniqueConstraint("project_id", "path"),
         ForeignKeyConstraint(["project_id"], ["projects.project_id"]),
     )
 
-    project = relationship("Project", backref="queries")
+    project = relationship("Project", backref="views")
 
 
 """
-# TBD
 MaterializationType = Enum("view")
 
 @orm_registry.mapped

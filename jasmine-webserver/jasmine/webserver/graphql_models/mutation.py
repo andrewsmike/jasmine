@@ -4,7 +4,7 @@ from typing import Optional
 from ariadne import ObjectType
 
 from jasmine.webserver.graphql_models.query import with_sqla_session
-from jasmine.webserver.models import Project, Query, User
+from jasmine.webserver.models import Project, User, View
 from jasmine.webserver.random_phrase import random_hex, random_phrase
 
 mutation_type_defs = """
@@ -38,10 +38,10 @@ type ProjectResult implements OperationResult {
     error: String
     result: Project
 }
-type SqlQueryResult implements OperationResult {
+type ViewResult implements OperationResult {
     success: Boolean!
     error: String
-    result: SqlQuery
+    result: View
 }
 
 type Mutation {
@@ -68,11 +68,12 @@ type Mutation {
     delete_project(id: ID!): ProjectResult!
     update_project_name(id: ID!, new_name: String!): ProjectResult!
 
-    create_query(project_id: ID, path: String, query_text: String): SqlQueryResult!
-    delete_query(id: ID!): SqlQueryResult!
-    update_query_path(id: ID!, path: String!): SqlQueryResult!
-    update_query_text(id: ID!, query_text: String!): SqlQueryResult!
-    copy_query(id: ID!, new_path: String): SqlQueryResult!
+    create_query(project_id: ID, path: String, query_text: String): ViewResult!
+    update_query_text(id: ID!, query_text: String!): ViewResult!
+
+    delete_view(id: ID!): ViewResult!
+    update_view_path(id: ID!, path: String!): ViewResult!
+    copy_view(id: ID!, new_path: String): ViewResult!
 }
 """
 mutation_obj = ObjectType("Mutation")
@@ -80,8 +81,8 @@ mutation_obj = ObjectType("Mutation")
 MAX_ATTEMPTS = 64
 
 
-def random_query_path(project: Project):
-    paths = {query.path for query in project.queries}
+def random_view_path(project: Project):
+    paths = {view.path for view in project.views}
 
     for i in range(MAX_ATTEMPTS):
         random_path = f"scratch/{random_phrase(short=True)}_{random_hex(4)}"
@@ -122,7 +123,7 @@ def create_query(
     project_id: Optional[int] = None,
     path: Optional[str] = None,
     query_text: Optional[str] = None,
-):
+) -> View:
     # Temporary.
     user = session.query(User).where(User.user_id == 1).first()
 
@@ -131,7 +132,7 @@ def create_query(
     ), "User must have default project configured."
 
     if path is None:
-        path = random_query_path(user.default_project)
+        path = random_view_path(user.default_project)
 
     if query_text is None:
         query_text = ""
@@ -139,10 +140,11 @@ def create_query(
     assert path is not None  # For MyPy.
     assert query_text is not None  # For MyPy.
 
-    query = Query(
+    query = View(
         project_id=user.default_project_id,
-        query_text=query_text,
+        view_type="query",
         path=path,
+        spec={"query_text": query_text, "view_type": "query"},
     )
 
     session.add(query)
@@ -155,11 +157,14 @@ def create_query(
 @with_sqla_session
 def update_query_text(
     session, obj, info, id: Optional[int] = None, query_text: Optional[str] = None
-) -> Query:
+) -> View:
     assert query_text is not None
     assert len(query_text) < 2 ** 16, "Query text must be < 65536 characters."
 
-    query = session.query(Query).where(Query.query_id == id).first()
-    query.query_text = query_text
+    query = session.query(View).where(View.view_id == id).first()
+
+    new_spec = dict(query.spec)
+    new_spec["query_text"] = query_text
+    query.spec = new_spec
 
     return query

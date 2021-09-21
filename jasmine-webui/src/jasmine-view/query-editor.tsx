@@ -13,8 +13,8 @@ import { useState } from "react";
 import { useDispatch } from "react-redux";
 import { Prompt } from "react-router";
 
-import SqlEditor from "jasmine-query/sql-editor";
-import { toggleFeedback } from "jasmine-query/state";
+import SqlEditor from "jasmine-view/sql-editor";
+import { toggleFeedback } from "jasmine-view/state";
 
 const useStyles = makeStyles((theme) => ({
     editorPaper: {
@@ -23,7 +23,6 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         margin: "10px",
         padding: "10px",
-        /*flexBasis: 'auto',*/
     },
     queryPathBox: {
         flexGrow: 1,
@@ -31,7 +30,6 @@ const useStyles = makeStyles((theme) => ({
     },
     saveButton: {
         marginLeft: "auto",
-        //marginLeft: theme.spacing(2),
     },
     formatButton: {
         marginLeft: theme.spacing(1.5),
@@ -59,12 +57,16 @@ const saveSqlQueryText = gql`
             success
             error
             result {
-                query_id
+                view_id
                 project {
                     name
                 }
                 path
-                query_text
+                spec {
+                    ... on QuerySpec {
+                        query_text
+                    }
+                }
             }
         }
     }

@@ -37,36 +37,41 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-interface QueryDirectoryArgs {
+interface ViewDirectoryArgs {
     organizationId: number;
 }
 
-interface QueryDirectoryProject {
+type ViewType = "query";
+
+interface ViewDirectoryProject {
     name: string;
-    queries: {
-        query_id: number;
+    views: {
+        view_id: number;
+        view_type: ViewType;
         path: string;
     }[];
 }
-interface QueryDirectoryData {
+interface ViewDirectoryData {
     organization: {
-        projects: QueryDirectoryProject[];
+        projects: ViewDirectoryProject[];
     };
 }
 
-const queryDirectoryQueries = gql`
-    query orgQueryDirectory($organizationId: ID!) {
+const viewDirectoryQuery = gql`
+    query orgViewDirectory($organizationId: ID!) {
         organization(id: $organizationId) {
             projects {
                 name
-                queries {
-                    query_id
+                views {
+                    view_id
+                    view_type
                     path
                 }
             }
         }
     }
 `;
+
 function treeViewFromDirectory(
     directory: RecursiveMap<number>,
     path: string[],
@@ -105,15 +110,15 @@ function treeViewFromDirectory(
 }
 
 function projectDirectoryTreeItems(
-    project: QueryDirectoryProject,
+    project: ViewDirectoryProject,
     className: string
 ): ReactNode {
-    const queryIdDirectory = unflattenedMap(
-        mapFromArray(project.queries, (query) => [query.path, query.query_id])
+    const viewIdDirectory = unflattenedMap(
+        mapFromArray(project.views, (view) => [view.path, view.view_id])
     );
     const projectName = "[" + project.name + "]";
 
-    return treeViewFromDirectory(queryIdDirectory, [projectName], className);
+    return treeViewFromDirectory(viewIdDirectory, [projectName], className);
 }
 
 export default function JasmineNavBar() {
@@ -124,15 +129,13 @@ export default function JasmineNavBar() {
     const organizationId = 1;
 
     const { loading, error, data } = useQuery<
-        QueryDirectoryData,
-        QueryDirectoryArgs
-    >(queryDirectoryQueries, { variables: { organizationId } });
+        ViewDirectoryData,
+        ViewDirectoryArgs
+    >(viewDirectoryQuery, { variables: { organizationId } });
 
-    const directoryOpenQuery = (event: any, queryDirPath: string) => {
-        if (queryDirPath.startsWith("leaf:")) {
-            history.push(
-                "/console/query/" + queryDirPath.slice("leaf:".length)
-            );
+    const directoryOpenView = (event: any, viewDirPath: string) => {
+        if (viewDirPath.startsWith("leaf:")) {
+            history.push("/console/view/" + viewDirPath.slice("leaf:".length));
             dispatch(toggleNavbar());
         }
     };
@@ -148,7 +151,7 @@ export default function JasmineNavBar() {
             className={classes.root}
             defaultCollapseIcon={<ExpandMoreIcon />}
             defaultExpandIcon={<ExpandLessIcon />}
-            onNodeSelect={directoryOpenQuery}
+            onNodeSelect={directoryOpenView}
         >
             {data &&
                 data.organization.projects.map((item) =>

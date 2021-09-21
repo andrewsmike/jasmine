@@ -12,12 +12,16 @@ const createSqlQuery = gql`
             success
             error
             result {
-                query_id
+                view_id
                 project {
                     name
                 }
                 path
-                query_text
+                spec {
+                    ... on QuerySpec {
+                        query_text
+                    }
+                }
             }
         }
     }
@@ -39,13 +43,13 @@ export default function CreateQueryButton() {
     );
 
     const [createSqlQueryMutation] = useMutation(createSqlQuery, {
-        refetchQueries: ["orgQueryDirectory"],
+        refetchQueries: ["orgViewDirectory"],
         variables: {},
         onCompleted: (data) => {
             const projectName = data.create_query.result.project.name;
             const queryPath = data.create_query.result.path;
             const fullQueryPath = "[" + projectName + "]/" + queryPath;
-            history.push("/console/query/" + fullQueryPath);
+            history.push("/console/view/" + fullQueryPath);
         },
     });
 

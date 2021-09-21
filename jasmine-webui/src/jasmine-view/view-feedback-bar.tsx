@@ -9,7 +9,7 @@ import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import WarningTwoToneIcon from "@material-ui/icons/WarningTwoTone";
 import { useDispatch, useSelector } from "react-redux";
 
-import { selectFeedbackCollapsed, toggleFeedback } from "jasmine-query/state";
+import { selectFeedbackCollapsed, toggleFeedback } from "jasmine-view/state";
 
 const useStyles = makeStyles((theme) => ({
     drawer: {
@@ -34,13 +34,7 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function QueryFeedbackBar({
-    queryId,
-    queryText,
-}: {
-    queryId: number;
-    queryText: string;
-}) {
+export default function ViewFeedbackBar({ viewId }: { viewId: number }) {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -97,7 +91,7 @@ export default function QueryFeedbackBar({
                 classes={{ paper: classes.drawerPaper }}
             >
                 <Typography variant="h5" className={classes.feedbackTitle}>
-                    Query Warnings
+                    View Warnings
                 </Typography>
                 {content}
             </Drawer>

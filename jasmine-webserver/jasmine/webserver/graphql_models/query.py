@@ -9,9 +9,9 @@ from jasmine.webserver.models import (
     Backend,
     Organization,
     Project,
-    Query,
     Team,
     User,
+    View,
     orm_registry,
 )
 
@@ -29,14 +29,14 @@ type Query {
     backend(id: ID!): Backend!
     project(id: ID!): Project!
 
-    sql_query(id: ID!): SqlQuery!
+    view(id: ID!): View!
 
     "Defaults to the current organization."
-    sql_query_from_path(
+    view_from_path(
         project_name: String!,
-        query_path: String!,
+        view_path: String!,
         organization_id: ID
-    ): SqlQuery!
+    ): View!
 
 "Get an autoformatted version of the given SQL query."
 formatted_query_text(query_text: String!): String!
@@ -93,29 +93,29 @@ def resolve_project(session, obj, info, id: int) -> Project:
     return session.query(Project).where(Project.project_id == id).first()
 
 
-@query_obj.field("sql_query")
+@query_obj.field("view")
 @with_sqla_session
-def resolve_sql_query(session, obj, info, id: int) -> Query:
-    return session.query(Query).where(Query.query_id == id).first()
+def resolve_view(session, obj, info, id: int) -> View:
+    return session.query(View).where(View.view_id == id).first()
 
 
-@query_obj.field("sql_query_from_path")
+@query_obj.field("view_from_path")
 @with_sqla_session
 def resolve_sql_query_from_path(
     session,
     obj,
     info,
     project_name: str,
-    query_path: str,
+    view_path: str,
     organization_id: Optional[int],
-) -> Query:
+) -> View:
     assert organization_id is not None
     return (
-        session.query(Query)
-        .join(Query.project)
+        session.query(View)
+        .join(View.project)
         .where(Project.name == project_name)
         .where(Project.organization_id == int(organization_id))
-        .where(Query.path == query_path)
+        .where(View.path == view_path)
     ).first()
 
 

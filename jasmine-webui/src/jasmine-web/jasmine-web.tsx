@@ -10,7 +10,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import HomePage from "home-page";
 import JasmineAppBar from "jasmine-web/app-bar";
 import JasmineNavBar from "jasmine-web/nav-bar";
-import JasmineQuery from "jasmine-query/jasmine-query";
+import JasmineView from "jasmine-view/jasmine-view";
 
 const useStyles = makeStyles((theme) => ({
     navBarSplit: {
@@ -52,8 +52,8 @@ export default function App() {
                     <JasmineNavBar />
                     <Switch>
                         <Route path="/console/about">About!</Route>
-                        <Route path="/console/query/:id">
-                            <JasmineQuery />
+                        <Route path="/console/view/:id">
+                            <JasmineView />
                         </Route>
                         <Route path="/console">
                             <HomePage />
