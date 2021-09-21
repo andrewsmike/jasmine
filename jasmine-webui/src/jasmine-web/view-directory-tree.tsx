@@ -1,10 +1,11 @@
 import { gql, useQuery } from "@apollo/client";
-import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
-import ExpandLessIcon from "@material-ui/icons/ExpandLess";
-import TreeView from "@material-ui/lab/TreeView";
-import TreeItem from "@material-ui/lab/TreeItem";
 import { makeStyles } from "@material-ui/core/styles";
 import Typography from "@material-ui/core/Typography";
+import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
+import ExpandLessIcon from "@material-ui/icons/ExpandLess";
+import DescriptionOutlinedIcon from "@material-ui/icons/DescriptionOutlined";
+import TreeView from "@material-ui/lab/TreeView";
+import TreeItem from "@material-ui/lab/TreeItem";
 import { useHistory } from "react-router-dom";
 import { ReactNode } from "react";
 import { useDispatch } from "react-redux";
@@ -34,6 +35,10 @@ const useStyles = makeStyles((theme) => ({
         [theme.breakpoints.up("md")]: {
             fontSize: theme.typography.pxToRem(16),
         },
+    },
+    classTypeIcon: {
+        fontSize: "1em",
+        marginRight: theme.spacing(0.5),
     },
 }));
 
@@ -73,22 +78,29 @@ const viewDirectoryQuery = gql`
 `;
 
 function treeViewFromDirectory(
-    directory: RecursiveMap<number>,
+    directory: RecursiveMap<[string, number]>,
     path: string[],
-    className: string
+    labelClassName: string,
+    iconClassName: string
 ): ReactNode {
     const name = path.at(-1);
     const pathStr = path.join("/");
 
-    const label = <Typography className={className}> {name} </Typography>;
-
     if (directory instanceof Map) {
         const children = arrayFromMap(directory, (subdir, subdirItems) =>
-            treeViewFromDirectory(subdirItems, path.concat([subdir]), className)
+            treeViewFromDirectory(
+                subdirItems,
+                path.concat([subdir]),
+                labelClassName,
+                iconClassName
+            )
+        );
+        const label = (
+            <Typography className={labelClassName}> {name} </Typography>
         );
         return (
             <TreeItem
-                classes={{ label: className }}
+                classes={{ label: labelClassName }}
                 key={pathStr}
                 nodeId={"dir:" + pathStr}
                 label={label}
@@ -98,9 +110,27 @@ function treeViewFromDirectory(
             </TreeItem>
         );
     } else {
+        const [viewType] = directory;
+
+        const viewTypeIcon = {
+            query: (
+                <DescriptionOutlinedIcon
+                    className={iconClassName}
+                    color="primary"
+                />
+            ),
+        }[viewType];
+
+        const label = (
+            <Typography className={labelClassName}>
+                {viewTypeIcon}
+                {name}
+            </Typography>
+        );
+
         return (
             <TreeItem
-                classes={{ label: className }}
+                classes={{ label: labelClassName }}
                 key={pathStr}
                 nodeId={"leaf:" + pathStr}
                 label={label}
@@ -111,14 +141,23 @@ function treeViewFromDirectory(
 
 function projectDirectoryTreeItems(
     project: ViewDirectoryProject,
-    className: string
+    labelClassName: string,
+    iconClassName: string
 ): ReactNode {
-    const viewIdDirectory = unflattenedMap(
-        mapFromArray(project.views, (view) => [view.path, view.view_id])
+    const viewNodeDirectory = unflattenedMap<RecursiveMap<[string, number]>>(
+        mapFromArray(project.views, (view) => [
+            view.path,
+            [view.view_type, view.view_id],
+        ])
     );
     const projectName = "[" + project.name + "]";
 
-    return treeViewFromDirectory(viewIdDirectory, [projectName], className);
+    return treeViewFromDirectory(
+        viewNodeDirectory,
+        [projectName],
+        labelClassName,
+        iconClassName
+    );
 }
 
 export default function JasmineNavBar() {
@@ -155,7 +194,11 @@ export default function JasmineNavBar() {
         >
             {data &&
                 data.organization.projects.map((item) =>
-                    projectDirectoryTreeItems(item, classes.treeItem)
+                    projectDirectoryTreeItems(
+                        item,
+                        classes.treeItem,
+                        classes.classTypeIcon
+                    )
                 )}
         </TreeView>
     );
