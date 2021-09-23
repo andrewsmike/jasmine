@@ -26,10 +26,11 @@ const useStyles = makeStyles((theme) => ({
     },
     queryPathBox: {
         flexGrow: 1,
-        marginRight: theme.spacing(2),
     },
     saveButton: {
-        marginLeft: "auto",
+        [theme.breakpoints.up("md")]: {
+            marginLeft: "auto",
+        },
     },
     formatButton: {
         marginLeft: theme.spacing(1.5),
@@ -45,9 +46,27 @@ const useStyles = makeStyles((theme) => ({
         marginLeft: theme.spacing(1.5),
     },
     queryBar: {
+        [theme.breakpoints.up("sm")]: {
+            display: "flex",
+            flexDirection: "row",
+            marginBottom: theme.spacing(1),
+        },
+        [theme.breakpoints.down("sm")]: {
+            display: "flex",
+            flexDirection: "column",
+            marginBottom: theme.spacing(1),
+        },
+    },
+    queryButtonBar: {
         display: "flex",
         flexDirection: "row",
-        marginBottom: theme.spacing(1),
+        justifyContent: "space-between",
+        [theme.breakpoints.up("md")]: {
+            marginLeft: theme.spacing(1),
+        },
+        [theme.breakpoints.down("sm")]: {
+            marginTop: theme.spacing(1),
+        },
     },
 }));
 
@@ -94,9 +113,12 @@ export default function JasmineQuery({
     const dispatch = useDispatch();
     const classes = useStyles();
 
+    /*
     const narrowMode = useMediaQuery((theme: any) =>
-        theme.breakpoints.down("sm")
+        theme.breakpoints.down("xs")
     );
+    */
+    const narrowButtonMode = useMediaQuery("(max-width: 420px)");
 
     const [code, setCode] = useState(queryText);
 
@@ -127,40 +149,43 @@ export default function JasmineQuery({
                         value={fullPath}
                         size="small"
                     />
-                    <Button
-                        className={classes.saveButton}
-                        variant="contained"
-                        color="primary"
-                        disabled={codeUnchanged}
-                        onClick={() => saveQueryTextMutation()}
-                        startIcon={narrowMode ? "" : <SaveIcon />}
-                    >
-                        {narrowMode ? <SaveIcon /> : "Save"}
-                    </Button>
-                    <Button
-                        className={classes.formatButton}
-                        variant="contained"
-                        color="secondary"
-                        onClick={() =>
-                            formatQuery({ variables: { queryText: code } })
-                        }
-                        startIcon={narrowMode ? "" : <FlashAuto />}
-                    >
-                        {narrowMode ? <FlashAuto /> : "Autoformat"}
-                    </Button>
-                    <Button
-                        className={classes.settingsButton}
-                        variant="contained"
-                    >
-                        <SettingsIcon fontSize="medium" />
-                    </Button>
-                    <Button
-                        className={classes.feedbackButton}
-                        variant="contained"
-                        onClick={() => dispatch(toggleFeedback())}
-                    >
-                        <FeedbackIcon fontSize="medium" />
-                    </Button>
+                    <div className={classes.queryButtonBar}>
+                        <Button
+                            className={classes.saveButton}
+                            variant="contained"
+                            color="primary"
+                            disabled={codeUnchanged}
+                            onClick={() => saveQueryTextMutation()}
+                            startIcon={narrowButtonMode ? "" : <SaveIcon />}
+                        >
+                            {narrowButtonMode ? <SaveIcon /> : "Save"}
+                        </Button>
+                        <Button
+                            className={classes.formatButton}
+                            variant="contained"
+                            color="secondary"
+                            onClick={() =>
+                                formatQuery({ variables: { queryText: code } })
+                            }
+                            startIcon={narrowButtonMode ? "" : <FlashAuto />}
+                        >
+                            {narrowButtonMode ? <FlashAuto /> : "Autoformat"}
+                        </Button>
+                        <Button
+                            className={classes.settingsButton}
+                            variant="contained"
+                            onClick={() => dispatch(toggleSettings())}
+                        >
+                            <SettingsIcon fontSize="medium" />
+                        </Button>
+                        <Button
+                            className={classes.feedbackButton}
+                            variant="contained"
+                            onClick={() => dispatch(toggleFeedback())}
+                        >
+                            <FeedbackIcon fontSize="medium" />
+                        </Button>
+                    </div>
                 </div>
 
                 <SqlEditor code={code || ""} setCode={setCode} />
