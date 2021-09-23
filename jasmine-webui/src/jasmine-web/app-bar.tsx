@@ -15,6 +15,7 @@ import { toggleNavbar } from "jasmine-web/state";
 const useStyles = makeStyles((theme) => ({
     appBar: {
         maxHeight: 64,
+        position: "relative",
     },
     logoText: {
         flexGrow: 1,
