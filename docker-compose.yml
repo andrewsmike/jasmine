@@ -30,6 +30,11 @@ services:
       - "5672:5672"
       - "15672:15672"
 
+  redis:
+    image: redis:latest
+    ports:
+      - "6379:6379"
+
   workers:
     build:
       context: .
@@ -44,6 +49,7 @@ services:
     depends_on:
       - database
       - worker_router
+      - redis
 
   backend:
     build:
@@ -60,6 +66,7 @@ services:
     depends_on:
       - database
       - workers
+      - redis
 
   nginx:
     image: nginx:stable

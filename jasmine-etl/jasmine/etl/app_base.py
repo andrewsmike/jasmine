@@ -2,12 +2,15 @@
 Initialize flask, config, database connections, auth, graphql, etc.
 """
 from configparser import ConfigParser
+from contextlib import contextmanager
 from functools import cache
 from os import getenv
 from os.path import expanduser
-from typing import Any
+from typing import Any, Optional
 
 from celery import Celery
+from pottery import Redlock
+from redis import Redis
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.orm import Session, scoped_session, sessionmaker
@@ -102,3 +105,54 @@ def app_db_engine_session_maker(orm_registry) -> tuple[Engine, Any]:
 def app_db_engine_session(orm_registry) -> tuple[Engine, Session]:
     engine, session_maker = app_db_engine_session_maker(orm_registry)
     return (engine, session_maker())
+
+
+@cache
+def redis_handle():
+    return Redis.from_url(app_config()["redis"]["url"])
+
+
+DEFAULT_ACQUIRE_TIMEOUT = 1.0  # Seconds.
+
+
+@cache
+def redislock(
+    key: str,
+    task_timeout: int,
+    acquire_timeout: Optional[float] = None,
+):
+    acquire_timeout = acquire_timeout or DEFAULT_ACQUIRE_TIMEOUT
+    assert acquire_timeout is not None  # For MyPy.
+
+    return Redlock(
+        key=key,
+        masters={redis_handle()},
+        raise_on_redis_errors=True,
+        auto_release_time=task_timeout,
+        context_manager_blocking=True,
+        context_manager_timeout=acquire_timeout,
+    )
+
+
+@contextmanager
+def timed_lock(
+    *key_parts_strs: str,
+    task_timeout: int,
+    acquire_timeout: Optional[float] = None,
+):
+    key_str = ":".join(key_parts_strs)
+    lock = redislock(key_str, task_timeout, acquire_timeout=acquire_timeout)
+
+    with lock:
+        yield lock
+
+
+def lock_free(
+    *key_parts_strs: str,
+    task_timeout: int,
+    acquire_timeout: Optional[float] = None,
+):
+    key_str = ":".join(key_parts_strs)
+    lock = redislock(key_str, task_timeout, acquire_timeout)
+
+    return lock.locked()

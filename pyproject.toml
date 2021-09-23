@@ -22,6 +22,6 @@ ignore_missing_imports = true
 exclude = "migrations,autogen,SQLLexer.py,SQLParser.py,SQLParserVisitor.py,SQLParserListener.py"
 
 [tool.pytest.ini_options]
-addopts = "--doctest-modules --ignore-glob=jasmine-webserver/migrations/* --ignore-glob=jasmine-webserver/migrations/versions/*.py --ignore=jasmine-sql/jasmine/sql/parser/autogen --ignore=jasmine-sql/jasmine/sql/parser/SQLLexer.py --ignore=jasmine-sql/jasmine/sql/parser/SQLParser.py --ignore=jasmine-sql/jasmine/sql/parser/SQLParserVisitor.py --ignore=jasmine-sql/jasmine/sql/parser/SQLParserListener.py --ignore=jasmine-webserver/jasmine/webserver/models"
+addopts = "--doctest-modules --ignore-glob=jasmine-webserver/migrations/* --ignore-glob=jasmine-webserver/migrations/versions/*.py --ignore=jasmine-sql/jasmine/sql/parser/autogen --ignore=jasmine-sql/jasmine/sql/parser/SQLLexer.py --ignore=jasmine-sql/jasmine/sql/parser/SQLParser.py --ignore=jasmine-sql/jasmine/sql/parser/SQLParserVisitor.py --ignore=jasmine-sql/jasmine/sql/parser/SQLParserListener.py --ignore=jasmine-webserver/jasmine/webserver/models --ignore=jasmine-etl/jasmine/etl/app.py"
 doctest_optionflags = "ELLIPSIS"
 filterwarnings = "ignore::DeprecationWarning"
