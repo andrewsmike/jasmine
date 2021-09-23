@@ -2,8 +2,6 @@
 Instantiate a global GraphQL server.
 Invoke with `uvicorn jasmine.webserver.app:app`.
 """
-from functools import cache
-
 from ariadne.asgi import GraphQL
 
 from jasmine.webserver.app_base import app_db_engine_session

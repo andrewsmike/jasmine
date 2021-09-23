@@ -1,5 +1,3 @@
-from ariadne import ObjectType
-
 user_models_type_defs = """
 type Organization {
     organization_id: ID!
