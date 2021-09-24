@@ -8,6 +8,11 @@ const useStyles = makeStyles((theme) => ({
         backgroundColor: "#f5f5f5",
         fontFamily:
             "ui-monospace,SFMono-Regular,SF Mono,Consolas,Liberation Mono,Menlo,monospace",
+        minWidth: "470px",
+    },
+    scrollDiv: {
+        overflowX: "auto",
+        overflowY: "auto",
     },
 }));
 
@@ -21,13 +26,15 @@ export default function SqlEditor({
     const classes = useStyles();
 
     return (
-        <CodeEditor
-            value={code}
-            language="sql"
-            placeholder="Enter your SQL query here."
-            onChange={(evn) => setCode(evn.target.value)}
-            className={classes.editor}
-            padding={15}
-        />
+        <div className={classes.scrollDiv}>
+            <CodeEditor
+                value={code}
+                language="sql"
+                placeholder="Enter your SQL query here."
+                onChange={(evn) => setCode(evn.target.value)}
+                className={classes.editor}
+                padding={15}
+            />
+        </div>
     );
 }

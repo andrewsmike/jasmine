@@ -1,5 +1,4 @@
 import { gql, useLazyQuery, useMutation } from "@apollo/client";
-import grey from "@material-ui/core/colors/grey";
 import { makeStyles } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Button from "@material-ui/core/Button";
@@ -23,6 +22,7 @@ const useStyles = makeStyles((theme) => ({
         flexGrow: 1,
         margin: "10px",
         padding: "10px",
+        minWidth: "1px",
     },
     queryPathBox: {
         flexGrow: 1,
@@ -32,18 +32,10 @@ const useStyles = makeStyles((theme) => ({
             marginLeft: "auto",
         },
     },
-    formatButton: {
-        marginLeft: theme.spacing(1.5),
-    },
-    settingsButton: {
-        marginLeft: theme.spacing(1.5),
-        backgroundColor: grey[200],
-        paddingLeft: theme.spacing(2),
-        paddingRight: theme.spacing(2),
-        minWidth: "0%",
-    },
-    feedbackButton: {
-        marginLeft: theme.spacing(1.5),
+    button: {
+        [theme.breakpoints.up("md")]: {
+            marginLeft: theme.spacing(1),
+        },
     },
     queryBar: {
         [theme.breakpoints.up("sm")]: {
@@ -151,7 +143,7 @@ export default function JasmineQuery({
                     />
                     <div className={classes.queryButtonBar}>
                         <Button
-                            className={classes.saveButton}
+                            className={classes.button}
                             variant="contained"
                             color="primary"
                             disabled={codeUnchanged}
@@ -161,7 +153,7 @@ export default function JasmineQuery({
                             {narrowButtonMode ? <SaveIcon /> : "Save"}
                         </Button>
                         <Button
-                            className={classes.formatButton}
+                            className={classes.button}
                             variant="contained"
                             color="secondary"
                             onClick={() =>
@@ -172,14 +164,14 @@ export default function JasmineQuery({
                             {narrowButtonMode ? <FlashAuto /> : "Autoformat"}
                         </Button>
                         <Button
-                            className={classes.settingsButton}
+                            className={classes.button}
                             variant="contained"
                             onClick={() => dispatch(toggleSettings())}
                         >
                             <SettingsIcon fontSize="medium" />
                         </Button>
                         <Button
-                            className={classes.feedbackButton}
+                            className={classes.button}
                             variant="contained"
                             onClick={() => dispatch(toggleFeedback())}
                         >
