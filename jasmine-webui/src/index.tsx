@@ -9,7 +9,7 @@ import JasmineWeb from "./jasmine-web/jasmine-web";
 import reportWebVitals from "report-web-vitals";
 
 const graphqlClient = new ApolloClient({
-    uri: "http://localhost:8000/api/graphql",
+    uri: "/api/graphql",
     cache: new InMemoryCache(),
 });
 

@@ -15,7 +15,7 @@ import JasmineView from "jasmine-view/jasmine-view";
 const useStyles = makeStyles((theme) => ({
     navBarSplit: {
         display: "flex",
-        height: "calc(100vh - 60px)",
+        height: "calc(100vh - 64px)",
     },
 }));
 

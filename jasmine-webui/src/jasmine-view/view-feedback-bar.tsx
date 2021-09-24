@@ -3,7 +3,7 @@ import useMediaQuery from "@material-ui/core/useMediaQuery";
 import Accordion from "@material-ui/core/Accordion";
 import AccordionSummary from "@material-ui/core/AccordionSummary";
 import AccordionDetails from "@material-ui/core/AccordionDetails";
-import Drawer from "@material-ui/core/Drawer";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import WarningTwoToneIcon from "@material-ui/icons/WarningTwoTone";
@@ -82,10 +82,11 @@ export default function ViewFeedbackBar({ viewId }: { viewId: number }) {
 
     return (
         <>
-            <Drawer
+            <SwipeableDrawer
                 variant="temporary"
                 anchor="right"
                 open={narrowMode && !feedbackCollapsed}
+                onOpen={() => dispatch(toggleFeedback())}
                 onClose={() => dispatch(toggleFeedback())}
                 className={classes.drawer}
                 classes={{ paper: classes.drawerPaper }}
@@ -94,7 +95,7 @@ export default function ViewFeedbackBar({ viewId }: { viewId: number }) {
                     View Warnings
                 </Typography>
                 {content}
-            </Drawer>
+            </SwipeableDrawer>
             {!narrowMode && !feedbackCollapsed && content}
         </>
     );

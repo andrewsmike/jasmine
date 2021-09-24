@@ -1,6 +1,6 @@
 import { makeStyles } from "@material-ui/core/styles";
 import useMediaQuery from "@material-ui/core/useMediaQuery";
-import Drawer from "@material-ui/core/Drawer";
+import SwipeableDrawer from "@material-ui/core/SwipeableDrawer";
 import { useDispatch, useSelector } from "react-redux";
 
 import { selectNavbarCollapsed, toggleNavbar } from "jasmine-web/state";
@@ -49,15 +49,16 @@ export default function JasmineNavBar() {
     }
 
     return (
-        <Drawer
+        <SwipeableDrawer
             variant={narrowMode ? "temporary" : "permanent"}
             anchor="left"
             open={drawerVisible}
+            onOpen={() => dispatch(toggleNavbar())}
             onClose={() => dispatch(toggleNavbar())}
             className={drawerClass}
             classes={{ paper: drawerPaperClass }}
         >
             <NavBarSections />
-        </Drawer>
+        </SwipeableDrawer>
     );
 }
