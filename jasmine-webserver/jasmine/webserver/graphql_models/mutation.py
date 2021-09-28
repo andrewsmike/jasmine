@@ -13,6 +13,11 @@ interface OperationResult {
     error: String
 }
 
+type DeleteResult implements OperationResult {
+    success: Boolean!
+    error: String
+}
+
 type OrganizationResult implements OperationResult {
     success: Boolean!
     error: String
@@ -45,33 +50,33 @@ type ViewResult implements OperationResult {
 }
 
 type Mutation {
-    delete_organization(id: ID!): OrganizationResult!
+    delete_organization(id: ID!): DeleteResult!
     update_organization_name(id: ID!, newName: String!): OrganizationResult!
 
-    delete_user(id: ID!): UserResult!
+    delete_user(id: ID!): DeleteResult!
     change_user_email(id: ID!, new_email: String!): UserResult!
     update_user_name(id: ID!, new_name: String!): UserResult!
     update_user_default_project(id: ID!, project_id: ID!): UserResult!
 
     create_team(organization_id: ID!, name: String!): TeamResult!
-    delete_team(id: ID!): TeamResult!
+    delete_team(id: ID!): DeleteResult!
     update_team_name(id: ID!, new_name: String!): TeamResult!
 
     add_team_member(team_id: ID!, user_id: ID!): TeamResult!
     remove_team_member(team_id: ID!, user_id: ID!): TeamResult!
 
     create_backend(organization_id: ID!, name: String!): BackendResult!
-    delete_backend(id: ID!): BackendResult!
+    delete_backend(id: ID!): DeleteResult!
     update_backend_name(id: ID!, new_name: String!): BackendResult!
 
     create_project(organization_id: ID!, name: String!, backend_id: ID!): ProjectResult!
-    delete_project(id: ID!): ProjectResult!
+    delete_project(id: ID!): DeleteResult!
     update_project_name(id: ID!, new_name: String!): ProjectResult!
 
     create_query(project_id: ID, path: String, query_text: String): ViewResult!
     update_query_text(id: ID!, query_text: String!): ViewResult!
 
-    delete_view(id: ID!): ViewResult!
+    delete_view(id: ID!): DeleteResult!
     update_view_path(id: ID!, path: String!): ViewResult!
     copy_view(id: ID!, new_path: String): ViewResult!
 }
@@ -161,10 +166,24 @@ def update_query_text(
     assert query_text is not None
     assert len(query_text) < 2 ** 16, "Query text must be < 65536 characters."
 
-    query = session.query(View).where(View.view_id == id).first()
+    view = session.query(View).where(View.view_id == id).first()
+
+    assert view.view_type == "query"
+    query = view
 
     new_spec = dict(query.spec)
     new_spec["query_text"] = query_text
     query.spec = new_spec
 
     return query
+
+
+@mutation_obj.field("delete_view")
+@as_wrapped_graphql_payload
+@with_sqla_session
+def delete_view(
+    session, obj, info, id: int = None,
+):
+    session.delete(
+        session.query(View).where(View.view_id == id).first()
+    )

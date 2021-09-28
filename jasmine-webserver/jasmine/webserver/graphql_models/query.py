@@ -36,7 +36,7 @@ type Query {
         project_name: String!,
         view_path: String!,
         organization_id: ID
-    ): View!
+    ): View
 
 "Get an autoformatted version of the given SQL query."
 formatted_query_text(query_text: String!): String!
@@ -108,7 +108,7 @@ def resolve_sql_query_from_path(
     project_name: str,
     view_path: str,
     organization_id: Optional[int],
-) -> View:
+) -> Optional[View]:
     assert organization_id is not None
     return (
         session.query(View)

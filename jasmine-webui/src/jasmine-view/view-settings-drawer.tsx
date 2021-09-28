@@ -78,7 +78,7 @@ export default function ViewSettingsDrawer({ viewId }: { viewId: number }) {
     );
 
     const settingsContent = [
-        <SchemaSettings />,
+        <SchemaSettings viewId={viewId} />,
         <PermissionSettings />,
         <DataSettings />,
         <PerformanceSettings />,

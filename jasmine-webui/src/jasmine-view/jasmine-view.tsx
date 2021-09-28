@@ -6,7 +6,7 @@ import ViewFeedbackBar from "jasmine-view/view-feedback-bar";
 import ViewSettingsDrawer from "jasmine-view/view-settings-drawer";
 
 const viewFromPathQuery = gql`
-    query ViewFromPathQuery(
+    query ViewFromPath(
         $projectName: String!
         $viewPath: String!
         $organizationId: ID
@@ -100,9 +100,18 @@ export default function JasmineView() {
         console.assert(false);
     }
 
-    if (loading) return <div> Loading... </div>;
-    else if (error) {
-        return <div> Could not load view at {pathName}. </div>;
+    const urlLocation =
+        pathType == "viewPath"
+            ? `at [${urlProjectName}]/${urlViewPath}`
+            : `with ID ${urlViewId}`;
+    if (loading) {
+        return <div> Loading... </div>;
+    } else if (pathType == "viewPath" && !data.view_from_path) {
+        return <div> There are no views {urlLocation}. </div>;
+    } else if (pathType == "viewId" && (!data || !data.view)) {
+        return <div> There is no view {urlLocation}. </div>;
+    } else if (error) {
+        return <div> Could not load view {urlLocation}. </div>;
     }
 
     var viewData;
