@@ -7,7 +7,7 @@ import {
     withoutKeyPrefix,
 } from "utils/map-utils";
 
-test("mapFromList works correctly", () => {
+test("arrayFromMap works correctly", () => {
     const testMap = new Map([
         ["hello", 2],
         ["world", 4],
