@@ -42,7 +42,7 @@ def parse_enum(values: list[Any], value: Any) -> Any:
 
 
 def value_str(value: Any) -> str:
-    if isinstance(value, frozenset):
+    if isinstance(value, (frozenset, set)):
         return ", ".join(f"task-{subtask}" for subtask in sorted(value))
     else:
         return str(value)

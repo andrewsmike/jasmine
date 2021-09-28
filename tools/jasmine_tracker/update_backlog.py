@@ -72,7 +72,7 @@ def best_taskset(
 ) -> set[Task]:
     return max(
         (
-            (task_set | required_tasks)
+            (set(task_set) | required_tasks)
             for task_set in subsets(possible_tasks - required_tasks)
         ),
         key=lambda taskset: (taskset_priority(taskset, all_tasks), -len(taskset)),
