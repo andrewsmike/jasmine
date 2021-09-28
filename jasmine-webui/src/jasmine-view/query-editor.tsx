@@ -13,7 +13,7 @@ import { useDispatch } from "react-redux";
 import { Prompt } from "react-router";
 
 import SqlEditor from "jasmine-view/sql-editor";
-import { toggleFeedback } from "jasmine-view/state";
+import { toggleFeedback, toggleSettings } from "jasmine-view/state";
 
 const useStyles = makeStyles((theme) => ({
     editorPaper: {
@@ -35,6 +35,11 @@ const useStyles = makeStyles((theme) => ({
     button: {
         [theme.breakpoints.up("md")]: {
             marginLeft: theme.spacing(1),
+        },
+        [theme.breakpoints.down("sm")]: {
+            flexGrow: 1,
+            marginLeft: theme.spacing(0.5),
+            marginRight: theme.spacing(0.5),
         },
     },
     queryBar: {

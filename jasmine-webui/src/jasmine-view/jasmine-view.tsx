@@ -3,6 +3,7 @@ import { useLocation } from "react-router-dom";
 
 import QueryEditor from "jasmine-view/query-editor";
 import ViewFeedbackBar from "jasmine-view/view-feedback-bar";
+import ViewSettingsDrawer from "jasmine-view/view-settings-drawer";
 
 const viewFromPathQuery = gql`
     query ViewFromPathQuery(
@@ -131,6 +132,7 @@ export default function JasmineView() {
                 refetchQueries={[viewFromIdQuery, viewFromPathQuery]}
             />
             <ViewFeedbackBar viewId={viewId} />
+            <ViewSettingsDrawer viewId={viewId} />
         </>
     );
 }
