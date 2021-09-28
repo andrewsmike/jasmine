@@ -7,6 +7,7 @@ import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
 
 import { setNotification } from "jasmine-web/state";
+import { toggleSettings } from "jasmine-view/state";
 
 const useStyles = makeStyles((theme) => ({
     deleteViewButton: {
@@ -47,6 +48,7 @@ export default function SchemaSettings({
             dispatch(
                 setNotification(`Deleted view at [${viewProject}]/${viewPath}.`)
             );
+            dispatch(toggleSettings());
             history.push("/console");
         },
     });
