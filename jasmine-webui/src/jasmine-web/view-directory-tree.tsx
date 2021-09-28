@@ -175,7 +175,7 @@ export default function JasmineNavBar() {
     const directoryOpenView = (event: any, viewDirPath: string) => {
         if (viewDirPath.startsWith("leaf:")) {
             history.push("/console/view/" + viewDirPath.slice("leaf:".length));
-            dispatch(toggleNavbar());
+            dispatch(setNavbarCollapsed(true));
         }
     };
 

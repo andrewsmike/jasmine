@@ -8,6 +8,11 @@ export type appState = {
 };
 
 export const toggleNavbar = () => ({ type: "app/toggle_navbar" } as const);
+export const setNavbarCollapsed = (collapsed: boolean) =>
+    ({
+        type: "app/set_navbar_collapsed",
+        navbarCollapsed: collapsed,
+    } as const);
 
 export const toggleAccountPopover = () =>
     ({ type: "app/toggle_account_popover" } as const);
@@ -22,6 +27,7 @@ export const resetNotification = () =>
 
 export type appAction = ReturnType<
     | typeof toggleNavbar
+    | typeof setNavbarCollapsed
     | typeof toggleAccountPopover
     | typeof setTheme
     | typeof setNotification
@@ -44,6 +50,11 @@ export function appReducer(
             return {
                 ...state,
                 navbarCollapsed: !state.navbarCollapsed,
+            };
+        case "app/set_navbar_collapsed":
+            return {
+                ...state,
+                navbarCollapsed: state.navbarCollapsed,
             };
         case "app/toggle_account_popover":
             return {
