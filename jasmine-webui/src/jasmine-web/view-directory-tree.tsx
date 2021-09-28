@@ -10,7 +10,7 @@ import { useHistory } from "react-router-dom";
 import { ReactNode } from "react";
 import { useDispatch } from "react-redux";
 
-import { toggleNavbar } from "jasmine-web/state";
+import { setNavbarCollapsed } from "jasmine-web/state";
 import {
     arrayFromMap,
     mapFromArray,
