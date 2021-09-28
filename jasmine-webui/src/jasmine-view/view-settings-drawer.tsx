@@ -28,7 +28,15 @@ const useStyles = makeStyles((theme) => ({
     },
 }));
 
-export default function ViewSettingsDrawer({ viewId }: { viewId: number }) {
+export default function ViewSettingsDrawer({
+    viewProject,
+    viewPath,
+    viewId,
+}: {
+    viewProject: string;
+    viewPath: string;
+    viewId: number;
+}) {
     const classes = useStyles();
     const dispatch = useDispatch();
 
@@ -78,7 +86,11 @@ export default function ViewSettingsDrawer({ viewId }: { viewId: number }) {
     );
 
     const settingsContent = [
-        <SchemaSettings viewId={viewId} />,
+        <SchemaSettings
+            viewProject={viewProject}
+            viewPath={viewPath}
+            viewId={viewId}
+        />,
         <PermissionSettings />,
         <DataSettings />,
         <PerformanceSettings />,

@@ -4,7 +4,10 @@ import { makeStyles } from "@material-ui/core/styles";
 import IconButton from "@material-ui/core/IconButton";
 import AddBoxOutlinedIcon from "@material-ui/icons/AddBoxOutlined";
 import { MouseEvent } from "react";
+import { useDispatch } from "react-redux";
 import { useHistory } from "react-router-dom";
+
+import { setNotification } from "jasmine-web/state";
 
 const createSqlQuery = gql`
     mutation createSqlQuery {
@@ -37,6 +40,7 @@ const useStyles = makeStyles((theme) => ({
 export default function CreateQueryButton() {
     const classes = useStyles();
     const history = useHistory();
+    const dispatch = useDispatch();
 
     const narrowMode = useMediaQuery((theme: any) =>
         theme.breakpoints.down("xs")
@@ -49,6 +53,7 @@ export default function CreateQueryButton() {
             const projectName = data.create_query.result.project.name;
             const queryPath = data.create_query.result.path;
             const fullQueryPath = "[" + projectName + "]/" + queryPath;
+            dispatch(setNotification(`Created view at ${fullQueryPath}.`));
             history.push("/console/view/" + fullQueryPath);
         },
     });

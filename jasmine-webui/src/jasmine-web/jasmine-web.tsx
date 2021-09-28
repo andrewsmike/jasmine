@@ -10,6 +10,7 @@ import { BrowserRouter as Router, Route, Switch } from "react-router-dom";
 import HomePage from "home-page";
 import JasmineAppBar from "jasmine-web/app-bar";
 import JasmineNavBar from "jasmine-web/nav-bar";
+import Notifications from "jasmine-web/notifications";
 import JasmineView from "jasmine-view/jasmine-view";
 
 const useStyles = makeStyles((theme) => ({
@@ -60,6 +61,7 @@ export default function App() {
                         </Route>
                     </Switch>
                 </div>
+                <Notifications />
             </Router>
         </ThemeProvider>
     );

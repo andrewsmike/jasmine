@@ -6,3 +6,4 @@ export const selectNavbarCollapsed = (state: rootState) =>
 export const selectAccountPopoverHidden = (state: rootState) =>
     state.app.accountPopoverHidden;
 export const selectAppTheme = (state: rootState) => state.app.theme;
+export const selectNotification = (state: rootState) => state.app.notification;

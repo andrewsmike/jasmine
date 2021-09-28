@@ -14,6 +14,7 @@ import { Prompt } from "react-router";
 
 import SqlEditor from "jasmine-view/sql-editor";
 import { toggleFeedback, toggleSettings } from "jasmine-view/state";
+import { setNotification } from "jasmine-web/state";
 
 const useStyles = makeStyles((theme) => ({
     editorPaper: {
@@ -110,11 +111,6 @@ export default function JasmineQuery({
     const dispatch = useDispatch();
     const classes = useStyles();
 
-    /*
-    const narrowMode = useMediaQuery((theme: any) =>
-        theme.breakpoints.down("xs")
-    );
-    */
     const narrowButtonMode = useMediaQuery("(max-width: 420px)");
 
     const [code, setCode] = useState(queryText);
@@ -122,6 +118,11 @@ export default function JasmineQuery({
     const [saveQueryTextMutation] = useMutation(saveSqlQueryText, {
         refetchQueries: refetchQueries,
         variables: { queryId, queryText: code },
+        onCompleted: (data) => {
+            dispatch(
+                setNotification(`Saved view at [${projectName}]/${queryPath}.`)
+            );
+        },
     });
     const [formatQuery] = useLazyQuery(formattedSqlQueryTextQuery, {
         onCompleted: (data) => setCode(data.formatted_query_text),

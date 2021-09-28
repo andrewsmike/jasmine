@@ -3,6 +3,10 @@ import red from "@material-ui/core/colors/red";
 import { makeStyles } from "@material-ui/core/styles";
 import Button from "@material-ui/core/Button";
 import DeleteIcon from "@material-ui/icons/Delete";
+import { useDispatch } from "react-redux";
+import { useHistory } from "react-router-dom";
+
+import { setNotification } from "jasmine-web/state";
 
 const useStyles = makeStyles((theme) => ({
     deleteViewButton: {
@@ -23,12 +27,28 @@ const deleteView = gql`
     }
 `;
 
-export default function SchemaSettings({ viewId }: { viewId: number }) {
+export default function SchemaSettings({
+    viewProject,
+    viewPath,
+    viewId,
+}: {
+    viewProject: string;
+    viewPath: string;
+    viewId: number;
+}) {
     const classes = useStyles();
+    const dispatch = useDispatch();
+    const history = useHistory();
 
     const [deleteViewMutation] = useMutation(deleteView, {
         refetchQueries: ["orgViewDirectory", "ViewFromPath", "ViewFromId"],
         variables: { viewId },
+        onCompleted: (data) => {
+            dispatch(
+                setNotification(`Deleted view at [${viewProject}]/${viewPath}.`)
+            );
+            history.push("/console");
+        },
     });
 
     return (

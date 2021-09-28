@@ -101,14 +101,14 @@ export default function JasmineView() {
     }
 
     const urlLocation =
-        pathType == "viewPath"
+        pathType === "viewPath"
             ? `at [${urlProjectName}]/${urlViewPath}`
             : `with ID ${urlViewId}`;
     if (loading) {
         return <div> Loading... </div>;
-    } else if (pathType == "viewPath" && !data.view_from_path) {
+    } else if (pathType === "viewPath" && !data.view_from_path) {
         return <div> There are no views {urlLocation}. </div>;
-    } else if (pathType == "viewId" && (!data || !data.view)) {
+    } else if (pathType === "viewId" && (!data || !data.view)) {
         return <div> There is no view {urlLocation}. </div>;
     } else if (error) {
         return <div> Could not load view {urlLocation}. </div>;
@@ -141,7 +141,11 @@ export default function JasmineView() {
                 refetchQueries={[viewFromIdQuery, viewFromPathQuery]}
             />
             <ViewFeedbackBar viewId={viewId} />
-            <ViewSettingsDrawer viewId={viewId} />
+            <ViewSettingsDrawer
+                viewProject={projectName}
+                viewPath={viewPath}
+                viewId={viewId}
+            />
         </>
     );
 }
