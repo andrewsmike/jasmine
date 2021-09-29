@@ -2,11 +2,13 @@ from sqlalchemy import (
     JSON,
     BigInteger,
     Column,
+    DateTime,
     Enum,
     ForeignKeyConstraint,
     Index,
     PrimaryKeyConstraint,
     String,
+    Text,
     UniqueConstraint,
 )
 from sqlalchemy.orm import relationship
@@ -83,7 +85,7 @@ class View:
     __table_args__ = (
         PrimaryKeyConstraint("view_id"),
         UniqueConstraint("project_id", "path"),
-        ForeignKeyConstraint(["project_id"], ["projects.project_id"]),
+        ForeignKeyConstraint(["project_id"], ["projects.project_id"], "view_project"),
     )
 
     project = relationship("Project", backref="views")
@@ -110,3 +112,43 @@ class Materialization:
     project = relationship("Project", backref="queries")
 
 """
+
+
+@orm_registry.mapped
+class BackendEvent:
+    __tablename__ = "backend_events"
+
+    backend_event_id = Column(BigInteger, nullable=False)
+    title = Column(String(length=256), nullable=False)
+    description = Column(Text, nullable=True)
+
+    created_time = Column(DateTime, nullable=False)
+
+    materialization_id = Column(BigInteger, nullable=True)
+    view_id = Column(BigInteger, nullable=True)
+    project_id = Column(BigInteger, nullable=True)
+    backend_id = Column(BigInteger, nullable=False)
+
+    __table_args__ = (
+        PrimaryKeyConstraint("backend_event_id"),
+        Index("created_time", "created_time"),
+        ForeignKeyConstraint(
+            ["backend_id"],
+            ["backends.backend_id"],
+            "backend_event_backend",
+        ),
+        ForeignKeyConstraint(
+            ["project_id"],
+            ["projects.project_id"],
+            "project_event_view",
+        ),
+        ForeignKeyConstraint(
+            ["view_id"],
+            ["views.view_id"],
+            "backend_event_view",
+        ),
+    )
+
+    backend = relationship("Backend", backref="backend_events")
+    project = relationship("Project", backref="backend_events")
+    view = relationship("View", backref="backend_events")

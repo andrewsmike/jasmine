@@ -94,7 +94,7 @@ export default function ViewSettingsDrawer({
         <DataSettings />,
         <PerformanceSettings />,
         <MaterializationSettings />,
-        <LogSettings />,
+        <LogSettings viewId={viewId} />,
     ][currentTab];
 
     return (

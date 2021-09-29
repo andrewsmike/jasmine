@@ -8,6 +8,17 @@ type Backend {
     backend_type: String!
     spec: JSON!
     projects: [Project]!
+    backend_events: [BackendEvent]!
+}
+
+type BackendEvent {
+    backend_event_id: ID!
+    title: String!
+    description: String
+    created_time: DateTime!
+    backend: Backend!
+    project: Project
+    view: View
 }
 
 type Project {
@@ -16,6 +27,7 @@ type Project {
     name: String!
     backend: Backend!
     views: [View]!
+    backend_events: [BackendEvent]!
 }
 
 enum ViewType {
@@ -34,6 +46,7 @@ type View {
     project: Project!
     path: String!
     spec: ViewSpec!
+    backend_events: [BackendEvent]!
 }
 """
 view_spec_type = UnionType("ViewSpec")

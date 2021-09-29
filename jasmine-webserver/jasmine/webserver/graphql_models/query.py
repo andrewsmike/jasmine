@@ -1,7 +1,12 @@
+from datetime import datetime
 from functools import wraps
+import json
 from typing import Optional
 
 from ariadne import ObjectType
+from jasmine.sql.pretty_print import pretty_printed_sql_str
+from jasmine.webserver.app_base import app_db_engine_session
+
 from jasmine.models import (
     Backend,
     Organization,
@@ -11,12 +16,11 @@ from jasmine.models import (
     View,
     orm_registry,
 )
-from jasmine.sql.pretty_print import pretty_printed_sql_str
-
-from jasmine.webserver.app_base import app_db_engine_session
 
 query_type_defs = """
 scalar JSON
+scalar Date
+scalar DateTime
 
 type Query {
     "Defaults to current user's organization."
@@ -43,6 +47,19 @@ formatted_query_text(query_text: String!): String!
 }
 """
 query_obj = ObjectType("Query")
+
+
+# Datetimes aren't json serializable by default.
+# This patch handles datetime when encoding json objects.
+def json_datetime_encoder(encoder, obj):
+    if isinstance(obj, datetime):
+        return obj.isoformat()
+    else:
+        return default_json_encoder(obj)
+
+
+default_json_encoder = json.JSONEncoder.default
+json.JSONEncoder.default = json_datetime_encoder
 
 
 def with_sqla_session(func):

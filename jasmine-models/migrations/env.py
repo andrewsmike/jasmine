@@ -2,8 +2,9 @@
 from logging.config import fileConfig
 
 from alembic import context
-from jasmine.webserver.models import orm_registry
 from sqlalchemy import engine_from_config, pool
+
+from jasmine.models import orm_registry
 
 # this is the Alembic Config object, which provides
 # access to the values within the .ini file in use.
