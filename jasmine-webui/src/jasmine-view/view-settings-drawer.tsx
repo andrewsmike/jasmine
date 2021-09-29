@@ -54,7 +54,6 @@ export default function ViewSettingsDrawer({
             textColor="primary"
             variant="scrollable"
             scrollButtons="auto"
-            centered
         >
             <Tab
                 icon={<FolderOpenIcon />}
