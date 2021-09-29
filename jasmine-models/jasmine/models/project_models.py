@@ -11,7 +11,7 @@ from sqlalchemy import (
 )
 from sqlalchemy.orm import relationship
 
-from jasmine.webserver.models.model_registry import orm_registry
+from jasmine.models.model_registry import orm_registry
 
 
 @orm_registry.mapped

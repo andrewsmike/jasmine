@@ -9,10 +9,8 @@ Jasmine is uses a variety of ETL strategies, along with a SQL manipulation libra
 
 Setting up
 ==========
-- Run `pushd jasmine-webserver && pip install -e '.[dev]' && popd`.
-- Run `pushd jasmine-sql && pip install -e '.[dev]' && popd`.
-
-- Run `docker-compose up` to start the services.
+- Run `for PROJECT in webserver models sql etl; do pushd jasmine-$PROJECT && pip install -e '.[dev]' && popd`.
+- Run `docker-compose up` to start the services (and build them if necessary).
 - Run `jasmine_initialize_schema` to initialize your database.
 - Copy `config/dev/example_jasmine_webserver.cfg` to `config/dev/jasmine_webserver.cfg`, optionally adding missing credentials.
 - Add the database at `mysql://jasmine_web_su:password@127.0.0.1:3305/jasmine_web` to your favorite SQL client.
@@ -39,9 +37,9 @@ While we use `$ jasmine_initialize_schema` to initialize a new schema, we use [a
 Upgrading typically looks like this:
 ```bash
 $ cd jasmine-webserver
-jasmine-webserver/ $ alembic revision --autogenerate -m "Add my fancy new column."
-jasmine-webserver/ $ less migrations/versions/generated_migration_file_name.py  # Review and make any necessary edits.
-jasmine-webserver/ $ alembic upgrade head
+jasmine-models/ $ alembic revision --autogenerate -m "Add my fancy new column."
+jasmine-models/ $ less migrations/versions/generated_migration_file_name.py  # Review and make any necessary edits.
+jasmine-models/ $ alembic upgrade head
 ```
 
 
@@ -56,4 +54,5 @@ Jasmine is split into a few components:
     Served using uvicorn, located in the `jasmine-webserver/` directory, and connects to the database.
 - Database: MySQL backend database.
 - Jasmine-ETL: RabbitMQ-based celery worker pool for running ETL and management jobs. Includes celery beat cron-like scheduler.
+- jasmine-models: Shared package holding the ORM models.
 - jasmine-sql: Utility package for SQL manipulation.

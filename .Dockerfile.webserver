@@ -1,23 +1,23 @@
 FROM python:3.9.7
 
-RUN mkdir -p /opt/jasmine-webserver
-RUN mkdir -p /opt/jasmine-sql
 WORKDIR /opt/jasmine-webserver
 
 RUN apt-get update
 
 # These are overwritten when docker-compose mounts live volumes.
-COPY jasmine-webserver /opt/jasmine-webserver/
+COPY jasmine-models /opt/jasmine-models/
 COPY jasmine-sql /opt/jasmine-sql/
 COPY jasmine-etl /opt/jasmine-etl/
+COPY jasmine-webserver /opt/jasmine-webserver/
 
 COPY ./config/dev/jasmine_webserver.cfg /root/.jasmine_webserver.cfg
 COPY ./config/dev/jasmine_worker.cfg /root/.jasmine_worker.cfg
 
 # TODO: Replace with docker-requirements.txt.
-RUN pip install -e '.[dev]'
+RUN pip install -e '../jasmine-models[dev]'
 RUN pip install -e '../jasmine-sql[dev]'
 RUN pip install -e '../jasmine-etl[dev]'
+RUN pip install -e '.[dev]'
 
 EXPOSE 8000
 

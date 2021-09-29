@@ -24,20 +24,3 @@ TODO:
 from sqlalchemy.orm import registry
 
 orm_registry = registry()
-
-
-def orm_model(cls):
-    """
-    Stand-in for @orm_registry.mapped.
-
-    When pytest invokes a file, looking for doctests, it can end up importing it twice.
-    (It loads the module's __init__, which loads the file, then loads it again for execution.)
-    This is normally fine, but calling registry.mapped() twice throws an exception.
-
-    If table is already defined, don't map the model. This avoids the issue, though
-    any tests using local references will find unmapped base classes.
-    """
-    if cls.__tablename__ in orm_registry.metadata.tables:
-        return cls
-    else:
-        return orm_registry.mapped(cls)

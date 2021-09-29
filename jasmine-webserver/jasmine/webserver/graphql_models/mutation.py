@@ -2,10 +2,10 @@ from functools import wraps
 from typing import Optional
 
 from ariadne import ObjectType
-
 from jasmine.webserver.graphql_models.query import with_sqla_session
-from jasmine.webserver.models import Project, User, View
 from jasmine.webserver.random_phrase import random_hex, random_phrase
+
+from jasmine.models import Project, User, View
 
 mutation_type_defs = """
 interface OperationResult {
@@ -182,8 +182,9 @@ def update_query_text(
 @as_wrapped_graphql_payload
 @with_sqla_session
 def delete_view(
-    session, obj, info, id: int = None,
+    session,
+    obj,
+    info,
+    id: int = None,
 ):
-    session.delete(
-        session.query(View).where(View.view_id == id).first()
-    )
+    session.delete(session.query(View).where(View.view_id == id).first())

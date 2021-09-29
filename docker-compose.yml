@@ -40,6 +40,7 @@ services:
       context: .
       dockerfile: .Dockerfile.worker
     volumes:
+      - "./jasmine-models:/opt/jasmine-models"
       - "./jasmine-sql:/opt/jasmine-sql"
       - "./jasmine-etl:/opt/jasmine-etl"
       - "./config/dev/jasmine_worker.cfg:/root/.jasmine_worker.cfg:ro"
@@ -58,9 +59,10 @@ services:
     ports:
       - "8002:8000"
     volumes:
-      - "./jasmine-webserver:/opt/jasmine-webserver"
+      - "./jasmine-models:/opt/jasmine-models"
       - "./jasmine-sql:/opt/jasmine-sql"
       - "./jasmine-etl:/opt/jasmine-etl"
+      - "./jasmine-webserver:/opt/jasmine-webserver"
       - "./config/dev/jasmine_webserver.cfg:/root/.jasmine_webserver.cfg:ro"
       - "./config/dev/jasmine_worker.cfg:/root/.jasmine_worker.cfg:ro"
     depends_on:
