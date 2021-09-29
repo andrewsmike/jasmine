@@ -1,4 +1,9 @@
-import { fullPath, fullPathValid, fullPathParts } from "utils/path-utils";
+import {
+    fullPath,
+    fullPathValid,
+    fullPathParts,
+    pathDirectories,
+} from "utils/path-utils";
 
 test("fullPath works correctly", () => {
     expect(fullPath("dev", "my/lovely/view/tree")).toEqual(
@@ -21,4 +26,11 @@ test("fullPathValid works correctly", () => {
     expect(fullPathValid("[dev/my/lovely_view")).toEqual(false);
     expect(fullPathValid("dev/my/lovely_view")).toEqual(false);
     expect(fullPathValid("[dev/blah]/my/lovely_view")).toEqual(false);
+});
+
+test("pathDirectories works correctly", () => {
+    expect(pathDirectories("hello")).toEqual(new Set());
+    expect(pathDirectories("[hello]/world/blah/blih")).toEqual(
+        new Set(["[hello]", "[hello]/world", "[hello]/world/blah"])
+    );
 });

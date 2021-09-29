@@ -17,6 +17,8 @@ import {
     unflattenedMap,
     RecursiveMap,
 } from "utils/map-utils";
+import { fullPath, pathDirectories } from "utils/path-utils";
+import { mapFromSet } from "utils/set-utils";
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -36,7 +38,7 @@ const useStyles = makeStyles((theme) => ({
             fontSize: theme.typography.pxToRem(16),
         },
     },
-    classTypeIcon: {
+    viewTypeIcon: {
         fontSize: "1em",
         marginRight: theme.spacing(0.5),
     },
@@ -56,6 +58,7 @@ interface ViewDirectoryProject {
         path: string;
     }[];
 }
+
 interface ViewDirectoryData {
     organization: {
         projects: ViewDirectoryProject[];
@@ -77,87 +80,102 @@ const viewDirectoryQuery = gql`
     }
 `;
 
-function treeViewFromDirectory(
-    directory: RecursiveMap<[string, number]>,
-    path: string[],
-    labelClassName: string,
-    iconClassName: string
-): ReactNode {
-    const name = path.at(-1);
-    const pathStr = path.join("/");
+interface DirectoryViewNode {
+    path: string;
+    icon: ReactNode;
+}
 
+export function DirectoryView({
+    classes,
+    onClick,
+    nodes,
+}: {
+    classes: { root?: string; treeItem?: string };
+    onClick: (event: object, nodeId: string) => void;
+    nodes: DirectoryViewNode[];
+}) {
+    const nodeDirectories = new Set(
+        nodes.map((node) => Array.from(pathDirectories(node.path))).flat()
+    );
+    const nodeDirectoryIds = mapFromSet(
+        nodeDirectories,
+        (dir_path) => `dir:${dir_path}`
+    );
+
+    const nodeDirectory = unflattenedMap<RecursiveMap<DirectoryViewNode>>(
+        mapFromArray(nodes, (node) => [node.path, node])
+    );
+
+    const children = treeViewFromDirectory(
+        nodeDirectory,
+        [],
+        classes.treeItem,
+        true
+    );
+
+    return (
+        <TreeView
+            className={classes.root}
+            defaultCollapseIcon={<ExpandMoreIcon />}
+            defaultExpandIcon={<ExpandLessIcon />}
+            onNodeSelect={onClick}
+            defaultExpanded={nodeDirectoryIds}
+        >
+            {children}
+        </TreeView>
+    );
+}
+
+function treeViewFromDirectory(
+    directory: RecursiveMap<DirectoryViewNode>,
+    path: string[],
+    className: string | undefined,
+    topLevel: boolean
+): ReactNode {
+    var children, nodeType, icon;
     if (directory instanceof Map) {
-        const children = arrayFromMap(directory, (subdir, subdirItems) =>
+        children = arrayFromMap(directory, (subdir, subdirItems) =>
             treeViewFromDirectory(
                 subdirItems,
                 path.concat([subdir]),
-                labelClassName,
-                iconClassName
+                className,
+                false
             )
         );
-        const label = (
-            <Typography className={labelClassName}> {name} </Typography>
-        );
+        nodeType = "dir";
+        icon = undefined;
+    } else {
+        children = undefined;
+        nodeType = "leaf";
+        icon = directory.icon;
+    }
+
+    const name = path.at(-1);
+    const label = (
+        <Typography className={className}>
+            {" "}
+            {icon}
+            {name}{" "}
+        </Typography>
+    );
+
+    const pathStr = path.join("/");
+    const nodeId = `${nodeType}:${pathStr}`;
+
+    if (topLevel) {
+        return <> {children} </>;
+    } else {
         return (
             <TreeItem
-                classes={{ label: labelClassName }}
+                classes={{ label: className }}
                 key={pathStr}
-                nodeId={"dir:" + pathStr}
+                nodeId={nodeId}
                 label={label}
             >
-                {" "}
-                {children}{" "}
+                {children}
             </TreeItem>
         );
-    } else {
-        const [viewType] = directory;
-
-        const viewTypeIcon = {
-            query: (
-                <DescriptionOutlinedIcon
-                    className={iconClassName}
-                    color="primary"
-                />
-            ),
-        }[viewType];
-
-        const label = (
-            <Typography className={labelClassName}>
-                {viewTypeIcon}
-                {name}
-            </Typography>
-        );
-
-        return (
-            <TreeItem
-                classes={{ label: labelClassName }}
-                key={pathStr}
-                nodeId={"leaf:" + pathStr}
-                label={label}
-            />
-        );
     }
-}
-
-function projectDirectoryTreeItems(
-    project: ViewDirectoryProject,
-    labelClassName: string,
-    iconClassName: string
-): ReactNode {
-    const viewNodeDirectory = unflattenedMap<RecursiveMap<[string, number]>>(
-        mapFromArray(project.views, (view) => [
-            view.path,
-            [view.view_type, view.view_id],
-        ])
-    );
-    const projectName = "[" + project.name + "]";
-
-    return treeViewFromDirectory(
-        viewNodeDirectory,
-        [projectName],
-        labelClassName,
-        iconClassName
-    );
 }
 
 export default function JasmineNavBar() {
@@ -185,21 +203,29 @@ export default function JasmineNavBar() {
             <div> Could not load organization with ID {organizationId}. </div>
         );
 
+    const viewTypeIcon = {
+        query: (
+            <DescriptionOutlinedIcon
+                className={classes.viewTypeIcon}
+                color="primary"
+            />
+        ),
+    };
+
+    const viewNodes = (data as ViewDirectoryData).organization.projects
+        .map((project) =>
+            project.views.map((view) => ({
+                path: fullPath(project.name, view.path),
+                icon: viewTypeIcon[view.view_type],
+            }))
+        )
+        .flat() as DirectoryViewNode[];
+
     return (
-        <TreeView
-            className={classes.root}
-            defaultCollapseIcon={<ExpandMoreIcon />}
-            defaultExpandIcon={<ExpandLessIcon />}
-            onNodeSelect={directoryOpenView}
-        >
-            {data &&
-                data.organization.projects.map((item) =>
-                    projectDirectoryTreeItems(
-                        item,
-                        classes.treeItem,
-                        classes.classTypeIcon
-                    )
-                )}
-        </TreeView>
+        <DirectoryView
+            classes={{ root: classes.root, treeItem: classes.treeItem }}
+            onClick={directoryOpenView}
+            nodes={viewNodes}
+        />
     );
 }
