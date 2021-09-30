@@ -51,7 +51,7 @@ def tasks_required_value_effort(
         required_task
         for task in tasks
         for required_task in (task_ancestors(task, frozenset(all_tasks)) | {task})
-        if "DONE" not in task.status
+        if "DONE" not in required_task.status
     }
 
     return taskset_value_effort(required_tasks)

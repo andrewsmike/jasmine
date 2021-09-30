@@ -82,38 +82,38 @@ def with_sqla_session(func):
 @with_sqla_session
 def resolve_organization(session, obj, info, id: Optional[int] = None) -> Organization:
     assert id is not None
-    return session.query(Organization).where(Organization.organization_id == id).first()
+    return session.query(Organization).where(Organization.organization_id == id).one()
 
 
 @query_obj.field("user")
 @with_sqla_session
 def resolve_user(session, obj, info, id: Optional[int] = None) -> User:
     assert id is not None
-    return session.query(User).where(User.user_id == id).first()
+    return session.query(User).where(User.user_id == id).one()
 
 
 @query_obj.field("team")
 @with_sqla_session
 def resolve_team(session, obj, info, id: int) -> Team:
-    return session.query(Team).where(Team.team_id == id).first()
+    return session.query(Team).where(Team.team_id == id).one()
 
 
 @query_obj.field("backend")
 @with_sqla_session
 def resolve_backend(session, obj, info, id: int) -> Backend:
-    return session.query(Backend).where(Backend.backend_id == id).first()
+    return session.query(Backend).where(Backend.backend_id == id).one()
 
 
 @query_obj.field("project")
 @with_sqla_session
 def resolve_project(session, obj, info, id: int) -> Project:
-    return session.query(Project).where(Project.project_id == id).first()
+    return session.query(Project).where(Project.project_id == id).one()
 
 
 @query_obj.field("view")
 @with_sqla_session
 def resolve_view(session, obj, info, id: int) -> View:
-    return session.query(View).where(View.view_id == id).first()
+    return session.query(View).where(View.view_id == id).one()
 
 
 @query_obj.field("view_from_path")
@@ -133,7 +133,7 @@ def resolve_sql_query_from_path(
         .where(Project.name == project_name)
         .where(Project.organization_id == int(organization_id))
         .where(View.path == view_path)
-    ).first()
+    ).one()
 
 
 @query_obj.field("formatted_query_text")

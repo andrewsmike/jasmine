@@ -131,7 +131,7 @@ def create_query(
     query_text: Optional[str] = None,
 ) -> View:
     # Temporary.
-    user = session.query(User).where(User.user_id == 1).first()
+    user = session.query(User).where(User.user_id == 1).one()
 
     assert (
         user.default_project_id is not None
@@ -167,7 +167,7 @@ def update_query_text(
     assert query_text is not None
     assert len(query_text) < 2 ** 16, "Query text must be < 65536 characters."
 
-    view = session.query(View).where(View.view_id == id).first()
+    view = session.query(View).where(View.view_id == id).one()
 
     assert view.view_type == "query"
     query = view
@@ -188,4 +188,4 @@ def delete_view(
     info,
     id: int = None,
 ):
-    session.delete(session.query(View).where(View.view_id == id).first())
+    session.delete(session.query(View).where(View.view_id == id).one())
