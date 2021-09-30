@@ -2,10 +2,11 @@ from functools import wraps
 from typing import Optional
 
 from ariadne import ObjectType
+
+from jasmine.etl.worker_tasks import view_result_preview
+from jasmine.models import Project, User, View
 from jasmine.webserver.graphql_models.query import with_sqla_session
 from jasmine.webserver.random_phrase import random_hex, random_phrase
-
-from jasmine.models import Project, User, View
 
 mutation_type_defs = """
 interface OperationResult {
