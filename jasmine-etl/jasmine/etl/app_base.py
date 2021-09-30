@@ -38,6 +38,7 @@ def celery_handle():
     return Celery(
         "jasmine_etl",
         broker=app_config()["celery"]["broker_url"],
+        backend=app_config()["celery"].get("backend_url", None),
         include=["jasmine.etl.worker_tasks"],
     )
 

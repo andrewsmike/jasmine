@@ -14,6 +14,7 @@ Setting up
 - Run `jasmine_initialize_schema` to initialize your database.
 - Copy `config/dev/example_jasmine_webserver.cfg` to `config/dev/jasmine_webserver.cfg`, optionally adding missing credentials.
 - Add the database at `mysql://jasmine_web_su:password@127.0.0.1:3305/jasmine_web` to your favorite SQL client.
+- Install your distro's redis package and use `redis-cli` to access the redis instance.
 - Manually add an initial company, user, backend, and default project for testing.
 
 Navigate to http://localhost:8000/, and the app should be visible.

@@ -59,7 +59,7 @@ def json_datetime_encoder(encoder, obj):
 
 
 default_json_encoder = json.JSONEncoder.default
-json.JSONEncoder.default = json_datetime_encoder
+json.JSONEncoder.default = json_datetime_encoder  # type: ignore
 
 
 def with_sqla_session(func):

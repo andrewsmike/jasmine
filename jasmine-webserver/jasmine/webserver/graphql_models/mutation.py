@@ -50,6 +50,12 @@ type ViewResult implements OperationResult {
     result: View
 }
 
+type DataResult implements OperationResult {
+    success: Boolean!
+    error: String
+    result: JSON
+}
+
 type Mutation {
     delete_organization(id: ID!): DeleteResult!
     update_organization_name(id: ID!, newName: String!): OrganizationResult!
@@ -80,6 +86,8 @@ type Mutation {
     delete_view(id: ID!): DeleteResult!
     update_view_path(id: ID!, path: String!): ViewResult!
     copy_view(id: ID!, new_path: String): ViewResult!
+
+    preview_view_result(id: ID!): DataResult!
 }
 """
 mutation_obj = ObjectType("Mutation")
@@ -189,3 +197,16 @@ def delete_view(
     id: int = None,
 ):
     session.delete(session.query(View).where(View.view_id == id).one())
+
+
+@mutation_obj.field("preview_view_result")
+@as_wrapped_graphql_payload
+@with_sqla_session
+def preview_view_result(
+    session,
+    obj,
+    info,
+    id: int = None,
+):
+    task = view_result_preview.delay(id)
+    return task.get(timeout=10)
