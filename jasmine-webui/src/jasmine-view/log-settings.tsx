@@ -47,13 +47,6 @@ export default function LogSettings({ viewId }: { viewId: number }) {
         { variables: { viewId } }
     );
 
-    /*
-    if (loading)
-        return <div> Loading... </div>;
-    else if (error)
-        return <div> Failed to load logs. </div>;
-    */
-
     const columns = [
         { field: "backendName", headerName: "Backend", minWidth: 140 },
         { field: "projectName", headerName: "Project", minWidth: 140 },
@@ -95,7 +88,9 @@ export default function LogSettings({ viewId }: { viewId: number }) {
             pageSize={10}
             loading={loading}
             error={error}
-            rowsPerPageOptions={[1, 10, 20, 50]}
+            density="compact"
+            autoPageSize={true}
+            rowsPerPageOptions={[5, 10, 20, 50]}
         />
     );
 }

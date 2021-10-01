@@ -13,6 +13,7 @@ import { useDispatch } from "react-redux";
 import { Prompt } from "react-router";
 
 import SqlEditor from "jasmine-view/sql-editor";
+import ViewResultPreview from "jasmine-view/view-result-preview";
 import { toggleFeedback, toggleSettings } from "jasmine-view/state";
 import { setNotification } from "jasmine-web/state";
 
@@ -187,6 +188,7 @@ export default function JasmineQuery({
                 </div>
 
                 <SqlEditor code={code || ""} setCode={setCode} />
+                <ViewResultPreview viewId={queryId} disabled={!codeUnchanged} />
             </Paper>
         </>
     );
