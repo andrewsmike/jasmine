@@ -21,7 +21,7 @@ def gsheet_jasmine_tasks() -> list[Task]:
         .values()
         .get(
             spreadsheetId=JASMINE_TRACKER_SPREADSHEET_ID,
-            range="User Stories!A2:L",
+            range="User Stories!A2:M",
         )
         .execute()
         .get("values", [])
@@ -36,6 +36,6 @@ def update_gsheet_jasmine_tasks(tasks: list[Task]):
     sheets_handle().values().update(
         spreadsheetId=JASMINE_TRACKER_SPREADSHEET_ID,
         valueInputOption="USER_ENTERED",
-        range="User Stories!A2:L",
+        range="User Stories!A2:M",
         body={"values": task_rows},
     ).execute()

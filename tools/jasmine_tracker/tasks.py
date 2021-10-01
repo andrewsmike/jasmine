@@ -62,6 +62,7 @@ class Task:
     best_effort: int
     priority: float
     best_followups: frozenset[int]
+    blocked_by: frozenset[int]
 
     statuses = [
         f"{i+1} - {status}"
@@ -81,6 +82,7 @@ class Task:
         ("best_effort", parse_opt_int),
         ("priority", parse_opt_float),
         ("best_followups", parse_task_set),
+        ("blocked_by", parse_task_set),
     ]
 
     @classmethod

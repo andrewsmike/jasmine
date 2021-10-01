@@ -96,12 +96,19 @@ def task_with_best_priority(task: Task, tasks: set[Task]) -> Task:
         followup_task.task_id for followup_task in (best_descendent_taskset - {task})
     }
 
+    blocked_by = {
+        blocking_ancestor.task_id
+        for blocking_ancestor in task_ancestors(task, frozenset(tasks))
+        if "DONE" not in blocking_ancestor.status
+    }
+
     return replace(
         task,
         best_value=best_value,
         best_effort=best_effort,
         priority=(best_value + 0.5) / (best_effort + 0.5),
         best_followups=best_followups,
+        blocked_by=blocked_by,
     )
 
 
