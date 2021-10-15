@@ -66,7 +66,9 @@ class Task:
 
     statuses = [
         f"{i+1} - {status}"
-        for i, status in enumerate(["TODO", "WIP", "BLOCKED", "DONE", "NOPE", "IDEA"])
+        for i, status in enumerate(
+            ["NEXT IN LINE", "WIP", "BLOCKED", "DONE", "NOPE", "IDEA"]
+        )
     ]
 
     ordered_column_parsing_funcs = [
