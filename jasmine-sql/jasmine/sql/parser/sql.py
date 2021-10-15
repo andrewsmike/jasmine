@@ -3,12 +3,18 @@ from typing import Callable, List, Optional
 from antlr4.CommonTokenStream import CommonTokenStream
 from antlr4.FileStream import FileStream
 from antlr4.InputStream import InputStream
+from antlr4.error.ErrorListener import ErrorListener
 from antlr4.tree.Tree import ParseTree
 
 from jasmine.sql.parser.SQLLexer import SQLLexer
 from jasmine.sql.parser.SQLParser import SQLParser
 from jasmine.sql.parser.SQLParserListener import SQLParserListener  # noqa
 from jasmine.sql.parser.SQLParserVisitor import SQLParserVisitor  # noqa
+
+
+class AbortSyntaxErrorListener(ErrorListener):
+    def syntaxError(self, recognizer, offendingSymbol, line, column, msg, e):
+        raise SyntaxError(f"At {line}:{column}: {msg}")
 
 
 def children_contexts(
@@ -37,27 +43,14 @@ def children_contexts(
     return children
 
 
-def uses_full_input_stream(node, token_stream, input_stream) -> bool:
-    last_matched_token_index = node.stop.tokenIndex
-    whitespace_tokens = token_stream.getHiddenTokensToRight(
-        last_matched_token_index,
-    )
-
-    return not whitespace_tokens or (
-        whitespace_tokens[-1].stop == input_stream.size - 1
-    )
-
-
 def sql_tree_from_stream(input_stream: InputStream) -> ParseTree:
     lexer = SQLLexer(input_stream)
     token_stream = CommonTokenStream(lexer)
     parser = SQLParser(token_stream)
 
-    program = parser.sqlProgram()
+    parser.addErrorListener(AbortSyntaxErrorListener())
 
-    assert uses_full_input_stream(
-        program, token_stream, input_stream
-    ), "Couldn't match full token stream."
+    program = parser.sqlProgram()
 
     return program
 
