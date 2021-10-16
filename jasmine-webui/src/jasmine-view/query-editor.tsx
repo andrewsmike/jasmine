@@ -8,7 +8,7 @@ import FeedbackIcon from "@material-ui/icons/Feedback";
 import FlashAuto from "@material-ui/icons/FlashAuto";
 import SaveIcon from "@material-ui/icons/Save";
 import SettingsIcon from "@material-ui/icons/Settings";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useDispatch } from "react-redux";
 import { Prompt } from "react-router";
 
@@ -16,6 +16,7 @@ import SqlEditor from "jasmine-view/sql-editor";
 import ViewResultPreview from "jasmine-view/view-result-preview";
 import { toggleFeedback, toggleSettings } from "jasmine-view/state";
 import { setNotification } from "jasmine-web/state";
+import { fullPath } from "utils/path-utils";
 
 const useStyles = makeStyles((theme) => ({
     editorPaper: {
@@ -115,14 +116,21 @@ export default function JasmineQuery({
     const narrowButtonMode = useMediaQuery("(max-width: 420px)");
 
     const [code, setCode] = useState(queryText);
+    useEffect(() => setCode(queryText), [queryText]);
+
+    const [queryFullPath, setFullPath] = useState(
+        fullPath(projectName, queryPath)
+    );
+    useEffect(
+        () => setFullPath(fullPath(projectName, queryPath)),
+        [projectName, queryPath]
+    );
 
     const [saveQueryTextMutation] = useMutation(saveSqlQueryText, {
         refetchQueries: refetchQueries,
         variables: { queryId, queryText: code },
         onCompleted: (data) => {
-            dispatch(
-                setNotification(`Saved view at [${projectName}]/${queryPath}.`)
-            );
+            dispatch(setNotification(`Saved view at ${queryFullPath}.`));
         },
     });
     const [formatQuery] = useLazyQuery(formattedSqlQueryTextQuery, {
@@ -130,8 +138,6 @@ export default function JasmineQuery({
     });
 
     const codeUnchanged = queryText === code;
-
-    const fullPath = "[" + projectName + "]/" + queryPath;
 
     return (
         <>
@@ -143,9 +149,10 @@ export default function JasmineQuery({
                 <div className={classes.queryBar}>
                     <TextField
                         className={classes.queryPathBox}
+                        onChange={(event) => setFullPath(event.target.value)}
                         variant="outlined"
                         label="Name"
-                        value={fullPath}
+                        value={queryFullPath}
                         size="small"
                     />
                     <div className={classes.queryButtonBar}>

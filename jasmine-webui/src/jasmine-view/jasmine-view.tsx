@@ -4,6 +4,7 @@ import { useLocation } from "react-router-dom";
 import QueryEditor from "jasmine-view/query-editor";
 import ViewFeedbackBar from "jasmine-view/view-feedback-bar";
 import ViewSettingsDrawer from "jasmine-view/view-settings-drawer";
+import { fullPath, fullPathParts } from "utils/path-utils";
 
 const viewFromPathQuery = gql`
     query ViewFromPath(
@@ -57,10 +58,7 @@ function viewAttrsFromPath(urlPath: string) {
 
     const viewFullPath = urlPath.slice(prefix.length);
     if (isIn("/", viewFullPath)) {
-        const fullPathRegex = /\[([^/\]]+)\]\/(.+)/;
-        const [, projectName, viewPath] = viewFullPath.match(
-            fullPathRegex
-        ) as RegExpMatchArray;
+        const [projectName, viewPath] = fullPathParts(viewFullPath);
         return { pathType: "viewPath", projectName, viewPath };
     } else {
         return { pathType: "viewId", viewId: parseInt(viewFullPath) };
@@ -102,7 +100,7 @@ export default function JasmineView() {
 
     const urlLocation =
         pathType === "viewPath"
-            ? `at [${urlProjectName}]/${urlViewPath}`
+            ? `at ${fullPath(urlProjectName as string, urlViewPath as string)}`
             : `with ID ${urlViewId}`;
     if (loading) {
         return <div> Loading... </div>;
