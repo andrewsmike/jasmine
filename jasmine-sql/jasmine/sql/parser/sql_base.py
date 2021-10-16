@@ -95,13 +95,13 @@ class SQLBaseLexer(Lexer):
     def determineFunction(self, proposed: int):
         if self.isSqlModeActive(IgnoreSpace):
             self.input = self._input.LA(1)
-            while self.input in " \t\r\n":
+            while self.input in [ord(c) for c in " \t\r\n"]:
                 self._interp.consume(self._input)
                 self.channel = self.HIDDEN
                 self.type = self.WHITESPACE
                 self.input = self._input.LA(1)
 
-        if self._input.LA(1) == "(":
+        if self._input.LA(1) == ord("("):
             return proposed
         else:
             return self.IDENTIFIER

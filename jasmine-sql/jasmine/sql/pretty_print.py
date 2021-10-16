@@ -504,14 +504,20 @@ def pretty_printed_sql_str(sql_query: str) -> str:
 
 
 def display_example_query():
-
-    sql_tree = sql_tree_from_file(
-        join(
-            dirname(__file__),
-            "examples",
-            f"{argv[1]}.sql",
-        )
+    sql_source_path = join(
+        dirname(__file__),
+        "examples",
+        f"{argv[1]}.sql",
     )
+
+    try:
+        sql_tree = sql_tree_from_file(sql_source_path)
+    except SyntaxError as e:
+        print("Failed to parse, dropping into debugger mode.")
+        from pdb import post_mortem
+
+        post_mortem(e.__traceback__)
+        raise e
 
     print("Pretty SQL tree string:")
     print(sql_tree_pretty_str(sql_tree))
