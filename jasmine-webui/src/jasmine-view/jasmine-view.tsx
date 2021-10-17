@@ -136,7 +136,11 @@ export default function JasmineView() {
                 projectName={projectName}
                 queryPath={viewPath}
                 queryText={queryText}
-                refetchQueries={[viewFromIdQuery, viewFromPathQuery]}
+                refetchQueries={[
+                    viewFromIdQuery,
+                    viewFromPathQuery,
+                    "orgViewDirectory",
+                ]}
             />
             <ViewFeedbackBar viewId={viewId} />
             <ViewSettingsDrawer

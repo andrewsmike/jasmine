@@ -1,22 +1,25 @@
-import { gql, useLazyQuery, useMutation } from "@apollo/client";
+import { gql, useMutation } from "@apollo/client";
 import { makeStyles } from "@material-ui/core/styles";
-import useMediaQuery from "@material-ui/core/useMediaQuery";
-import Button from "@material-ui/core/Button";
 import Paper from "@material-ui/core/Paper";
-import TextField from "@material-ui/core/TextField";
-import FeedbackIcon from "@material-ui/icons/Feedback";
-import FlashAuto from "@material-ui/icons/FlashAuto";
-import SaveIcon from "@material-ui/icons/Save";
-import SettingsIcon from "@material-ui/icons/Settings";
-import { useEffect, useState } from "react";
-import { useDispatch } from "react-redux";
+import { useEffect } from "react";
+import { useDispatch, useSelector } from "react-redux";
 import { Prompt } from "react-router";
+import { useHistory } from "react-router-dom";
 
 import SqlEditor from "jasmine-view/sql-editor";
+import QueryEditorBar from "jasmine-view/query-editor-bar";
 import ViewResultPreview from "jasmine-view/view-result-preview";
-import { toggleFeedback, toggleSettings } from "jasmine-view/state";
+import {
+    queryEditorPartialReset,
+    selectEditorQuery,
+    selectEditorQueryUnchanged,
+    selectEditorQueryValid,
+    selectOriginalQuery,
+    setEditorQueryFullPath,
+    setEditorQueryText,
+} from "jasmine-view/state";
 import { setNotification } from "jasmine-web/state";
-import { fullPath } from "utils/path-utils";
+import { fullPath, fullPathParts, fullPathValid } from "utils/path-utils";
 
 const useStyles = makeStyles((theme) => ({
     editorPaper: {
@@ -27,51 +30,10 @@ const useStyles = makeStyles((theme) => ({
         padding: "10px",
         minWidth: "1px",
     },
-    queryPathBox: {
-        flexGrow: 1,
-    },
-    saveButton: {
-        [theme.breakpoints.up("md")]: {
-            marginLeft: "auto",
-        },
-    },
-    button: {
-        [theme.breakpoints.up("md")]: {
-            marginLeft: theme.spacing(1),
-        },
-        [theme.breakpoints.down("sm")]: {
-            flexGrow: 1,
-            marginLeft: theme.spacing(0.5),
-            marginRight: theme.spacing(0.5),
-        },
-    },
-    queryBar: {
-        [theme.breakpoints.up("sm")]: {
-            display: "flex",
-            flexDirection: "row",
-            marginBottom: theme.spacing(1),
-        },
-        [theme.breakpoints.down("sm")]: {
-            display: "flex",
-            flexDirection: "column",
-            marginBottom: theme.spacing(1),
-        },
-    },
-    queryButtonBar: {
-        display: "flex",
-        flexDirection: "row",
-        justifyContent: "space-between",
-        [theme.breakpoints.up("md")]: {
-            marginLeft: theme.spacing(1),
-        },
-        [theme.breakpoints.down("sm")]: {
-            marginTop: theme.spacing(1),
-        },
-    },
 }));
 
-const saveSqlQueryText = gql`
-    mutation saveSqlQueryText($queryId: ID!, $queryText: String!) {
+const updateQueryTextMutation = gql`
+    mutation updateQueryText($queryId: ID!, $queryText: String!) {
         update_query_text(id: $queryId, query_text: $queryText) {
             success
             error
@@ -91,13 +53,36 @@ const saveSqlQueryText = gql`
     }
 `;
 
-const formattedSqlQueryTextQuery = gql`
-    query formattedQueryText($queryText: String!) {
-        formatted_query_text(query_text: $queryText)
+const moveQueryMutation = gql`
+    mutation moveQuery(
+        $queryId: ID!
+        $projectName: String!
+        $queryPath: String!
+    ) {
+        move_view(
+            id: $queryId
+            project_name: $projectName
+            view_path: $queryPath
+        ) {
+            success
+            error
+            result {
+                view_id
+                project {
+                    name
+                }
+                path
+                spec {
+                    ... on QuerySpec {
+                        query_text
+                    }
+                }
+            }
+        }
     }
 `;
 
-export default function JasmineQuery({
+export default function QueryEditor({
     queryId,
     projectName,
     queryPath,
@@ -110,92 +95,110 @@ export default function JasmineQuery({
     queryText: string;
     refetchQueries: any[];
 }) {
-    const dispatch = useDispatch();
     const classes = useStyles();
+    const dispatch = useDispatch();
+    const history = useHistory();
 
-    const narrowButtonMode = useMediaQuery("(max-width: 420px)");
+    /* When the original query gets created/updated, update both the original and editor queries. */
+    useEffect(() => {
+        dispatch(
+            queryEditorPartialReset({
+                fullPath: fullPath(projectName, queryPath),
+            })
+        );
+    }, [projectName, queryPath]);
+    useEffect(() => {
+        dispatch(queryEditorPartialReset({ queryText }));
+    }, [queryText]);
 
-    const [code, setCode] = useState(queryText);
-    useEffect(() => setCode(queryText), [queryText]);
+    /* updateQuery: Convert query updates into a sequence of delta-applying mutations. */
+    const editorQueryValid = useSelector(selectEditorQueryValid);
 
-    const [queryFullPath, setFullPath] = useState(
-        fullPath(projectName, queryPath)
-    );
-    useEffect(
-        () => setFullPath(fullPath(projectName, queryPath)),
-        [projectName, queryPath]
-    );
+    const originalQuery = useSelector(selectOriginalQuery);
+    const editorQuery = useSelector(selectEditorQuery);
 
-    const [saveQueryTextMutation] = useMutation(saveSqlQueryText, {
+    /* Parse out arguments for the updateQueryText mutation. */
+    var editorQueryProjectName, editorQueryPath;
+    if (editorQueryValid)
+        [editorQueryProjectName, editorQueryPath] = fullPathParts(
+            editorQuery?.fullPath as string
+        );
+    else [editorQueryProjectName, editorQueryPath] = [undefined, undefined];
+
+    const [updateQueryText] = useMutation(updateQueryTextMutation, {
         refetchQueries: refetchQueries,
-        variables: { queryId, queryText: code },
+        variables: { queryId, queryText: editorQuery?.queryText },
         onCompleted: (data) => {
-            dispatch(setNotification(`Saved view at ${queryFullPath}.`));
+            dispatch(
+                setNotification(`Saved view at ${originalQuery?.fullPath}.`)
+            );
+            dispatch(
+                queryEditorPartialReset({ queryText: editorQuery?.queryText })
+            );
         },
     });
-    const [formatQuery] = useLazyQuery(formattedSqlQueryTextQuery, {
-        onCompleted: (data) => setCode(data.formatted_query_text),
+
+    const [moveQuery] = useMutation(moveQueryMutation, {
+        refetchQueries: refetchQueries,
+        variables: {
+            queryId,
+            projectName: editorQueryProjectName,
+            queryPath: editorQueryPath,
+        },
+        onCompleted: (data) => {
+            dispatch(
+                setNotification(`Moved view to ${editorQuery?.fullPath}.`)
+            );
+            dispatch(
+                queryEditorPartialReset({ fullPath: editorQuery?.fullPath })
+            );
+            history.push(`/console/view/${editorQuery?.fullPath}`);
+        },
     });
 
-    const codeUnchanged = queryText === code;
+    const updateQuery = () => {
+        if (originalQuery === undefined || editorQuery === undefined)
+            // For typechecking.
+            return;
+
+        if (!editorQueryValid) return;
+
+        if (originalQuery.queryText !== editorQuery.queryText)
+            updateQueryText();
+
+        if (originalQuery.fullPath !== editorQuery.fullPath) {
+            moveQuery();
+        }
+    };
+
+    /* These should be pushed into subcomponents at some point.
+     * They're not relevant to the top-level form logic.
+     */
+    const editorQueryUnchanged = useSelector(selectEditorQueryUnchanged);
+    const setEditorCode = (queryText: string) => {
+        dispatch(setEditorQueryText(queryText));
+    };
 
     return (
         <>
             <Prompt
-                when={!codeUnchanged}
+                when={!editorQueryUnchanged}
                 message="You have unsaved changes. Discard and continue?"
             />
             <Paper className={classes.editorPaper} elevation={6}>
-                <div className={classes.queryBar}>
-                    <TextField
-                        className={classes.queryPathBox}
-                        onChange={(event) => setFullPath(event.target.value)}
-                        variant="outlined"
-                        label="Name"
-                        value={queryFullPath}
-                        size="small"
-                    />
-                    <div className={classes.queryButtonBar}>
-                        <Button
-                            className={classes.button}
-                            variant="contained"
-                            color="primary"
-                            disabled={codeUnchanged}
-                            onClick={() => saveQueryTextMutation()}
-                            startIcon={narrowButtonMode ? "" : <SaveIcon />}
-                        >
-                            {narrowButtonMode ? <SaveIcon /> : "Save"}
-                        </Button>
-                        <Button
-                            className={classes.button}
-                            variant="contained"
-                            color="secondary"
-                            onClick={() =>
-                                formatQuery({ variables: { queryText: code } })
-                            }
-                            startIcon={narrowButtonMode ? "" : <FlashAuto />}
-                        >
-                            {narrowButtonMode ? <FlashAuto /> : "Autoformat"}
-                        </Button>
-                        <Button
-                            className={classes.button}
-                            variant="contained"
-                            onClick={() => dispatch(toggleSettings())}
-                        >
-                            <SettingsIcon fontSize="medium" />
-                        </Button>
-                        <Button
-                            className={classes.button}
-                            variant="contained"
-                            onClick={() => dispatch(toggleFeedback())}
-                        >
-                            <FeedbackIcon fontSize="medium" />
-                        </Button>
-                    </div>
-                </div>
-
-                <SqlEditor code={code || ""} setCode={setCode} />
-                <ViewResultPreview viewId={queryId} disabled={!codeUnchanged} />
+                <QueryEditorBar
+                    queryId={queryId}
+                    updateQuery={updateQuery}
+                    refetchQueries={refetchQueries}
+                />
+                <SqlEditor
+                    code={editorQuery?.queryText || ""}
+                    setCode={setEditorCode}
+                />
+                <ViewResultPreview
+                    viewId={queryId}
+                    disabled={!editorQueryUnchanged}
+                />
             </Paper>
         </>
     );
