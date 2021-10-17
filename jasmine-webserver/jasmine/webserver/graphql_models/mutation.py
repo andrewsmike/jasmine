@@ -83,9 +83,9 @@ type Mutation {
     create_query(project_id: ID, path: String, query_text: String): ViewResult!
     update_query_text(id: ID!, query_text: String!): ViewResult!
 
-    delete_view(id: ID!): DeleteResult!
+    move_view(id: ID!, project_name: String, view_path: String): ViewResult!
     update_view_path(id: ID!, path: String!): ViewResult!
-    copy_view(id: ID!, new_path: String): ViewResult!
+    delete_view(id: ID!): DeleteResult!
 
     preview_view_result(id: ID!): DataResult!
 }
@@ -197,6 +197,29 @@ def delete_view(
     id: int = None,
 ):
     session.delete(session.query(View).where(View.view_id == id).one())
+
+
+@mutation_obj.field("move_view")
+@as_wrapped_graphql_payload
+@with_sqla_session
+def move_view(
+    session,
+    obj,
+    info,
+    id: int,
+    project_name: Optional[str] = None,
+    view_path: Optional[str] = None,
+) -> View:
+    view = session.query(View).where(View.view_id == id).one()
+
+    if project_name is not None:
+        project = session.query(Project).where(Project.name == project_name).one()
+        view.project = project
+
+    if view_path is not None:
+        view.path = view_path
+
+    return view
 
 
 @mutation_obj.field("preview_view_result")
