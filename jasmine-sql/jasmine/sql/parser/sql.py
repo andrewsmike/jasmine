@@ -43,6 +43,16 @@ def children_contexts(
     return children
 
 
+def sql_parser_from_str(expr: str) -> SQLParser:
+    lexer = SQLLexer(InputStream(expr))
+    token_stream = CommonTokenStream(lexer)
+    parser = SQLParser(token_stream)
+
+    parser.addErrorListener(AbortSyntaxErrorListener())
+
+    return parser
+
+
 def sql_tree_from_stream(input_stream: InputStream) -> ParseTree:
     lexer = SQLLexer(input_stream)
     token_stream = CommonTokenStream(lexer)
