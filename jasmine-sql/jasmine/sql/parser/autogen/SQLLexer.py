@@ -2,7 +2,6 @@
 from antlr4 import *
 from io import StringIO
 import sys
-
 if sys.version_info[1] > 5:
     from typing import TextIO
 else:
@@ -49,8 +48,8 @@ def serializedATN():
         buf.write("\4\16\t\16\4\17\t\17\4\20\t\20\4\21\t\21\4\22\t\22\4\23")
         buf.write("\t\23\4\24\t\24\4\25\t\25\4\26\t\26\4\27\t\27\4\30\t\30")
         buf.write("\4\31\t\31\4\32\t\32\4\33\t\33\4\34\t\34\4\35\t\35\4\36")
-        buf.write('\t\36\4\37\t\37\4 \t \4!\t!\4"\t"\4#\t#\4$\t$\4%\t%')
-        buf.write("\4&\t&\4'\t'\4(\t(\4)\t)\4*\t*\4+\t+\4,\t,\4-\t-\4.")
+        buf.write("\t\36\4\37\t\37\4 \t \4!\t!\4\"\t\"\4#\t#\4$\t$\4%\t%")
+        buf.write("\4&\t&\4\'\t\'\4(\t(\4)\t)\4*\t*\4+\t+\4,\t,\4-\t-\4.")
         buf.write("\t.\4/\t/\4\60\t\60\4\61\t\61\4\62\t\62\4\63\t\63\4\64")
         buf.write("\t\64\4\65\t\65\4\66\t\66\4\67\t\67\48\t8\49\t9\4:\t:")
         buf.write("\4;\t;\4<\t<\4=\t=\4>\t>\4?\t?\4@\t@\4A\tA\4B\tB\4C\t")
@@ -276,8 +275,8 @@ def serializedATN():
         buf.write("\3\23\3\23\3\24\3\24\3\24\3\25\3\25\3\26\3\26\3\27\3\27")
         buf.write("\3\27\3\27\3\27\3\30\3\30\3\31\3\31\3\32\3\32\3\33\3\33")
         buf.write("\3\34\3\34\3\35\3\35\3\36\3\36\3\37\3\37\3 \3 \3!\3!\3")
-        buf.write('"\3"\3"\3"\3"\3#\3#\3#\3#\3#\3#\3$\3$\3%\3%\3%\3')
-        buf.write("&\3&\3&\3'\3'\3'\3(\3(\3)\3)\3*\3*\3+\3+\3,\3,\3-\3")
+        buf.write("\"\3\"\3\"\3\"\3\"\3#\3#\3#\3#\3#\3#\3$\3$\3%\3%\3%\3")
+        buf.write("&\3&\3&\3\'\3\'\3\'\3(\3(\3)\3)\3*\3*\3+\3+\3,\3,\3-\3")
         buf.write("-\3.\3.\3/\3/\3\60\3\60\3\61\3\61\3\62\3\62\3\63\3\63")
         buf.write("\3\64\3\64\3\65\3\65\3\66\3\66\3\67\3\67\38\38\39\39\3")
         buf.write(":\3:\3;\3;\3<\3<\3=\3=\3>\3>\3?\3?\3@\3@\3A\3A\3B\3B\3")
@@ -1313,7 +1312,7 @@ def serializedATN():
         buf.write("\u23c5\u23d6\u23e9\u240d\2\u035a\3\u02f0\5\u02f1\7\u02f2")
         buf.write("\t\u02f3\13\u02f4\r\u02f5\17\u02f6\21\u02f7\23\u0328\25")
         buf.write("\u02f8\27\u02f9\31\u02fa\33\u02fb\35\u02fc\37\u02fd!\u02fe")
-        buf.write("#\u02ff%\u0300'\u0301)\u0302+\u0303-\u0304/\u0305\61")
+        buf.write("#\u02ff%\u0300\'\u0301)\u0302+\u0303-\u0304/\u0305\61")
         buf.write("\u0306\63\u0307\65\u0308\67\u03099\u030a;\u030b=\u030c")
         buf.write("?\u030dA\u030eC\u030fE\u0310G\u0311I\u0312K\u0313M\u0314")
         buf.write("O\u0315Q\2S\2U\2W\2Y\2[\2]\2_\2a\2c\2e\2g\2i\2k\2m\2o")
@@ -1324,8 +1323,8 @@ def serializedATN():
         buf.write("\r\u00ad\16\u00af\17\u00b1\20\u00b3\21\u00b5\22\u00b7")
         buf.write("\23\u00b9\24\u00bb\25\u00bd\26\u00bf\27\u00c1\30\u00c3")
         buf.write("\31\u00c5\32\u00c7\33\u00c9\34\u00cb\35\u00cd\36\u00cf")
-        buf.write('\37\u00d1 \u00d3!\u00d5"\u00d7#\u00d9$\u00db%\u00dd&')
-        buf.write("\u00df'\u00e1(\u00e3)\u00e5*\u00e7+\u00e9,\u00eb-\u00ed")
+        buf.write("\37\u00d1 \u00d3!\u00d5\"\u00d7#\u00d9$\u00db%\u00dd&")
+        buf.write("\u00df\'\u00e1(\u00e3)\u00e5*\u00e7+\u00e9,\u00eb-\u00ed")
         buf.write(".\u00ef/\u00f1\60\u00f3\61\u00f5\62\u00f7\63\u00f9\64")
         buf.write("\u00fb\65\u00fd\66\u00ff\67\u01018\u01039\u0105:\u0107")
         buf.write(";\u0109<\u010b=\u010d>\u010f?\u0111@\u0113A\u0115B\u0117")
@@ -1485,14 +1484,14 @@ def serializedATN():
         buf.write("Jjj\4\2KKkk\4\2LLll\4\2MMmm\4\2NNnn\4\2OOoo\4\2PPpp\4")
         buf.write("\2QQqq\4\2RRrr\4\2SSss\4\2TTtt\4\2UUuu\4\2VVvv\4\2WWw")
         buf.write("w\4\2XXxx\4\2YYyy\4\2ZZzz\4\2[[{{\4\2\\\\||\3\2\62;\5")
-        buf.write('\2\62;CHch\3\2\62\63\5\2\13\f\16\17""\7\2\3\n\r\16\20')
-        buf.write('!]]__\4\2\62;c|\3\2##\4\2\f\f\17\17\4\2\13\13""\6\2')
+        buf.write("\2\62;CHch\3\2\62\63\5\2\13\f\16\17\"\"\7\2\3\n\r\16\20")
+        buf.write("!]]__\4\2\62;c|\3\2##\4\2\f\f\17\17\4\2\13\13\"\"\6\2")
         buf.write("&&C\\aac|\7\2&&C\\aac|\u0082\1\t\2&&CFH\\aacfh|\u0082")
         buf.write("\1\2\u244b\2\3\3\2\2\2\2\5\3\2\2\2\2\7\3\2\2\2\2\t\3\2")
         buf.write("\2\2\2\13\3\2\2\2\2\r\3\2\2\2\2\17\3\2\2\2\2\21\3\2\2")
         buf.write("\2\2\23\3\2\2\2\2\25\3\2\2\2\2\27\3\2\2\2\2\31\3\2\2\2")
         buf.write("\2\33\3\2\2\2\2\35\3\2\2\2\2\37\3\2\2\2\2!\3\2\2\2\2#")
-        buf.write("\3\2\2\2\2%\3\2\2\2\2'\3\2\2\2\2)\3\2\2\2\2+\3\2\2\2")
+        buf.write("\3\2\2\2\2%\3\2\2\2\2\'\3\2\2\2\2)\3\2\2\2\2+\3\2\2\2")
         buf.write("\2-\3\2\2\2\2/\3\2\2\2\2\61\3\2\2\2\2\63\3\2\2\2\2\65")
         buf.write("\3\2\2\2\2\67\3\2\2\2\29\3\2\2\2\2;\3\2\2\2\2=\3\2\2\2")
         buf.write("\2?\3\2\2\2\2A\3\2\2\2\2C\3\2\2\2\2E\3\2\2\2\2G\3\2\2")
@@ -1724,7 +1723,7 @@ def serializedATN():
         buf.write("\u06c6\3\2\2\2\23\u06c9\3\2\2\2\25\u06ce\3\2\2\2\27\u06d0")
         buf.write("\3\2\2\2\31\u06d2\3\2\2\2\33\u06d4\3\2\2\2\35\u06d6\3")
         buf.write("\2\2\2\37\u06d8\3\2\2\2!\u06da\3\2\2\2#\u06dc\3\2\2\2")
-        buf.write("%\u06df\3\2\2\2'\u06e2\3\2\2\2)\u06e5\3\2\2\2+\u06e7")
+        buf.write("%\u06df\3\2\2\2\'\u06e2\3\2\2\2)\u06e5\3\2\2\2+\u06e7")
         buf.write("\3\2\2\2-\u06e9\3\2\2\2/\u06ee\3\2\2\2\61\u06f0\3\2\2")
         buf.write("\2\63\u06f2\3\2\2\2\65\u06f4\3\2\2\2\67\u06f6\3\2\2\2")
         buf.write("9\u06f8\3\2\2\2;\u06fa\3\2\2\2=\u06fc\3\2\2\2?\u06fe\3")
@@ -2037,8 +2036,8 @@ def serializedATN():
         buf.write("\24\3\2\2\2\u06ce\u06cf\7-\2\2\u06cf\26\3\2\2\2\u06d0")
         buf.write("\u06d1\7/\2\2\u06d1\30\3\2\2\2\u06d2\u06d3\7,\2\2\u06d3")
         buf.write("\32\3\2\2\2\u06d4\u06d5\7\61\2\2\u06d5\34\3\2\2\2\u06d6")
-        buf.write("\u06d7\7'\2\2\u06d7\36\3\2\2\2\u06d8\u06d9\7#\2\2\u06d9")
-        buf.write(' \3\2\2\2\u06da\u06db\7\u0080\2\2\u06db"\3\2\2\2\u06dc')
+        buf.write("\u06d7\7\'\2\2\u06d7\36\3\2\2\2\u06d8\u06d9\7#\2\2\u06d9")
+        buf.write(" \3\2\2\2\u06da\u06db\7\u0080\2\2\u06db\"\3\2\2\2\u06dc")
         buf.write("\u06dd\7>\2\2\u06dd\u06de\7>\2\2\u06de$\3\2\2\2\u06df")
         buf.write("\u06e0\7@\2\2\u06e0\u06e1\7@\2\2\u06e1&\3\2\2\2\u06e2")
         buf.write("\u06e3\7(\2\2\u06e3\u06e4\7(\2\2\u06e4(\3\2\2\2\u06e5")
@@ -2052,7 +2051,7 @@ def serializedATN():
         buf.write("\7+\2\2\u06fb<\3\2\2\2\u06fc\u06fd\7}\2\2\u06fd>\3\2\2")
         buf.write("\2\u06fe\u06ff\7\177\2\2\u06ff@\3\2\2\2\u0700\u0701\7")
         buf.write("a\2\2\u0701B\3\2\2\2\u0702\u0703\7/\2\2\u0703\u0704\7")
-        buf.write('@\2\2\u0704\u0705\3\2\2\2\u0705\u0706\6"\2\2\u0706D\3')
+        buf.write("@\2\2\u0704\u0705\3\2\2\2\u0705\u0706\6\"\2\2\u0706D\3")
         buf.write("\2\2\2\u0707\u0708\7/\2\2\u0708\u0709\7@\2\2\u0709\u070a")
         buf.write("\7@\2\2\u070a\u070b\3\2\2\2\u070b\u070c\6#\3\2\u070cF")
         buf.write("\3\2\2\2\u070d\u070e\7B\2\2\u070eH\3\2\2\2\u070f\u0710")
@@ -3188,7 +3187,7 @@ def serializedATN():
         buf.write("\u13e2\u13e3\5k\66\2\u13e3\u13e4\7a\2\2\u13e4\u13e5\5")
         buf.write("s:\2\u13e5\u13e6\5m\67\2\u13e6\u13e7\5}?\2\u13e7\u13e8")
         buf.write("\5u;\2\u13e8\u0346\3\2\2\2\u13e9\u13ea\5i\65\2\u13ea\u13eb")
-        buf.write('\5a\61\2\u13eb\u13ec\5k\66\2\u13ec\u13ed\b\u01a4"\2\u13ed')
+        buf.write("\5a\61\2\u13eb\u13ec\5k\66\2\u13ec\u13ed\b\u01a4\"\2\u13ed")
         buf.write("\u0348\3\2\2\2\u13ee\u13ef\5i\65\2\u13ef\u13f0\5m\67\2")
         buf.write("\u13f0\u13f1\5W,\2\u13f1\u13f2\5Y-\2\u13f2\u034a\3\2\2")
         buf.write("\2\u13f3\u13f4\5i\65\2\u13f4\u13f5\5m\67\2\u13f5\u13f6")
@@ -3276,7 +3275,7 @@ def serializedATN():
         buf.write("\66\2\u14e0\u14e1\5y=\2\u14e1\u14e2\5g\64\2\u14e2\u14e3")
         buf.write("\5g\64\2\u14e3\u0386\3\2\2\2\u14e4\u14e5\5k\66\2\u14e5")
         buf.write("\u14e6\5y=\2\u14e6\u14e7\5i\65\2\u14e7\u14e8\5S*\2\u14e8")
-        buf.write('\u14e9\5Y-\2\u14e9\u14ea\5s:\2\u14ea\u14eb\6\u01c4"\2')
+        buf.write("\u14e9\5Y-\2\u14e9\u14ea\5s:\2\u14ea\u14eb\6\u01c4\"\2")
         buf.write("\u14eb\u0388\3\2\2\2\u14ec\u14ed\5k\66\2\u14ed\u14ee\5")
         buf.write("y=\2\u14ee\u14ef\5i\65\2\u14ef\u14f0\5Y-\2\u14f0\u14f1")
         buf.write("\5s:\2\u14f1\u14f2\5a\61\2\u14f2\u14f3\5U+\2\u14f3\u038a")
@@ -3380,7 +3379,7 @@ def serializedATN():
         buf.write("\u160e\b\u01e9&\2\u160e\u03d2\3\2\2\2\u160f\u1610\5o8")
         buf.write("\2\u1610\u1611\5s:\2\u1611\u1612\5Y-\2\u1612\u1613\5U")
         buf.write("+\2\u1613\u1614\5Y-\2\u1614\u1615\5W,\2\u1615\u1616\5")
-        buf.write("Y-\2\u1616\u1617\5u;\2\u1617\u1618\6\u01ea'\2\u1618\u03d4")
+        buf.write("Y-\2\u1616\u1617\5u;\2\u1617\u1618\6\u01ea\'\2\u1618\u03d4")
         buf.write("\3\2\2\2\u1619\u161a\5o8\2\u161a\u161b\5s:\2\u161b\u161c")
         buf.write("\5Y-\2\u161c\u161d\5U+\2\u161d\u161e\5a\61\2\u161e\u161f")
         buf.write("\5u;\2\u161f\u1620\5a\61\2\u1620\u1621\5m\67\2\u1621\u1622")
@@ -3602,7 +3601,7 @@ def serializedATN():
         buf.write("\u189c\5]/\2\u189c\u189d\5_\60\2\u189d\u189e\5w<\2\u189e")
         buf.write("\u0452\3\2\2\2\u189f\u18a0\5s:\2\u18a0\u18a1\5g\64\2\u18a1")
         buf.write("\u18a2\5a\61\2\u18a2\u18a3\5e\63\2\u18a3\u18a4\5Y-\2\u18a4")
-        buf.write("\u18a5\3\2\2\2\u18a5\u18a6\b\u022a'\2\u18a6\u0454\3\2")
+        buf.write("\u18a5\3\2\2\2\u18a5\u18a6\b\u022a\'\2\u18a6\u0454\3\2")
         buf.write("\2\2\u18a7\u18a8\5s:\2\u18a8\u18a9\5m\67\2\u18a9\u18aa")
         buf.write("\5g\64\2\u18aa\u18ab\5g\64\2\u18ab\u18ac\5S*\2\u18ac\u18ad")
         buf.write("\5Q)\2\u18ad\u18ae\5U+\2\u18ae\u18af\5e\63\2\u18af\u0456")
@@ -4621,7 +4620,7 @@ def serializedATN():
         buf.write("\u2400\3\2\2\2\u2400\u2401\b\u034eE\2\u2401\u069c\3\2")
         buf.write("\2\2\u2402\u2403\7\61\2\2\u2403\u2404\7,\2\2\u2404\u2405")
         buf.write("\7,\2\2\u2405\u2413\7\61\2\2\u2406\u2407\7\61\2\2\u2407")
-        buf.write('\u2408\7,\2\2\u2408\u2409\3\2\2\2\u2409\u240d\n"\2\2')
+        buf.write("\u2408\7,\2\2\u2408\u2409\3\2\2\2\u2409\u240d\n\"\2\2")
         buf.write("\u240a\u240c\13\2\2\2\u240b\u240a\3\2\2\2\u240c\u240f")
         buf.write("\3\2\2\2\u240d\u240e\3\2\2\2\u240d\u240b\3\2\2\2\u240e")
         buf.write("\u2410\3\2\2\2\u240f\u240d\3\2\2\2\u2410\u2411\7,\2\2")
@@ -4648,7 +4647,7 @@ def serializedATN():
         buf.write("\3\2\2\2\u243f\u2442\5\u0085C\2\u2440\u2442\5\u06af\u0358")
         buf.write("\2\u2441\u243f\3\2\2\2\u2441\u2440\3\2\2\2\u2442\u06ae")
         buf.write("\3\2\2\2\u2443\u2444\t&\2\2\u2444\u06b0\3\2\2\2\u2445")
-        buf.write("\u2446\t'\2\2\u2446\u06b2\3\2\2\2-\2\u0753\u075d\u0765")
+        buf.write("\u2446\t\'\2\2\u2446\u06b2\3\2\2\2-\2\u0753\u075d\u0765")
         buf.write("\u0769\u0771\u0779\u077c\u0782\u0788\u078b\u0791\u079a")
         buf.write("\u127e\u12be\u1888\u2378\u237e\u2385\u238c\u238f\u2394")
         buf.write("\u239a\u23a1\u23a4\u23b2\u23b7\u23c0\u23c5\u23cc\u23d1")
@@ -4661,8 +4660,8 @@ def serializedATN():
         buf.write("\23\3\u019d\24\t\u014d\2\3\u01a4\25\t\u016d\2\3\u01be")
         buf.write("\26\3\u01bf\27\3\u01e9\30\t\u01be\2\to\2\tp\2\3\u0244")
         buf.write("\31\t\22\2\3\u026f\32\3\u0270\33\3\u0271\34\3\u0272\35")
-        buf.write('\3\u0279\36\3\u027d\37\3\u027e \3\u027f!\3\u0284"\3\u0285')
-        buf.write("#\3\u029e$\t\u0277\2\3\u02c3%\3\u02c5&\3\u02c6'\t\u024e")
+        buf.write("\3\u0279\36\3\u027d\37\3\u027e \3\u027f!\3\u0284\"\3\u0285")
+        buf.write("#\3\u029e$\t\u0277\2\3\u02c3%\3\u02c5&\3\u02c6\'\t\u024e")
         buf.write("\2\t\u0206\2\t!\2\t\u01f1\2\t\u0159\2\t\u00e7\2\t\u0282")
         buf.write("\2\t\u0160\2\t\u01af\2\t\u0292\2\2\3\2\3\u0343(\3\u034d")
         buf.write(")\3\u034e*")
@@ -4673,7 +4672,7 @@ class SQLLexer(SQLBaseLexer):
 
     atn = ATNDeserializer().deserialize(serializedATN())
 
-    decisionsToDFA = [DFA(ds, i) for i, ds in enumerate(atn.decisionToState)]
+    decisionsToDFA = [ DFA(ds, i) for i, ds in enumerate(atn.decisionToState) ]
 
     ACCESSIBLE_SYMBOL = 1
     ACCOUNT_SYMBOL = 2
@@ -5482,1776 +5481,544 @@ class SQLLexer(SQLBaseLexer):
     DASHDASH_COMMENT = 805
     NOT_EQUAL2_OPERATOR = 806
 
-    channelNames = [u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN"]
+    channelNames = [ u"DEFAULT_TOKEN_CHANNEL", u"HIDDEN" ]
 
-    modeNames = ["DEFAULT_MODE"]
+    modeNames = [ "DEFAULT_MODE" ]
 
-    literalNames = [
-        "<INVALID>",
-        "'='",
-        "':='",
-        "'<=>'",
-        "'>='",
-        "'>'",
-        "'<='",
-        "'<'",
-        "'!='",
-        "'+'",
-        "'-'",
-        "'*'",
-        "'/'",
-        "'%'",
-        "'!'",
-        "'~'",
-        "'<<'",
-        "'>>'",
-        "'&&'",
-        "'&'",
-        "'^'",
-        "'||'",
-        "'|'",
-        "'.'",
-        "','",
-        "';'",
-        "':'",
-        "'('",
-        "')'",
-        "'{'",
-        "'}'",
-        "'_'",
-        "'->'",
-        "'->>'",
-        "'@'",
-        "'@@'",
-        "'\\N'",
-        "'?'",
-        "'<>'",
-    ]
+    literalNames = [ "<INVALID>",
+            "'='", "':='", "'<=>'", "'>='", "'>'", "'<='", "'<'", "'!='", 
+            "'+'", "'-'", "'*'", "'/'", "'%'", "'!'", "'~'", "'<<'", "'>>'", 
+            "'&&'", "'&'", "'^'", "'||'", "'|'", "'.'", "','", "';'", "':'", 
+            "'('", "')'", "'{'", "'}'", "'_'", "'->'", "'->>'", "'@'", "'@@'", 
+            "'\\N'", "'?'", "'<>'" ]
 
-    symbolicNames = [
-        "<INVALID>",
-        "ACCESSIBLE_SYMBOL",
-        "ACCOUNT_SYMBOL",
-        "ACTION_SYMBOL",
-        "ADD_SYMBOL",
-        "ADDDATE_SYMBOL",
-        "AFTER_SYMBOL",
-        "AGAINST_SYMBOL",
-        "AGGREGATE_SYMBOL",
-        "ALGORITHM_SYMBOL",
-        "ALL_SYMBOL",
-        "ALTER_SYMBOL",
-        "ALWAYS_SYMBOL",
-        "ANALYSE_SYMBOL",
-        "ANALYZE_SYMBOL",
-        "AND_SYMBOL",
-        "ANY_SYMBOL",
-        "AS_SYMBOL",
-        "ASC_SYMBOL",
-        "ASCII_SYMBOL",
-        "ASENSITIVE_SYMBOL",
-        "AT_SYMBOL",
-        "AUTHORS_SYMBOL",
-        "AUTOEXTEND_SIZE_SYMBOL",
-        "AUTO_INCREMENT_SYMBOL",
-        "AVG_ROW_LENGTH_SYMBOL",
-        "AVG_SYMBOL",
-        "BACKUP_SYMBOL",
-        "BEFORE_SYMBOL",
-        "BEGIN_SYMBOL",
-        "BETWEEN_SYMBOL",
-        "BIGINT_SYMBOL",
-        "BINARY_SYMBOL",
-        "BINLOG_SYMBOL",
-        "BIN_NUM_SYMBOL",
-        "BIT_AND_SYMBOL",
-        "BIT_OR_SYMBOL",
-        "BIT_SYMBOL",
-        "BIT_XOR_SYMBOL",
-        "BLOB_SYMBOL",
-        "BLOCK_SYMBOL",
-        "BOOLEAN_SYMBOL",
-        "BOOL_SYMBOL",
-        "BOTH_SYMBOL",
-        "BTREE_SYMBOL",
-        "BY_SYMBOL",
-        "BYTE_SYMBOL",
-        "CACHE_SYMBOL",
-        "CALL_SYMBOL",
-        "CASCADE_SYMBOL",
-        "CASCADED_SYMBOL",
-        "CASE_SYMBOL",
-        "CAST_SYMBOL",
-        "CATALOG_NAME_SYMBOL",
-        "CHAIN_SYMBOL",
-        "CHANGE_SYMBOL",
-        "CHANGED_SYMBOL",
-        "CHANNEL_SYMBOL",
-        "CHARSET_SYMBOL",
-        "CHARACTER_SYMBOL",
-        "CHAR_SYMBOL",
-        "CHECKSUM_SYMBOL",
-        "CHECK_SYMBOL",
-        "CIPHER_SYMBOL",
-        "CLASS_ORIGIN_SYMBOL",
-        "CLIENT_SYMBOL",
-        "CLOSE_SYMBOL",
-        "COALESCE_SYMBOL",
-        "CODE_SYMBOL",
-        "COLLATE_SYMBOL",
-        "COLLATION_SYMBOL",
-        "COLUMNS_SYMBOL",
-        "COLUMN_SYMBOL",
-        "COLUMN_NAME_SYMBOL",
-        "COLUMN_FORMAT_SYMBOL",
-        "COMMENT_SYMBOL",
-        "COMMITTED_SYMBOL",
-        "COMMIT_SYMBOL",
-        "COMPACT_SYMBOL",
-        "COMPLETION_SYMBOL",
-        "COMPRESSED_SYMBOL",
-        "COMPRESSION_SYMBOL",
-        "CONCURRENT_SYMBOL",
-        "CONDITION_SYMBOL",
-        "CONNECTION_SYMBOL",
-        "CONSISTENT_SYMBOL",
-        "CONSTRAINT_SYMBOL",
-        "CONSTRAINT_CATALOG_SYMBOL",
-        "CONSTRAINT_NAME_SYMBOL",
-        "CONSTRAINT_SCHEMA_SYMBOL",
-        "CONTAINS_SYMBOL",
-        "CONTEXT_SYMBOL",
-        "CONTINUE_SYMBOL",
-        "CONTRIBUTORS_SYMBOL",
-        "CONVERT_SYMBOL",
-        "COUNT_SYMBOL",
-        "CPU_SYMBOL",
-        "CREATE_SYMBOL",
-        "CROSS_SYMBOL",
-        "CUBE_SYMBOL",
-        "CURDATE_SYMBOL",
-        "CURRENT_SYMBOL",
-        "CURRENT_DATE_SYMBOL",
-        "CURRENT_TIME_SYMBOL",
-        "CURRENT_TIMESTAMP_SYMBOL",
-        "CURRENT_USER_SYMBOL",
-        "CURSOR_SYMBOL",
-        "CURSOR_NAME_SYMBOL",
-        "CURTIME_SYMBOL",
-        "DATABASE_SYMBOL",
-        "DATABASES_SYMBOL",
-        "DATAFILE_SYMBOL",
-        "DATA_SYMBOL",
-        "DATETIME_SYMBOL",
-        "DATE_ADD_SYMBOL",
-        "DATE_SUB_SYMBOL",
-        "DATE_SYMBOL",
-        "DAYOFMONTH_SYMBOL",
-        "DAY_HOUR_SYMBOL",
-        "DAY_MICROSECOND_SYMBOL",
-        "DAY_MINUTE_SYMBOL",
-        "DAY_SECOND_SYMBOL",
-        "DAY_SYMBOL",
-        "DEALLOCATE_SYMBOL",
-        "DEC_SYMBOL",
-        "DECIMAL_NUM_SYMBOL",
-        "DECIMAL_SYMBOL",
-        "DECLARE_SYMBOL",
-        "DEFAULT_SYMBOL",
-        "DEFAULT_AUTH_SYMBOL",
-        "DEFINER_SYMBOL",
-        "DELAYED_SYMBOL",
-        "DELAY_KEY_WRITE_SYMBOL",
-        "DELETE_SYMBOL",
-        "DESC_SYMBOL",
-        "DESCRIBE_SYMBOL",
-        "DES_KEY_FILE_SYMBOL",
-        "DETERMINISTIC_SYMBOL",
-        "DIAGNOSTICS_SYMBOL",
-        "DIRECTORY_SYMBOL",
-        "DISABLE_SYMBOL",
-        "DISCARD_SYMBOL",
-        "DISK_SYMBOL",
-        "DISTINCT_SYMBOL",
-        "DISTINCTROW_SYMBOL",
-        "DIV_SYMBOL",
-        "DOUBLE_SYMBOL",
-        "DO_SYMBOL",
-        "DROP_SYMBOL",
-        "DUAL_SYMBOL",
-        "DUMPFILE_SYMBOL",
-        "DUPLICATE_SYMBOL",
-        "DYNAMIC_SYMBOL",
-        "EACH_SYMBOL",
-        "ELSE_SYMBOL",
-        "ELSEIF_SYMBOL",
-        "ENABLE_SYMBOL",
-        "ENCLOSED_SYMBOL",
-        "ENCRYPTION_SYMBOL",
-        "END_SYMBOL",
-        "ENDS_SYMBOL",
-        "END_OF_INPUT_SYMBOL",
-        "ENGINES_SYMBOL",
-        "ENGINE_SYMBOL",
-        "ENUM_SYMBOL",
-        "ERROR_SYMBOL",
-        "ERRORS_SYMBOL",
-        "ESCAPED_SYMBOL",
-        "ESCAPE_SYMBOL",
-        "EVENTS_SYMBOL",
-        "EVENT_SYMBOL",
-        "EVERY_SYMBOL",
-        "EXCHANGE_SYMBOL",
-        "EXECUTE_SYMBOL",
-        "EXISTS_SYMBOL",
-        "EXIT_SYMBOL",
-        "EXPANSION_SYMBOL",
-        "EXPIRE_SYMBOL",
-        "EXPLAIN_SYMBOL",
-        "EXPORT_SYMBOL",
-        "EXTENDED_SYMBOL",
-        "EXTENT_SIZE_SYMBOL",
-        "EXTRACT_SYMBOL",
-        "FALSE_SYMBOL",
-        "FAST_SYMBOL",
-        "FAULTS_SYMBOL",
-        "FETCH_SYMBOL",
-        "FIELDS_SYMBOL",
-        "FILE_SYMBOL",
-        "FILE_BLOCK_SIZE_SYMBOL",
-        "FILTER_SYMBOL",
-        "FIRST_SYMBOL",
-        "FIXED_SYMBOL",
-        "FLOAT4_SYMBOL",
-        "FLOAT8_SYMBOL",
-        "FLOAT_SYMBOL",
-        "FLUSH_SYMBOL",
-        "FOLLOWS_SYMBOL",
-        "FORCE_SYMBOL",
-        "FOREIGN_SYMBOL",
-        "FOR_SYMBOL",
-        "FORMAT_SYMBOL",
-        "FOUND_SYMBOL",
-        "FROM_SYMBOL",
-        "FULL_SYMBOL",
-        "FULLTEXT_SYMBOL",
-        "FUNCTION_SYMBOL",
-        "GET_SYMBOL",
-        "GENERAL_SYMBOL",
-        "GENERATED_SYMBOL",
-        "GROUP_REPLICATION_SYMBOL",
-        "GEOMETRYCOLLECTION_SYMBOL",
-        "GEOMETRY_SYMBOL",
-        "GET_FORMAT_SYMBOL",
-        "GLOBAL_SYMBOL",
-        "GRANT_SYMBOL",
-        "GRANTS_SYMBOL",
-        "GROUP_SYMBOL",
-        "GROUP_CONCAT_SYMBOL",
-        "HANDLER_SYMBOL",
-        "HASH_SYMBOL",
-        "HAVING_SYMBOL",
-        "HELP_SYMBOL",
-        "HIGH_PRIORITY_SYMBOL",
-        "HOST_SYMBOL",
-        "HOSTS_SYMBOL",
-        "HOUR_MICROSECOND_SYMBOL",
-        "HOUR_MINUTE_SYMBOL",
-        "HOUR_SECOND_SYMBOL",
-        "HOUR_SYMBOL",
-        "IDENTIFIED_SYMBOL",
-        "IF_SYMBOL",
-        "IGNORE_SYMBOL",
-        "IGNORE_SERVER_IDS_SYMBOL",
-        "IMPORT_SYMBOL",
-        "INDEXES_SYMBOL",
-        "INDEX_SYMBOL",
-        "INFILE_SYMBOL",
-        "INITIAL_SIZE_SYMBOL",
-        "INNER_SYMBOL",
-        "INOUT_SYMBOL",
-        "INSENSITIVE_SYMBOL",
-        "INSERT_SYMBOL",
-        "INSERT_METHOD_SYMBOL",
-        "INSTANCE_SYMBOL",
-        "INSTALL_SYMBOL",
-        "INTEGER_SYMBOL",
-        "INTERVAL_SYMBOL",
-        "INTO_SYMBOL",
-        "INT_SYMBOL",
-        "INVOKER_SYMBOL",
-        "IN_SYMBOL",
-        "IO_AFTER_GTIDS_SYMBOL",
-        "IO_BEFORE_GTIDS_SYMBOL",
-        "IO_THREAD_SYMBOL",
-        "IO_SYMBOL",
-        "IPC_SYMBOL",
-        "IS_SYMBOL",
-        "ISOLATION_SYMBOL",
-        "ISSUER_SYMBOL",
-        "ITERATE_SYMBOL",
-        "JOIN_SYMBOL",
-        "JSON_SYMBOL",
-        "KEYS_SYMBOL",
-        "KEY_BLOCK_SIZE_SYMBOL",
-        "KEY_SYMBOL",
-        "KILL_SYMBOL",
-        "LANGUAGE_SYMBOL",
-        "LAST_SYMBOL",
-        "LEADING_SYMBOL",
-        "LEAVES_SYMBOL",
-        "LEAVE_SYMBOL",
-        "LEFT_SYMBOL",
-        "LESS_SYMBOL",
-        "LEVEL_SYMBOL",
-        "LIKE_SYMBOL",
-        "LIMIT_SYMBOL",
-        "LINEAR_SYMBOL",
-        "LINES_SYMBOL",
-        "LINESTRING_SYMBOL",
-        "LIST_SYMBOL",
-        "LOAD_SYMBOL",
-        "LOCALTIME_SYMBOL",
-        "LOCALTIMESTAMP_SYMBOL",
-        "LOCAL_SYMBOL",
-        "LOCATOR_SYMBOL",
-        "LOCKS_SYMBOL",
-        "LOCK_SYMBOL",
-        "LOGFILE_SYMBOL",
-        "LOGS_SYMBOL",
-        "LONGBLOB_SYMBOL",
-        "LONGTEXT_SYMBOL",
-        "LONG_NUM_SYMBOL",
-        "LONG_SYMBOL",
-        "LOOP_SYMBOL",
-        "LOW_PRIORITY_SYMBOL",
-        "MASTER_AUTO_POSITION_SYMBOL",
-        "MASTER_BIND_SYMBOL",
-        "MASTER_CONNECT_RETRY_SYMBOL",
-        "MASTER_DELAY_SYMBOL",
-        "MASTER_HOST_SYMBOL",
-        "MASTER_LOG_FILE_SYMBOL",
-        "MASTER_LOG_POS_SYMBOL",
-        "MASTER_PASSWORD_SYMBOL",
-        "MASTER_PORT_SYMBOL",
-        "MASTER_RETRY_COUNT_SYMBOL",
-        "MASTER_SERVER_ID_SYMBOL",
-        "MASTER_SSL_CAPATH_SYMBOL",
-        "MASTER_SSL_CA_SYMBOL",
-        "MASTER_SSL_CERT_SYMBOL",
-        "MASTER_SSL_CIPHER_SYMBOL",
-        "MASTER_SSL_CRL_SYMBOL",
-        "MASTER_SSL_CRLPATH_SYMBOL",
-        "MASTER_SSL_KEY_SYMBOL",
-        "MASTER_SSL_SYMBOL",
-        "MASTER_SSL_VERIFY_SERVER_CERT_SYMBOL",
-        "MASTER_SYMBOL",
-        "MASTER_TLS_VERSION_SYMBOL",
-        "MASTER_USER_SYMBOL",
-        "MASTER_HEARTBEAT_PERIOD_SYMBOL",
-        "MATCH_SYMBOL",
-        "MAX_CONNECTIONS_PER_HOUR_SYMBOL",
-        "MAX_QUERIES_PER_HOUR_SYMBOL",
-        "MAX_ROWS_SYMBOL",
-        "MAX_SIZE_SYMBOL",
-        "MAX_STATEMENT_TIME_SYMBOL",
-        "MAX_SYMBOL",
-        "MAX_UPDATES_PER_HOUR_SYMBOL",
-        "MAX_USER_CONNECTIONS_SYMBOL",
-        "MAXVALUE_SYMBOL",
-        "MEDIUMBLOB_SYMBOL",
-        "MEDIUMINT_SYMBOL",
-        "MEDIUMTEXT_SYMBOL",
-        "MEDIUM_SYMBOL",
-        "MEMORY_SYMBOL",
-        "MERGE_SYMBOL",
-        "MESSAGE_TEXT_SYMBOL",
-        "MICROSECOND_SYMBOL",
-        "MID_SYMBOL",
-        "MIDDLEINT_SYMBOL",
-        "MIGRATE_SYMBOL",
-        "MINUTE_MICROSECOND_SYMBOL",
-        "MINUTE_SECOND_SYMBOL",
-        "MINUTE_SYMBOL",
-        "MIN_ROWS_SYMBOL",
-        "MIN_SYMBOL",
-        "MODE_SYMBOL",
-        "MODIFIES_SYMBOL",
-        "MODIFY_SYMBOL",
-        "MOD_SYMBOL",
-        "MONTH_SYMBOL",
-        "MULTILINESTRING_SYMBOL",
-        "MULTIPOINT_SYMBOL",
-        "MULTIPOLYGON_SYMBOL",
-        "MUTEX_SYMBOL",
-        "MYSQL_ERRNO_SYMBOL",
-        "NAMES_SYMBOL",
-        "NAME_SYMBOL",
-        "NATIONAL_SYMBOL",
-        "NATURAL_SYMBOL",
-        "NCHAR_STRING_SYMBOL",
-        "NCHAR_SYMBOL",
-        "NDB_SYMBOL",
-        "NDBCLUSTER_SYMBOL",
-        "NEG_SYMBOL",
-        "NEVER_SYMBOL",
-        "NEW_SYMBOL",
-        "NEXT_SYMBOL",
-        "NODEGROUP_SYMBOL",
-        "NONE_SYMBOL",
-        "NONBLOCKING_SYMBOL",
-        "NOT_SYMBOL",
-        "NOW_SYMBOL",
-        "NO_SYMBOL",
-        "NO_WAIT_SYMBOL",
-        "NO_WRITE_TO_BINLOG_SYMBOL",
-        "NULL_SYMBOL",
-        "NUMBER_SYMBOL",
-        "NUMERIC_SYMBOL",
-        "NVARCHAR_SYMBOL",
-        "OFFLINE_SYMBOL",
-        "OFFSET_SYMBOL",
-        "OLD_PASSWORD_SYMBOL",
-        "ON_SYMBOL",
-        "ONE_SYMBOL",
-        "ONLINE_SYMBOL",
-        "ONLY_SYMBOL",
-        "OPEN_SYMBOL",
-        "OPTIMIZE_SYMBOL",
-        "OPTIMIZER_COSTS_SYMBOL",
-        "OPTIONS_SYMBOL",
-        "OPTION_SYMBOL",
-        "OPTIONALLY_SYMBOL",
-        "ORDER_SYMBOL",
-        "OR_SYMBOL",
-        "OUTER_SYMBOL",
-        "OUTFILE_SYMBOL",
-        "OUT_SYMBOL",
-        "OWNER_SYMBOL",
-        "PACK_KEYS_SYMBOL",
-        "PAGE_SYMBOL",
-        "PARSER_SYMBOL",
-        "PARTIAL_SYMBOL",
-        "PARTITIONING_SYMBOL",
-        "PARTITIONS_SYMBOL",
-        "PARTITION_SYMBOL",
-        "PASSWORD_SYMBOL",
-        "PHASE_SYMBOL",
-        "PLUGINS_SYMBOL",
-        "PLUGIN_DIR_SYMBOL",
-        "PLUGIN_SYMBOL",
-        "POINT_SYMBOL",
-        "POLYGON_SYMBOL",
-        "PORT_SYMBOL",
-        "POSITION_SYMBOL",
-        "PRECEDES_SYMBOL",
-        "PRECISION_SYMBOL",
-        "PREPARE_SYMBOL",
-        "PRESERVE_SYMBOL",
-        "PREV_SYMBOL",
-        "PRIMARY_SYMBOL",
-        "PRIVILEGES_SYMBOL",
-        "PROCEDURE_SYMBOL",
-        "PROCESS_SYMBOL",
-        "PROCESSLIST_SYMBOL",
-        "PROFILE_SYMBOL",
-        "PROFILES_SYMBOL",
-        "PROXY_SYMBOL",
-        "PURGE_SYMBOL",
-        "QUARTER_SYMBOL",
-        "QUERY_SYMBOL",
-        "QUICK_SYMBOL",
-        "RANGE_SYMBOL",
-        "READS_SYMBOL",
-        "READ_ONLY_SYMBOL",
-        "READ_SYMBOL",
-        "READ_WRITE_SYMBOL",
-        "REAL_SYMBOL",
-        "REBUILD_SYMBOL",
-        "RECOVER_SYMBOL",
-        "REDOFILE_SYMBOL",
-        "REDO_BUFFER_SIZE_SYMBOL",
-        "REDUNDANT_SYMBOL",
-        "REFERENCES_SYMBOL",
-        "REGEXP_SYMBOL",
-        "RELAY_SYMBOL",
-        "RELAYLOG_SYMBOL",
-        "RELAY_LOG_FILE_SYMBOL",
-        "RELAY_LOG_POS_SYMBOL",
-        "RELAY_THREAD_SYMBOL",
-        "RELEASE_SYMBOL",
-        "RELOAD_SYMBOL",
-        "REMOVE_SYMBOL",
-        "RENAME_SYMBOL",
-        "REORGANIZE_SYMBOL",
-        "REPAIR_SYMBOL",
-        "REPEATABLE_SYMBOL",
-        "REPEAT_SYMBOL",
-        "REPLACE_SYMBOL",
-        "REPLICATION_SYMBOL",
-        "REPLICATE_DO_DB_SYMBOL",
-        "REPLICATE_IGNORE_DB_SYMBOL",
-        "REPLICATE_DO_TABLE_SYMBOL",
-        "REPLICATE_IGNORE_TABLE_SYMBOL",
-        "REPLICATE_WILD_DO_TABLE_SYMBOL",
-        "REPLICATE_WILD_IGNORE_TABLE_SYMBOL",
-        "REPLICATE_REWRITE_DB_SYMBOL",
-        "REQUIRE_SYMBOL",
-        "RESET_SYMBOL",
-        "RESIGNAL_SYMBOL",
-        "RESTORE_SYMBOL",
-        "RESTRICT_SYMBOL",
-        "RESUME_SYMBOL",
-        "RETURNED_SQLSTATE_SYMBOL",
-        "RETURNS_SYMBOL",
-        "RETURN_SYMBOL",
-        "REVERSE_SYMBOL",
-        "REVOKE_SYMBOL",
-        "RIGHT_SYMBOL",
-        "RLIKE_SYMBOL",
-        "ROLLBACK_SYMBOL",
-        "ROLLUP_SYMBOL",
-        "ROTATE_SYMBOL",
-        "ROUTINE_SYMBOL",
-        "ROWS_SYMBOL",
-        "ROW_COUNT_SYMBOL",
-        "ROW_FORMAT_SYMBOL",
-        "ROW_SYMBOL",
-        "RTREE_SYMBOL",
-        "SAVEPOINT_SYMBOL",
-        "SCHEDULE_SYMBOL",
-        "SCHEMA_SYMBOL",
-        "SCHEMA_NAME_SYMBOL",
-        "SCHEMAS_SYMBOL",
-        "SECOND_MICROSECOND_SYMBOL",
-        "SECOND_SYMBOL",
-        "SECURITY_SYMBOL",
-        "SELECT_SYMBOL",
-        "SENSITIVE_SYMBOL",
-        "SEPARATOR_SYMBOL",
-        "SERIALIZABLE_SYMBOL",
-        "SERIAL_SYMBOL",
-        "SESSION_SYMBOL",
-        "SERVER_SYMBOL",
-        "SERVER_OPTIONS_SYMBOL",
-        "SESSION_USER_SYMBOL",
-        "SET_SYMBOL",
-        "SET_VAR_SYMBOL",
-        "SHARE_SYMBOL",
-        "SHOW_SYMBOL",
-        "SHUTDOWN_SYMBOL",
-        "SIGNAL_SYMBOL",
-        "SIGNED_SYMBOL",
-        "SIMPLE_SYMBOL",
-        "SLAVE_SYMBOL",
-        "SLOW_SYMBOL",
-        "SMALLINT_SYMBOL",
-        "SNAPSHOT_SYMBOL",
-        "SOME_SYMBOL",
-        "SOCKET_SYMBOL",
-        "SONAME_SYMBOL",
-        "SOUNDS_SYMBOL",
-        "SOURCE_SYMBOL",
-        "SPATIAL_SYMBOL",
-        "SPECIFIC_SYMBOL",
-        "SQLEXCEPTION_SYMBOL",
-        "SQLSTATE_SYMBOL",
-        "SQLWARNING_SYMBOL",
-        "SQL_AFTER_GTIDS_SYMBOL",
-        "SQL_AFTER_MTS_GAPS_SYMBOL",
-        "SQL_BEFORE_GTIDS_SYMBOL",
-        "SQL_BIG_RESULT_SYMBOL",
-        "SQL_BUFFER_RESULT_SYMBOL",
-        "SQL_CACHE_SYMBOL",
-        "SQL_CALC_FOUND_ROWS_SYMBOL",
-        "SQL_NO_CACHE_SYMBOL",
-        "SQL_SMALL_RESULT_SYMBOL",
-        "SQL_SYMBOL",
-        "SQL_THREAD_SYMBOL",
-        "SSL_SYMBOL",
-        "STACKED_SYMBOL",
-        "STARTING_SYMBOL",
-        "STARTS_SYMBOL",
-        "START_SYMBOL",
-        "STATS_AUTO_RECALC_SYMBOL",
-        "STATS_PERSISTENT_SYMBOL",
-        "STATS_SAMPLE_PAGES_SYMBOL",
-        "STATUS_SYMBOL",
-        "STDDEV_SAMP_SYMBOL",
-        "STDDEV_SYMBOL",
-        "STDDEV_POP_SYMBOL",
-        "STD_SYMBOL",
-        "STOP_SYMBOL",
-        "STORAGE_SYMBOL",
-        "STORED_SYMBOL",
-        "STRAIGHT_JOIN_SYMBOL",
-        "STRING_SYMBOL",
-        "SUBCLASS_ORIGIN_SYMBOL",
-        "SUBDATE_SYMBOL",
-        "SUBJECT_SYMBOL",
-        "SUBPARTITIONS_SYMBOL",
-        "SUBPARTITION_SYMBOL",
-        "SUBSTR_SYMBOL",
-        "SUBSTRING_SYMBOL",
-        "SUM_SYMBOL",
-        "SUPER_SYMBOL",
-        "SUSPEND_SYMBOL",
-        "SWAPS_SYMBOL",
-        "SWITCHES_SYMBOL",
-        "SYSDATE_SYMBOL",
-        "SYSTEM_USER_SYMBOL",
-        "TABLES_SYMBOL",
-        "TABLESPACE_SYMBOL",
-        "TABLE_REF_PRIORITY_SYMBOL",
-        "TABLE_SYMBOL",
-        "TABLE_CHECKSUM_SYMBOL",
-        "TABLE_NAME_SYMBOL",
-        "TEMPORARY_SYMBOL",
-        "TEMPTABLE_SYMBOL",
-        "TERMINATED_SYMBOL",
-        "TEXT_SYMBOL",
-        "THAN_SYMBOL",
-        "THEN_SYMBOL",
-        "TIMESTAMP_SYMBOL",
-        "TIMESTAMP_ADD_SYMBOL",
-        "TIMESTAMP_DIFF_SYMBOL",
-        "TIME_SYMBOL",
-        "TINYBLOB_SYMBOL",
-        "TINYINT_SYMBOL",
-        "TINYTEXT_SYMBOL",
-        "TO_SYMBOL",
-        "TRAILING_SYMBOL",
-        "TRANSACTION_SYMBOL",
-        "TRIGGERS_SYMBOL",
-        "TRIGGER_SYMBOL",
-        "TRIM_SYMBOL",
-        "TRUE_SYMBOL",
-        "TRUNCATE_SYMBOL",
-        "TYPES_SYMBOL",
-        "TYPE_SYMBOL",
-        "UDF_RETURNS_SYMBOL",
-        "UNCOMMITTED_SYMBOL",
-        "UNDEFINED_SYMBOL",
-        "UNDOFILE_SYMBOL",
-        "UNDO_BUFFER_SIZE_SYMBOL",
-        "UNDO_SYMBOL",
-        "UNICODE_SYMBOL",
-        "UNINSTALL_SYMBOL",
-        "UNION_SYMBOL",
-        "UNIQUE_SYMBOL",
-        "UNKNOWN_SYMBOL",
-        "UNLOCK_SYMBOL",
-        "UNSIGNED_SYMBOL",
-        "UNTIL_SYMBOL",
-        "UPDATE_SYMBOL",
-        "UPGRADE_SYMBOL",
-        "USAGE_SYMBOL",
-        "USER_RESOURCES_SYMBOL",
-        "USER_SYMBOL",
-        "USE_FRM_SYMBOL",
-        "USE_SYMBOL",
-        "USING_SYMBOL",
-        "UTC_DATE_SYMBOL",
-        "UTC_TIMESTAMP_SYMBOL",
-        "UTC_TIME_SYMBOL",
-        "VALIDATION_SYMBOL",
-        "VALUES_SYMBOL",
-        "VALUE_SYMBOL",
-        "VARBINARY_SYMBOL",
-        "VARCHAR_SYMBOL",
-        "VARCHARACTER_SYMBOL",
-        "VARIABLES_SYMBOL",
-        "VARIANCE_SYMBOL",
-        "VARYING_SYMBOL",
-        "VAR_POP_SYMBOL",
-        "VAR_SAMP_SYMBOL",
-        "VIEW_SYMBOL",
-        "VIRTUAL_SYMBOL",
-        "WAIT_SYMBOL",
-        "WARNINGS_SYMBOL",
-        "WEEK_SYMBOL",
-        "WEIGHT_STRING_SYMBOL",
-        "WHEN_SYMBOL",
-        "WHERE_SYMBOL",
-        "WHILE_SYMBOL",
-        "WITH_SYMBOL",
-        "WITHOUT_SYMBOL",
-        "WORK_SYMBOL",
-        "WRAPPER_SYMBOL",
-        "WRITE_SYMBOL",
-        "X509_SYMBOL",
-        "XA_SYMBOL",
-        "XID_SYMBOL",
-        "XML_SYMBOL",
-        "XOR_SYMBOL",
-        "YEAR_MONTH_SYMBOL",
-        "YEAR_SYMBOL",
-        "ZEROFILL_SYMBOL",
-        "PERSIST_SYMBOL",
-        "ROLE_SYMBOL",
-        "ADMIN_SYMBOL",
-        "INVISIBLE_SYMBOL",
-        "VISIBLE_SYMBOL",
-        "EXCEPT_SYMBOL",
-        "COMPONENT_SYMBOL",
-        "RECURSIVE_SYMBOL",
-        "JSON_OBJECTAGG_SYMBOL",
-        "JSON_ARRAYAGG_SYMBOL",
-        "OF_SYMBOL",
-        "SKIP_SYMBOL",
-        "LOCKED_SYMBOL",
-        "NOWAIT_SYMBOL",
-        "GROUPING_SYMBOL",
-        "PERSIST_ONLY_SYMBOL",
-        "HISTOGRAM_SYMBOL",
-        "BUCKETS_SYMBOL",
-        "REMOTE_SYMBOL",
-        "CLONE_SYMBOL",
-        "CUME_DIST_SYMBOL",
-        "DENSE_RANK_SYMBOL",
-        "EXCLUDE_SYMBOL",
-        "FIRST_VALUE_SYMBOL",
-        "FOLLOWING_SYMBOL",
-        "GROUPS_SYMBOL",
-        "LAG_SYMBOL",
-        "LAST_VALUE_SYMBOL",
-        "LEAD_SYMBOL",
-        "NTH_VALUE_SYMBOL",
-        "NTILE_SYMBOL",
-        "NULLS_SYMBOL",
-        "OTHERS_SYMBOL",
-        "OVER_SYMBOL",
-        "PERCENT_RANK_SYMBOL",
-        "PRECEDING_SYMBOL",
-        "RANK_SYMBOL",
-        "RESPECT_SYMBOL",
-        "ROW_NUMBER_SYMBOL",
-        "TIES_SYMBOL",
-        "UNBOUNDED_SYMBOL",
-        "WINDOW_SYMBOL",
-        "EMPTY_SYMBOL",
-        "JSON_TABLE_SYMBOL",
-        "NESTED_SYMBOL",
-        "ORDINALITY_SYMBOL",
-        "PATH_SYMBOL",
-        "HISTORY_SYMBOL",
-        "REUSE_SYMBOL",
-        "SRID_SYMBOL",
-        "THREAD_PRIORITY_SYMBOL",
-        "RESOURCE_SYMBOL",
-        "SYSTEM_SYMBOL",
-        "VCPU_SYMBOL",
-        "MASTER_PUBLIC_KEY_PATH_SYMBOL",
-        "GET_MASTER_PUBLIC_KEY_SYMBOL",
-        "RESTART_SYMBOL",
-        "DEFINITION_SYMBOL",
-        "DESCRIPTION_SYMBOL",
-        "ORGANIZATION_SYMBOL",
-        "REFERENCE_SYMBOL",
-        "OPTIONAL_SYMBOL",
-        "SECONDARY_SYMBOL",
-        "SECONDARY_ENGINE_SYMBOL",
-        "SECONDARY_LOAD_SYMBOL",
-        "SECONDARY_UNLOAD_SYMBOL",
-        "ACTIVE_SYMBOL",
-        "INACTIVE_SYMBOL",
-        "LATERAL_SYMBOL",
-        "RETAIN_SYMBOL",
-        "OLD_SYMBOL",
-        "NETWORK_NAMESPACE_SYMBOL",
-        "ENFORCED_SYMBOL",
-        "ARRAY_SYMBOL",
-        "OJ_SYMBOL",
-        "MEMBER_SYMBOL",
-        "RANDOM_SYMBOL",
-        "MASTER_COMPRESSION_ALGORITHM_SYMBOL",
-        "MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOL",
-        "PRIVILEGE_CHECKS_USER_SYMBOL",
-        "MASTER_TLS_CIPHERSUITES_SYMBOL",
-        "REQUIRE_ROW_FORMAT_SYMBOL",
-        "PASSWORD_LOCK_TIME_SYMBOL",
-        "FAILED_LOGIN_ATTEMPTS_SYMBOL",
-        "REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOL",
-        "STREAM_SYMBOL",
-        "OFF_SYMBOL",
-        "NOT2_SYMBOL",
-        "CONCAT_PIPES_SYMBOL",
-        "INT_NUMBER",
-        "LONG_NUMBER",
-        "ULONGLONG_NUMBER",
-        "EQUAL_OPERATOR",
-        "ASSIGN_OPERATOR",
-        "NULL_SAFE_EQUAL_OPERATOR",
-        "GREATER_OR_EQUAL_OPERATOR",
-        "GREATER_THAN_OPERATOR",
-        "LESS_OR_EQUAL_OPERATOR",
-        "LESS_THAN_OPERATOR",
-        "NOT_EQUAL_OPERATOR",
-        "PLUS_OPERATOR",
-        "MINUS_OPERATOR",
-        "MULT_OPERATOR",
-        "DIV_OPERATOR",
-        "MOD_OPERATOR",
-        "LOGICAL_NOT_OPERATOR",
-        "BITWISE_NOT_OPERATOR",
-        "SHIFT_LEFT_OPERATOR",
-        "SHIFT_RIGHT_OPERATOR",
-        "LOGICAL_AND_OPERATOR",
-        "BITWISE_AND_OPERATOR",
-        "BITWISE_XOR_OPERATOR",
-        "LOGICAL_OR_OPERATOR",
-        "BITWISE_OR_OPERATOR",
-        "DOT_SYMBOL",
-        "COMMA_SYMBOL",
-        "SEMICOLON_SYMBOL",
-        "COLON_SYMBOL",
-        "OPEN_PAR_SYMBOL",
-        "CLOSE_PAR_SYMBOL",
-        "OPEN_CURLY_SYMBOL",
-        "CLOSE_CURLY_SYMBOL",
-        "UNDERLINE_SYMBOL",
-        "JSON_SEPARATOR_SYMBOL",
-        "JSON_UNQUOTED_SEPARATOR_SYMBOL",
-        "AT_SIGN_SYMBOL",
-        "AT_TEXT_SUFFIX",
-        "AT_AT_SIGN_SYMBOL",
-        "NULL2_SYMBOL",
-        "PARAM_MARKER",
-        "HEX_NUMBER",
-        "BIN_NUMBER",
-        "DECIMAL_NUMBER",
-        "FLOAT_NUMBER",
-        "WHITESPACE",
-        "INVALID_INPUT",
-        "UNDERSCORE_CHARSET",
-        "IDENTIFIER",
-        "NCHAR_TEXT",
-        "BACK_TICK_QUOTED_ID",
-        "DOUBLE_QUOTED_TEXT",
-        "SINGLE_QUOTED_TEXT",
-        "VERSION_COMMENT_START",
-        "MYSQL_COMMENT_START",
-        "VERSION_COMMENT_END",
-        "BLOCK_COMMENT",
-        "POUND_COMMENT",
-        "DASHDASH_COMMENT",
-        "NOT_EQUAL2_OPERATOR",
-    ]
+    symbolicNames = [ "<INVALID>",
+            "ACCESSIBLE_SYMBOL", "ACCOUNT_SYMBOL", "ACTION_SYMBOL", "ADD_SYMBOL", 
+            "ADDDATE_SYMBOL", "AFTER_SYMBOL", "AGAINST_SYMBOL", "AGGREGATE_SYMBOL", 
+            "ALGORITHM_SYMBOL", "ALL_SYMBOL", "ALTER_SYMBOL", "ALWAYS_SYMBOL", 
+            "ANALYSE_SYMBOL", "ANALYZE_SYMBOL", "AND_SYMBOL", "ANY_SYMBOL", 
+            "AS_SYMBOL", "ASC_SYMBOL", "ASCII_SYMBOL", "ASENSITIVE_SYMBOL", 
+            "AT_SYMBOL", "AUTHORS_SYMBOL", "AUTOEXTEND_SIZE_SYMBOL", "AUTO_INCREMENT_SYMBOL", 
+            "AVG_ROW_LENGTH_SYMBOL", "AVG_SYMBOL", "BACKUP_SYMBOL", "BEFORE_SYMBOL", 
+            "BEGIN_SYMBOL", "BETWEEN_SYMBOL", "BIGINT_SYMBOL", "BINARY_SYMBOL", 
+            "BINLOG_SYMBOL", "BIN_NUM_SYMBOL", "BIT_AND_SYMBOL", "BIT_OR_SYMBOL", 
+            "BIT_SYMBOL", "BIT_XOR_SYMBOL", "BLOB_SYMBOL", "BLOCK_SYMBOL", 
+            "BOOLEAN_SYMBOL", "BOOL_SYMBOL", "BOTH_SYMBOL", "BTREE_SYMBOL", 
+            "BY_SYMBOL", "BYTE_SYMBOL", "CACHE_SYMBOL", "CALL_SYMBOL", "CASCADE_SYMBOL", 
+            "CASCADED_SYMBOL", "CASE_SYMBOL", "CAST_SYMBOL", "CATALOG_NAME_SYMBOL", 
+            "CHAIN_SYMBOL", "CHANGE_SYMBOL", "CHANGED_SYMBOL", "CHANNEL_SYMBOL", 
+            "CHARSET_SYMBOL", "CHARACTER_SYMBOL", "CHAR_SYMBOL", "CHECKSUM_SYMBOL", 
+            "CHECK_SYMBOL", "CIPHER_SYMBOL", "CLASS_ORIGIN_SYMBOL", "CLIENT_SYMBOL", 
+            "CLOSE_SYMBOL", "COALESCE_SYMBOL", "CODE_SYMBOL", "COLLATE_SYMBOL", 
+            "COLLATION_SYMBOL", "COLUMNS_SYMBOL", "COLUMN_SYMBOL", "COLUMN_NAME_SYMBOL", 
+            "COLUMN_FORMAT_SYMBOL", "COMMENT_SYMBOL", "COMMITTED_SYMBOL", 
+            "COMMIT_SYMBOL", "COMPACT_SYMBOL", "COMPLETION_SYMBOL", "COMPRESSED_SYMBOL", 
+            "COMPRESSION_SYMBOL", "CONCURRENT_SYMBOL", "CONDITION_SYMBOL", 
+            "CONNECTION_SYMBOL", "CONSISTENT_SYMBOL", "CONSTRAINT_SYMBOL", 
+            "CONSTRAINT_CATALOG_SYMBOL", "CONSTRAINT_NAME_SYMBOL", "CONSTRAINT_SCHEMA_SYMBOL", 
+            "CONTAINS_SYMBOL", "CONTEXT_SYMBOL", "CONTINUE_SYMBOL", "CONTRIBUTORS_SYMBOL", 
+            "CONVERT_SYMBOL", "COUNT_SYMBOL", "CPU_SYMBOL", "CREATE_SYMBOL", 
+            "CROSS_SYMBOL", "CUBE_SYMBOL", "CURDATE_SYMBOL", "CURRENT_SYMBOL", 
+            "CURRENT_DATE_SYMBOL", "CURRENT_TIME_SYMBOL", "CURRENT_TIMESTAMP_SYMBOL", 
+            "CURRENT_USER_SYMBOL", "CURSOR_SYMBOL", "CURSOR_NAME_SYMBOL", 
+            "CURTIME_SYMBOL", "DATABASE_SYMBOL", "DATABASES_SYMBOL", "DATAFILE_SYMBOL", 
+            "DATA_SYMBOL", "DATETIME_SYMBOL", "DATE_ADD_SYMBOL", "DATE_SUB_SYMBOL", 
+            "DATE_SYMBOL", "DAYOFMONTH_SYMBOL", "DAY_HOUR_SYMBOL", "DAY_MICROSECOND_SYMBOL", 
+            "DAY_MINUTE_SYMBOL", "DAY_SECOND_SYMBOL", "DAY_SYMBOL", "DEALLOCATE_SYMBOL", 
+            "DEC_SYMBOL", "DECIMAL_NUM_SYMBOL", "DECIMAL_SYMBOL", "DECLARE_SYMBOL", 
+            "DEFAULT_SYMBOL", "DEFAULT_AUTH_SYMBOL", "DEFINER_SYMBOL", "DELAYED_SYMBOL", 
+            "DELAY_KEY_WRITE_SYMBOL", "DELETE_SYMBOL", "DESC_SYMBOL", "DESCRIBE_SYMBOL", 
+            "DES_KEY_FILE_SYMBOL", "DETERMINISTIC_SYMBOL", "DIAGNOSTICS_SYMBOL", 
+            "DIRECTORY_SYMBOL", "DISABLE_SYMBOL", "DISCARD_SYMBOL", "DISK_SYMBOL", 
+            "DISTINCT_SYMBOL", "DISTINCTROW_SYMBOL", "DIV_SYMBOL", "DOUBLE_SYMBOL", 
+            "DO_SYMBOL", "DROP_SYMBOL", "DUAL_SYMBOL", "DUMPFILE_SYMBOL", 
+            "DUPLICATE_SYMBOL", "DYNAMIC_SYMBOL", "EACH_SYMBOL", "ELSE_SYMBOL", 
+            "ELSEIF_SYMBOL", "ENABLE_SYMBOL", "ENCLOSED_SYMBOL", "ENCRYPTION_SYMBOL", 
+            "END_SYMBOL", "ENDS_SYMBOL", "END_OF_INPUT_SYMBOL", "ENGINES_SYMBOL", 
+            "ENGINE_SYMBOL", "ENUM_SYMBOL", "ERROR_SYMBOL", "ERRORS_SYMBOL", 
+            "ESCAPED_SYMBOL", "ESCAPE_SYMBOL", "EVENTS_SYMBOL", "EVENT_SYMBOL", 
+            "EVERY_SYMBOL", "EXCHANGE_SYMBOL", "EXECUTE_SYMBOL", "EXISTS_SYMBOL", 
+            "EXIT_SYMBOL", "EXPANSION_SYMBOL", "EXPIRE_SYMBOL", "EXPLAIN_SYMBOL", 
+            "EXPORT_SYMBOL", "EXTENDED_SYMBOL", "EXTENT_SIZE_SYMBOL", "EXTRACT_SYMBOL", 
+            "FALSE_SYMBOL", "FAST_SYMBOL", "FAULTS_SYMBOL", "FETCH_SYMBOL", 
+            "FIELDS_SYMBOL", "FILE_SYMBOL", "FILE_BLOCK_SIZE_SYMBOL", "FILTER_SYMBOL", 
+            "FIRST_SYMBOL", "FIXED_SYMBOL", "FLOAT4_SYMBOL", "FLOAT8_SYMBOL", 
+            "FLOAT_SYMBOL", "FLUSH_SYMBOL", "FOLLOWS_SYMBOL", "FORCE_SYMBOL", 
+            "FOREIGN_SYMBOL", "FOR_SYMBOL", "FORMAT_SYMBOL", "FOUND_SYMBOL", 
+            "FROM_SYMBOL", "FULL_SYMBOL", "FULLTEXT_SYMBOL", "FUNCTION_SYMBOL", 
+            "GET_SYMBOL", "GENERAL_SYMBOL", "GENERATED_SYMBOL", "GROUP_REPLICATION_SYMBOL", 
+            "GEOMETRYCOLLECTION_SYMBOL", "GEOMETRY_SYMBOL", "GET_FORMAT_SYMBOL", 
+            "GLOBAL_SYMBOL", "GRANT_SYMBOL", "GRANTS_SYMBOL", "GROUP_SYMBOL", 
+            "GROUP_CONCAT_SYMBOL", "HANDLER_SYMBOL", "HASH_SYMBOL", "HAVING_SYMBOL", 
+            "HELP_SYMBOL", "HIGH_PRIORITY_SYMBOL", "HOST_SYMBOL", "HOSTS_SYMBOL", 
+            "HOUR_MICROSECOND_SYMBOL", "HOUR_MINUTE_SYMBOL", "HOUR_SECOND_SYMBOL", 
+            "HOUR_SYMBOL", "IDENTIFIED_SYMBOL", "IF_SYMBOL", "IGNORE_SYMBOL", 
+            "IGNORE_SERVER_IDS_SYMBOL", "IMPORT_SYMBOL", "INDEXES_SYMBOL", 
+            "INDEX_SYMBOL", "INFILE_SYMBOL", "INITIAL_SIZE_SYMBOL", "INNER_SYMBOL", 
+            "INOUT_SYMBOL", "INSENSITIVE_SYMBOL", "INSERT_SYMBOL", "INSERT_METHOD_SYMBOL", 
+            "INSTANCE_SYMBOL", "INSTALL_SYMBOL", "INTEGER_SYMBOL", "INTERVAL_SYMBOL", 
+            "INTO_SYMBOL", "INT_SYMBOL", "INVOKER_SYMBOL", "IN_SYMBOL", 
+            "IO_AFTER_GTIDS_SYMBOL", "IO_BEFORE_GTIDS_SYMBOL", "IO_THREAD_SYMBOL", 
+            "IO_SYMBOL", "IPC_SYMBOL", "IS_SYMBOL", "ISOLATION_SYMBOL", 
+            "ISSUER_SYMBOL", "ITERATE_SYMBOL", "JOIN_SYMBOL", "JSON_SYMBOL", 
+            "KEYS_SYMBOL", "KEY_BLOCK_SIZE_SYMBOL", "KEY_SYMBOL", "KILL_SYMBOL", 
+            "LANGUAGE_SYMBOL", "LAST_SYMBOL", "LEADING_SYMBOL", "LEAVES_SYMBOL", 
+            "LEAVE_SYMBOL", "LEFT_SYMBOL", "LESS_SYMBOL", "LEVEL_SYMBOL", 
+            "LIKE_SYMBOL", "LIMIT_SYMBOL", "LINEAR_SYMBOL", "LINES_SYMBOL", 
+            "LINESTRING_SYMBOL", "LIST_SYMBOL", "LOAD_SYMBOL", "LOCALTIME_SYMBOL", 
+            "LOCALTIMESTAMP_SYMBOL", "LOCAL_SYMBOL", "LOCATOR_SYMBOL", "LOCKS_SYMBOL", 
+            "LOCK_SYMBOL", "LOGFILE_SYMBOL", "LOGS_SYMBOL", "LONGBLOB_SYMBOL", 
+            "LONGTEXT_SYMBOL", "LONG_NUM_SYMBOL", "LONG_SYMBOL", "LOOP_SYMBOL", 
+            "LOW_PRIORITY_SYMBOL", "MASTER_AUTO_POSITION_SYMBOL", "MASTER_BIND_SYMBOL", 
+            "MASTER_CONNECT_RETRY_SYMBOL", "MASTER_DELAY_SYMBOL", "MASTER_HOST_SYMBOL", 
+            "MASTER_LOG_FILE_SYMBOL", "MASTER_LOG_POS_SYMBOL", "MASTER_PASSWORD_SYMBOL", 
+            "MASTER_PORT_SYMBOL", "MASTER_RETRY_COUNT_SYMBOL", "MASTER_SERVER_ID_SYMBOL", 
+            "MASTER_SSL_CAPATH_SYMBOL", "MASTER_SSL_CA_SYMBOL", "MASTER_SSL_CERT_SYMBOL", 
+            "MASTER_SSL_CIPHER_SYMBOL", "MASTER_SSL_CRL_SYMBOL", "MASTER_SSL_CRLPATH_SYMBOL", 
+            "MASTER_SSL_KEY_SYMBOL", "MASTER_SSL_SYMBOL", "MASTER_SSL_VERIFY_SERVER_CERT_SYMBOL", 
+            "MASTER_SYMBOL", "MASTER_TLS_VERSION_SYMBOL", "MASTER_USER_SYMBOL", 
+            "MASTER_HEARTBEAT_PERIOD_SYMBOL", "MATCH_SYMBOL", "MAX_CONNECTIONS_PER_HOUR_SYMBOL", 
+            "MAX_QUERIES_PER_HOUR_SYMBOL", "MAX_ROWS_SYMBOL", "MAX_SIZE_SYMBOL", 
+            "MAX_STATEMENT_TIME_SYMBOL", "MAX_SYMBOL", "MAX_UPDATES_PER_HOUR_SYMBOL", 
+            "MAX_USER_CONNECTIONS_SYMBOL", "MAXVALUE_SYMBOL", "MEDIUMBLOB_SYMBOL", 
+            "MEDIUMINT_SYMBOL", "MEDIUMTEXT_SYMBOL", "MEDIUM_SYMBOL", "MEMORY_SYMBOL", 
+            "MERGE_SYMBOL", "MESSAGE_TEXT_SYMBOL", "MICROSECOND_SYMBOL", 
+            "MID_SYMBOL", "MIDDLEINT_SYMBOL", "MIGRATE_SYMBOL", "MINUTE_MICROSECOND_SYMBOL", 
+            "MINUTE_SECOND_SYMBOL", "MINUTE_SYMBOL", "MIN_ROWS_SYMBOL", 
+            "MIN_SYMBOL", "MODE_SYMBOL", "MODIFIES_SYMBOL", "MODIFY_SYMBOL", 
+            "MOD_SYMBOL", "MONTH_SYMBOL", "MULTILINESTRING_SYMBOL", "MULTIPOINT_SYMBOL", 
+            "MULTIPOLYGON_SYMBOL", "MUTEX_SYMBOL", "MYSQL_ERRNO_SYMBOL", 
+            "NAMES_SYMBOL", "NAME_SYMBOL", "NATIONAL_SYMBOL", "NATURAL_SYMBOL", 
+            "NCHAR_STRING_SYMBOL", "NCHAR_SYMBOL", "NDB_SYMBOL", "NDBCLUSTER_SYMBOL", 
+            "NEG_SYMBOL", "NEVER_SYMBOL", "NEW_SYMBOL", "NEXT_SYMBOL", "NODEGROUP_SYMBOL", 
+            "NONE_SYMBOL", "NONBLOCKING_SYMBOL", "NOT_SYMBOL", "NOW_SYMBOL", 
+            "NO_SYMBOL", "NO_WAIT_SYMBOL", "NO_WRITE_TO_BINLOG_SYMBOL", 
+            "NULL_SYMBOL", "NUMBER_SYMBOL", "NUMERIC_SYMBOL", "NVARCHAR_SYMBOL", 
+            "OFFLINE_SYMBOL", "OFFSET_SYMBOL", "OLD_PASSWORD_SYMBOL", "ON_SYMBOL", 
+            "ONE_SYMBOL", "ONLINE_SYMBOL", "ONLY_SYMBOL", "OPEN_SYMBOL", 
+            "OPTIMIZE_SYMBOL", "OPTIMIZER_COSTS_SYMBOL", "OPTIONS_SYMBOL", 
+            "OPTION_SYMBOL", "OPTIONALLY_SYMBOL", "ORDER_SYMBOL", "OR_SYMBOL", 
+            "OUTER_SYMBOL", "OUTFILE_SYMBOL", "OUT_SYMBOL", "OWNER_SYMBOL", 
+            "PACK_KEYS_SYMBOL", "PAGE_SYMBOL", "PARSER_SYMBOL", "PARTIAL_SYMBOL", 
+            "PARTITIONING_SYMBOL", "PARTITIONS_SYMBOL", "PARTITION_SYMBOL", 
+            "PASSWORD_SYMBOL", "PHASE_SYMBOL", "PLUGINS_SYMBOL", "PLUGIN_DIR_SYMBOL", 
+            "PLUGIN_SYMBOL", "POINT_SYMBOL", "POLYGON_SYMBOL", "PORT_SYMBOL", 
+            "POSITION_SYMBOL", "PRECEDES_SYMBOL", "PRECISION_SYMBOL", "PREPARE_SYMBOL", 
+            "PRESERVE_SYMBOL", "PREV_SYMBOL", "PRIMARY_SYMBOL", "PRIVILEGES_SYMBOL", 
+            "PROCEDURE_SYMBOL", "PROCESS_SYMBOL", "PROCESSLIST_SYMBOL", 
+            "PROFILE_SYMBOL", "PROFILES_SYMBOL", "PROXY_SYMBOL", "PURGE_SYMBOL", 
+            "QUARTER_SYMBOL", "QUERY_SYMBOL", "QUICK_SYMBOL", "RANGE_SYMBOL", 
+            "READS_SYMBOL", "READ_ONLY_SYMBOL", "READ_SYMBOL", "READ_WRITE_SYMBOL", 
+            "REAL_SYMBOL", "REBUILD_SYMBOL", "RECOVER_SYMBOL", "REDOFILE_SYMBOL", 
+            "REDO_BUFFER_SIZE_SYMBOL", "REDUNDANT_SYMBOL", "REFERENCES_SYMBOL", 
+            "REGEXP_SYMBOL", "RELAY_SYMBOL", "RELAYLOG_SYMBOL", "RELAY_LOG_FILE_SYMBOL", 
+            "RELAY_LOG_POS_SYMBOL", "RELAY_THREAD_SYMBOL", "RELEASE_SYMBOL", 
+            "RELOAD_SYMBOL", "REMOVE_SYMBOL", "RENAME_SYMBOL", "REORGANIZE_SYMBOL", 
+            "REPAIR_SYMBOL", "REPEATABLE_SYMBOL", "REPEAT_SYMBOL", "REPLACE_SYMBOL", 
+            "REPLICATION_SYMBOL", "REPLICATE_DO_DB_SYMBOL", "REPLICATE_IGNORE_DB_SYMBOL", 
+            "REPLICATE_DO_TABLE_SYMBOL", "REPLICATE_IGNORE_TABLE_SYMBOL", 
+            "REPLICATE_WILD_DO_TABLE_SYMBOL", "REPLICATE_WILD_IGNORE_TABLE_SYMBOL", 
+            "REPLICATE_REWRITE_DB_SYMBOL", "REQUIRE_SYMBOL", "RESET_SYMBOL", 
+            "RESIGNAL_SYMBOL", "RESTORE_SYMBOL", "RESTRICT_SYMBOL", "RESUME_SYMBOL", 
+            "RETURNED_SQLSTATE_SYMBOL", "RETURNS_SYMBOL", "RETURN_SYMBOL", 
+            "REVERSE_SYMBOL", "REVOKE_SYMBOL", "RIGHT_SYMBOL", "RLIKE_SYMBOL", 
+            "ROLLBACK_SYMBOL", "ROLLUP_SYMBOL", "ROTATE_SYMBOL", "ROUTINE_SYMBOL", 
+            "ROWS_SYMBOL", "ROW_COUNT_SYMBOL", "ROW_FORMAT_SYMBOL", "ROW_SYMBOL", 
+            "RTREE_SYMBOL", "SAVEPOINT_SYMBOL", "SCHEDULE_SYMBOL", "SCHEMA_SYMBOL", 
+            "SCHEMA_NAME_SYMBOL", "SCHEMAS_SYMBOL", "SECOND_MICROSECOND_SYMBOL", 
+            "SECOND_SYMBOL", "SECURITY_SYMBOL", "SELECT_SYMBOL", "SENSITIVE_SYMBOL", 
+            "SEPARATOR_SYMBOL", "SERIALIZABLE_SYMBOL", "SERIAL_SYMBOL", 
+            "SESSION_SYMBOL", "SERVER_SYMBOL", "SERVER_OPTIONS_SYMBOL", 
+            "SESSION_USER_SYMBOL", "SET_SYMBOL", "SET_VAR_SYMBOL", "SHARE_SYMBOL", 
+            "SHOW_SYMBOL", "SHUTDOWN_SYMBOL", "SIGNAL_SYMBOL", "SIGNED_SYMBOL", 
+            "SIMPLE_SYMBOL", "SLAVE_SYMBOL", "SLOW_SYMBOL", "SMALLINT_SYMBOL", 
+            "SNAPSHOT_SYMBOL", "SOME_SYMBOL", "SOCKET_SYMBOL", "SONAME_SYMBOL", 
+            "SOUNDS_SYMBOL", "SOURCE_SYMBOL", "SPATIAL_SYMBOL", "SPECIFIC_SYMBOL", 
+            "SQLEXCEPTION_SYMBOL", "SQLSTATE_SYMBOL", "SQLWARNING_SYMBOL", 
+            "SQL_AFTER_GTIDS_SYMBOL", "SQL_AFTER_MTS_GAPS_SYMBOL", "SQL_BEFORE_GTIDS_SYMBOL", 
+            "SQL_BIG_RESULT_SYMBOL", "SQL_BUFFER_RESULT_SYMBOL", "SQL_CACHE_SYMBOL", 
+            "SQL_CALC_FOUND_ROWS_SYMBOL", "SQL_NO_CACHE_SYMBOL", "SQL_SMALL_RESULT_SYMBOL", 
+            "SQL_SYMBOL", "SQL_THREAD_SYMBOL", "SSL_SYMBOL", "STACKED_SYMBOL", 
+            "STARTING_SYMBOL", "STARTS_SYMBOL", "START_SYMBOL", "STATS_AUTO_RECALC_SYMBOL", 
+            "STATS_PERSISTENT_SYMBOL", "STATS_SAMPLE_PAGES_SYMBOL", "STATUS_SYMBOL", 
+            "STDDEV_SAMP_SYMBOL", "STDDEV_SYMBOL", "STDDEV_POP_SYMBOL", 
+            "STD_SYMBOL", "STOP_SYMBOL", "STORAGE_SYMBOL", "STORED_SYMBOL", 
+            "STRAIGHT_JOIN_SYMBOL", "STRING_SYMBOL", "SUBCLASS_ORIGIN_SYMBOL", 
+            "SUBDATE_SYMBOL", "SUBJECT_SYMBOL", "SUBPARTITIONS_SYMBOL", 
+            "SUBPARTITION_SYMBOL", "SUBSTR_SYMBOL", "SUBSTRING_SYMBOL", 
+            "SUM_SYMBOL", "SUPER_SYMBOL", "SUSPEND_SYMBOL", "SWAPS_SYMBOL", 
+            "SWITCHES_SYMBOL", "SYSDATE_SYMBOL", "SYSTEM_USER_SYMBOL", "TABLES_SYMBOL", 
+            "TABLESPACE_SYMBOL", "TABLE_REF_PRIORITY_SYMBOL", "TABLE_SYMBOL", 
+            "TABLE_CHECKSUM_SYMBOL", "TABLE_NAME_SYMBOL", "TEMPORARY_SYMBOL", 
+            "TEMPTABLE_SYMBOL", "TERMINATED_SYMBOL", "TEXT_SYMBOL", "THAN_SYMBOL", 
+            "THEN_SYMBOL", "TIMESTAMP_SYMBOL", "TIMESTAMP_ADD_SYMBOL", "TIMESTAMP_DIFF_SYMBOL", 
+            "TIME_SYMBOL", "TINYBLOB_SYMBOL", "TINYINT_SYMBOL", "TINYTEXT_SYMBOL", 
+            "TO_SYMBOL", "TRAILING_SYMBOL", "TRANSACTION_SYMBOL", "TRIGGERS_SYMBOL", 
+            "TRIGGER_SYMBOL", "TRIM_SYMBOL", "TRUE_SYMBOL", "TRUNCATE_SYMBOL", 
+            "TYPES_SYMBOL", "TYPE_SYMBOL", "UDF_RETURNS_SYMBOL", "UNCOMMITTED_SYMBOL", 
+            "UNDEFINED_SYMBOL", "UNDOFILE_SYMBOL", "UNDO_BUFFER_SIZE_SYMBOL", 
+            "UNDO_SYMBOL", "UNICODE_SYMBOL", "UNINSTALL_SYMBOL", "UNION_SYMBOL", 
+            "UNIQUE_SYMBOL", "UNKNOWN_SYMBOL", "UNLOCK_SYMBOL", "UNSIGNED_SYMBOL", 
+            "UNTIL_SYMBOL", "UPDATE_SYMBOL", "UPGRADE_SYMBOL", "USAGE_SYMBOL", 
+            "USER_RESOURCES_SYMBOL", "USER_SYMBOL", "USE_FRM_SYMBOL", "USE_SYMBOL", 
+            "USING_SYMBOL", "UTC_DATE_SYMBOL", "UTC_TIMESTAMP_SYMBOL", "UTC_TIME_SYMBOL", 
+            "VALIDATION_SYMBOL", "VALUES_SYMBOL", "VALUE_SYMBOL", "VARBINARY_SYMBOL", 
+            "VARCHAR_SYMBOL", "VARCHARACTER_SYMBOL", "VARIABLES_SYMBOL", 
+            "VARIANCE_SYMBOL", "VARYING_SYMBOL", "VAR_POP_SYMBOL", "VAR_SAMP_SYMBOL", 
+            "VIEW_SYMBOL", "VIRTUAL_SYMBOL", "WAIT_SYMBOL", "WARNINGS_SYMBOL", 
+            "WEEK_SYMBOL", "WEIGHT_STRING_SYMBOL", "WHEN_SYMBOL", "WHERE_SYMBOL", 
+            "WHILE_SYMBOL", "WITH_SYMBOL", "WITHOUT_SYMBOL", "WORK_SYMBOL", 
+            "WRAPPER_SYMBOL", "WRITE_SYMBOL", "X509_SYMBOL", "XA_SYMBOL", 
+            "XID_SYMBOL", "XML_SYMBOL", "XOR_SYMBOL", "YEAR_MONTH_SYMBOL", 
+            "YEAR_SYMBOL", "ZEROFILL_SYMBOL", "PERSIST_SYMBOL", "ROLE_SYMBOL", 
+            "ADMIN_SYMBOL", "INVISIBLE_SYMBOL", "VISIBLE_SYMBOL", "EXCEPT_SYMBOL", 
+            "COMPONENT_SYMBOL", "RECURSIVE_SYMBOL", "JSON_OBJECTAGG_SYMBOL", 
+            "JSON_ARRAYAGG_SYMBOL", "OF_SYMBOL", "SKIP_SYMBOL", "LOCKED_SYMBOL", 
+            "NOWAIT_SYMBOL", "GROUPING_SYMBOL", "PERSIST_ONLY_SYMBOL", "HISTOGRAM_SYMBOL", 
+            "BUCKETS_SYMBOL", "REMOTE_SYMBOL", "CLONE_SYMBOL", "CUME_DIST_SYMBOL", 
+            "DENSE_RANK_SYMBOL", "EXCLUDE_SYMBOL", "FIRST_VALUE_SYMBOL", 
+            "FOLLOWING_SYMBOL", "GROUPS_SYMBOL", "LAG_SYMBOL", "LAST_VALUE_SYMBOL", 
+            "LEAD_SYMBOL", "NTH_VALUE_SYMBOL", "NTILE_SYMBOL", "NULLS_SYMBOL", 
+            "OTHERS_SYMBOL", "OVER_SYMBOL", "PERCENT_RANK_SYMBOL", "PRECEDING_SYMBOL", 
+            "RANK_SYMBOL", "RESPECT_SYMBOL", "ROW_NUMBER_SYMBOL", "TIES_SYMBOL", 
+            "UNBOUNDED_SYMBOL", "WINDOW_SYMBOL", "EMPTY_SYMBOL", "JSON_TABLE_SYMBOL", 
+            "NESTED_SYMBOL", "ORDINALITY_SYMBOL", "PATH_SYMBOL", "HISTORY_SYMBOL", 
+            "REUSE_SYMBOL", "SRID_SYMBOL", "THREAD_PRIORITY_SYMBOL", "RESOURCE_SYMBOL", 
+            "SYSTEM_SYMBOL", "VCPU_SYMBOL", "MASTER_PUBLIC_KEY_PATH_SYMBOL", 
+            "GET_MASTER_PUBLIC_KEY_SYMBOL", "RESTART_SYMBOL", "DEFINITION_SYMBOL", 
+            "DESCRIPTION_SYMBOL", "ORGANIZATION_SYMBOL", "REFERENCE_SYMBOL", 
+            "OPTIONAL_SYMBOL", "SECONDARY_SYMBOL", "SECONDARY_ENGINE_SYMBOL", 
+            "SECONDARY_LOAD_SYMBOL", "SECONDARY_UNLOAD_SYMBOL", "ACTIVE_SYMBOL", 
+            "INACTIVE_SYMBOL", "LATERAL_SYMBOL", "RETAIN_SYMBOL", "OLD_SYMBOL", 
+            "NETWORK_NAMESPACE_SYMBOL", "ENFORCED_SYMBOL", "ARRAY_SYMBOL", 
+            "OJ_SYMBOL", "MEMBER_SYMBOL", "RANDOM_SYMBOL", "MASTER_COMPRESSION_ALGORITHM_SYMBOL", 
+            "MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOL", "PRIVILEGE_CHECKS_USER_SYMBOL", 
+            "MASTER_TLS_CIPHERSUITES_SYMBOL", "REQUIRE_ROW_FORMAT_SYMBOL", 
+            "PASSWORD_LOCK_TIME_SYMBOL", "FAILED_LOGIN_ATTEMPTS_SYMBOL", 
+            "REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOL", "STREAM_SYMBOL", "OFF_SYMBOL", 
+            "NOT2_SYMBOL", "CONCAT_PIPES_SYMBOL", "INT_NUMBER", "LONG_NUMBER", 
+            "ULONGLONG_NUMBER", "EQUAL_OPERATOR", "ASSIGN_OPERATOR", "NULL_SAFE_EQUAL_OPERATOR", 
+            "GREATER_OR_EQUAL_OPERATOR", "GREATER_THAN_OPERATOR", "LESS_OR_EQUAL_OPERATOR", 
+            "LESS_THAN_OPERATOR", "NOT_EQUAL_OPERATOR", "PLUS_OPERATOR", 
+            "MINUS_OPERATOR", "MULT_OPERATOR", "DIV_OPERATOR", "MOD_OPERATOR", 
+            "LOGICAL_NOT_OPERATOR", "BITWISE_NOT_OPERATOR", "SHIFT_LEFT_OPERATOR", 
+            "SHIFT_RIGHT_OPERATOR", "LOGICAL_AND_OPERATOR", "BITWISE_AND_OPERATOR", 
+            "BITWISE_XOR_OPERATOR", "LOGICAL_OR_OPERATOR", "BITWISE_OR_OPERATOR", 
+            "DOT_SYMBOL", "COMMA_SYMBOL", "SEMICOLON_SYMBOL", "COLON_SYMBOL", 
+            "OPEN_PAR_SYMBOL", "CLOSE_PAR_SYMBOL", "OPEN_CURLY_SYMBOL", 
+            "CLOSE_CURLY_SYMBOL", "UNDERLINE_SYMBOL", "JSON_SEPARATOR_SYMBOL", 
+            "JSON_UNQUOTED_SEPARATOR_SYMBOL", "AT_SIGN_SYMBOL", "AT_TEXT_SUFFIX", 
+            "AT_AT_SIGN_SYMBOL", "NULL2_SYMBOL", "PARAM_MARKER", "HEX_NUMBER", 
+            "BIN_NUMBER", "DECIMAL_NUMBER", "FLOAT_NUMBER", "WHITESPACE", 
+            "INVALID_INPUT", "UNDERSCORE_CHARSET", "IDENTIFIER", "NCHAR_TEXT", 
+            "BACK_TICK_QUOTED_ID", "DOUBLE_QUOTED_TEXT", "SINGLE_QUOTED_TEXT", 
+            "VERSION_COMMENT_START", "MYSQL_COMMENT_START", "VERSION_COMMENT_END", 
+            "BLOCK_COMMENT", "POUND_COMMENT", "DASHDASH_COMMENT", "NOT_EQUAL2_OPERATOR" ]
 
-    ruleNames = [
-        "EQUAL_OPERATOR",
-        "ASSIGN_OPERATOR",
-        "NULL_SAFE_EQUAL_OPERATOR",
-        "GREATER_OR_EQUAL_OPERATOR",
-        "GREATER_THAN_OPERATOR",
-        "LESS_OR_EQUAL_OPERATOR",
-        "LESS_THAN_OPERATOR",
-        "NOT_EQUAL_OPERATOR",
-        "NOT_EQUAL2_OPERATOR",
-        "PLUS_OPERATOR",
-        "MINUS_OPERATOR",
-        "MULT_OPERATOR",
-        "DIV_OPERATOR",
-        "MOD_OPERATOR",
-        "LOGICAL_NOT_OPERATOR",
-        "BITWISE_NOT_OPERATOR",
-        "SHIFT_LEFT_OPERATOR",
-        "SHIFT_RIGHT_OPERATOR",
-        "LOGICAL_AND_OPERATOR",
-        "BITWISE_AND_OPERATOR",
-        "BITWISE_XOR_OPERATOR",
-        "LOGICAL_OR_OPERATOR",
-        "BITWISE_OR_OPERATOR",
-        "DOT_SYMBOL",
-        "COMMA_SYMBOL",
-        "SEMICOLON_SYMBOL",
-        "COLON_SYMBOL",
-        "OPEN_PAR_SYMBOL",
-        "CLOSE_PAR_SYMBOL",
-        "OPEN_CURLY_SYMBOL",
-        "CLOSE_CURLY_SYMBOL",
-        "UNDERLINE_SYMBOL",
-        "JSON_SEPARATOR_SYMBOL",
-        "JSON_UNQUOTED_SEPARATOR_SYMBOL",
-        "AT_SIGN_SYMBOL",
-        "AT_TEXT_SUFFIX",
-        "AT_AT_SIGN_SYMBOL",
-        "NULL2_SYMBOL",
-        "PARAM_MARKER",
-        "A",
-        "B",
-        "C",
-        "D",
-        "E",
-        "F",
-        "G",
-        "H",
-        "I",
-        "J",
-        "K",
-        "L",
-        "M",
-        "N",
-        "O",
-        "P",
-        "Q",
-        "R",
-        "S",
-        "T",
-        "U",
-        "V",
-        "W",
-        "X",
-        "Y",
-        "Z",
-        "DIGIT",
-        "DIGITS",
-        "HEXDIGIT",
-        "HEX_NUMBER",
-        "BIN_NUMBER",
-        "INT_NUMBER",
-        "DECIMAL_NUMBER",
-        "FLOAT_NUMBER",
-        "DOT_IDENTIFIER",
-        "ACCESSIBLE_SYMBOL",
-        "ACCOUNT_SYMBOL",
-        "ACTION_SYMBOL",
-        "ADD_SYMBOL",
-        "ADDDATE_SYMBOL",
-        "AFTER_SYMBOL",
-        "AGAINST_SYMBOL",
-        "AGGREGATE_SYMBOL",
-        "ALGORITHM_SYMBOL",
-        "ALL_SYMBOL",
-        "ALTER_SYMBOL",
-        "ALWAYS_SYMBOL",
-        "ANALYSE_SYMBOL",
-        "ANALYZE_SYMBOL",
-        "AND_SYMBOL",
-        "ANY_SYMBOL",
-        "AS_SYMBOL",
-        "ASC_SYMBOL",
-        "ASCII_SYMBOL",
-        "ASENSITIVE_SYMBOL",
-        "AT_SYMBOL",
-        "AUTHORS_SYMBOL",
-        "AUTOEXTEND_SIZE_SYMBOL",
-        "AUTO_INCREMENT_SYMBOL",
-        "AVG_ROW_LENGTH_SYMBOL",
-        "AVG_SYMBOL",
-        "BACKUP_SYMBOL",
-        "BEFORE_SYMBOL",
-        "BEGIN_SYMBOL",
-        "BETWEEN_SYMBOL",
-        "BIGINT_SYMBOL",
-        "BINARY_SYMBOL",
-        "BINLOG_SYMBOL",
-        "BIN_NUM_SYMBOL",
-        "BIT_AND_SYMBOL",
-        "BIT_OR_SYMBOL",
-        "BIT_SYMBOL",
-        "BIT_XOR_SYMBOL",
-        "BLOB_SYMBOL",
-        "BLOCK_SYMBOL",
-        "BOOLEAN_SYMBOL",
-        "BOOL_SYMBOL",
-        "BOTH_SYMBOL",
-        "BTREE_SYMBOL",
-        "BY_SYMBOL",
-        "BYTE_SYMBOL",
-        "CACHE_SYMBOL",
-        "CALL_SYMBOL",
-        "CASCADE_SYMBOL",
-        "CASCADED_SYMBOL",
-        "CASE_SYMBOL",
-        "CAST_SYMBOL",
-        "CATALOG_NAME_SYMBOL",
-        "CHAIN_SYMBOL",
-        "CHANGE_SYMBOL",
-        "CHANGED_SYMBOL",
-        "CHANNEL_SYMBOL",
-        "CHARSET_SYMBOL",
-        "CHARACTER_SYMBOL",
-        "CHAR_SYMBOL",
-        "CHECKSUM_SYMBOL",
-        "CHECK_SYMBOL",
-        "CIPHER_SYMBOL",
-        "CLASS_ORIGIN_SYMBOL",
-        "CLIENT_SYMBOL",
-        "CLOSE_SYMBOL",
-        "COALESCE_SYMBOL",
-        "CODE_SYMBOL",
-        "COLLATE_SYMBOL",
-        "COLLATION_SYMBOL",
-        "COLUMNS_SYMBOL",
-        "COLUMN_SYMBOL",
-        "COLUMN_NAME_SYMBOL",
-        "COLUMN_FORMAT_SYMBOL",
-        "COMMENT_SYMBOL",
-        "COMMITTED_SYMBOL",
-        "COMMIT_SYMBOL",
-        "COMPACT_SYMBOL",
-        "COMPLETION_SYMBOL",
-        "COMPRESSED_SYMBOL",
-        "COMPRESSION_SYMBOL",
-        "CONCURRENT_SYMBOL",
-        "CONDITION_SYMBOL",
-        "CONNECTION_SYMBOL",
-        "CONSISTENT_SYMBOL",
-        "CONSTRAINT_SYMBOL",
-        "CONSTRAINT_CATALOG_SYMBOL",
-        "CONSTRAINT_NAME_SYMBOL",
-        "CONSTRAINT_SCHEMA_SYMBOL",
-        "CONTAINS_SYMBOL",
-        "CONTEXT_SYMBOL",
-        "CONTINUE_SYMBOL",
-        "CONTRIBUTORS_SYMBOL",
-        "CONVERT_SYMBOL",
-        "COUNT_SYMBOL",
-        "CPU_SYMBOL",
-        "CREATE_SYMBOL",
-        "CROSS_SYMBOL",
-        "CUBE_SYMBOL",
-        "CURDATE_SYMBOL",
-        "CURRENT_SYMBOL",
-        "CURRENT_DATE_SYMBOL",
-        "CURRENT_TIME_SYMBOL",
-        "CURRENT_TIMESTAMP_SYMBOL",
-        "CURRENT_USER_SYMBOL",
-        "CURSOR_SYMBOL",
-        "CURSOR_NAME_SYMBOL",
-        "CURTIME_SYMBOL",
-        "DATABASE_SYMBOL",
-        "DATABASES_SYMBOL",
-        "DATAFILE_SYMBOL",
-        "DATA_SYMBOL",
-        "DATETIME_SYMBOL",
-        "DATE_ADD_SYMBOL",
-        "DATE_SUB_SYMBOL",
-        "DATE_SYMBOL",
-        "DAYOFMONTH_SYMBOL",
-        "DAY_HOUR_SYMBOL",
-        "DAY_MICROSECOND_SYMBOL",
-        "DAY_MINUTE_SYMBOL",
-        "DAY_SECOND_SYMBOL",
-        "DAY_SYMBOL",
-        "DEALLOCATE_SYMBOL",
-        "DEC_SYMBOL",
-        "DECIMAL_NUM_SYMBOL",
-        "DECIMAL_SYMBOL",
-        "DECLARE_SYMBOL",
-        "DEFAULT_SYMBOL",
-        "DEFAULT_AUTH_SYMBOL",
-        "DEFINER_SYMBOL",
-        "DELAYED_SYMBOL",
-        "DELAY_KEY_WRITE_SYMBOL",
-        "DELETE_SYMBOL",
-        "DESC_SYMBOL",
-        "DESCRIBE_SYMBOL",
-        "DES_KEY_FILE_SYMBOL",
-        "DETERMINISTIC_SYMBOL",
-        "DIAGNOSTICS_SYMBOL",
-        "DIRECTORY_SYMBOL",
-        "DISABLE_SYMBOL",
-        "DISCARD_SYMBOL",
-        "DISK_SYMBOL",
-        "DISTINCT_SYMBOL",
-        "DISTINCTROW_SYMBOL",
-        "DIV_SYMBOL",
-        "DOUBLE_SYMBOL",
-        "DO_SYMBOL",
-        "DROP_SYMBOL",
-        "DUAL_SYMBOL",
-        "DUMPFILE_SYMBOL",
-        "DUPLICATE_SYMBOL",
-        "DYNAMIC_SYMBOL",
-        "EACH_SYMBOL",
-        "ELSE_SYMBOL",
-        "ELSEIF_SYMBOL",
-        "ENABLE_SYMBOL",
-        "ENCLOSED_SYMBOL",
-        "ENCRYPTION_SYMBOL",
-        "END_SYMBOL",
-        "ENDS_SYMBOL",
-        "END_OF_INPUT_SYMBOL",
-        "ENGINES_SYMBOL",
-        "ENGINE_SYMBOL",
-        "ENUM_SYMBOL",
-        "ERROR_SYMBOL",
-        "ERRORS_SYMBOL",
-        "ESCAPED_SYMBOL",
-        "ESCAPE_SYMBOL",
-        "EVENTS_SYMBOL",
-        "EVENT_SYMBOL",
-        "EVERY_SYMBOL",
-        "EXCHANGE_SYMBOL",
-        "EXECUTE_SYMBOL",
-        "EXISTS_SYMBOL",
-        "EXIT_SYMBOL",
-        "EXPANSION_SYMBOL",
-        "EXPIRE_SYMBOL",
-        "EXPLAIN_SYMBOL",
-        "EXPORT_SYMBOL",
-        "EXTENDED_SYMBOL",
-        "EXTENT_SIZE_SYMBOL",
-        "EXTRACT_SYMBOL",
-        "FALSE_SYMBOL",
-        "FAST_SYMBOL",
-        "FAULTS_SYMBOL",
-        "FETCH_SYMBOL",
-        "FIELDS_SYMBOL",
-        "FILE_SYMBOL",
-        "FILE_BLOCK_SIZE_SYMBOL",
-        "FILTER_SYMBOL",
-        "FIRST_SYMBOL",
-        "FIXED_SYMBOL",
-        "FLOAT4_SYMBOL",
-        "FLOAT8_SYMBOL",
-        "FLOAT_SYMBOL",
-        "FLUSH_SYMBOL",
-        "FOLLOWS_SYMBOL",
-        "FORCE_SYMBOL",
-        "FOREIGN_SYMBOL",
-        "FOR_SYMBOL",
-        "FORMAT_SYMBOL",
-        "FOUND_SYMBOL",
-        "FROM_SYMBOL",
-        "FULL_SYMBOL",
-        "FULLTEXT_SYMBOL",
-        "FUNCTION_SYMBOL",
-        "GET_SYMBOL",
-        "GENERAL_SYMBOL",
-        "GENERATED_SYMBOL",
-        "GROUP_REPLICATION_SYMBOL",
-        "GEOMETRYCOLLECTION_SYMBOL",
-        "GEOMETRY_SYMBOL",
-        "GET_FORMAT_SYMBOL",
-        "GLOBAL_SYMBOL",
-        "GRANT_SYMBOL",
-        "GRANTS_SYMBOL",
-        "GROUP_SYMBOL",
-        "GROUP_CONCAT_SYMBOL",
-        "HANDLER_SYMBOL",
-        "HASH_SYMBOL",
-        "HAVING_SYMBOL",
-        "HELP_SYMBOL",
-        "HIGH_PRIORITY_SYMBOL",
-        "HOST_SYMBOL",
-        "HOSTS_SYMBOL",
-        "HOUR_MICROSECOND_SYMBOL",
-        "HOUR_MINUTE_SYMBOL",
-        "HOUR_SECOND_SYMBOL",
-        "HOUR_SYMBOL",
-        "IDENTIFIED_SYMBOL",
-        "IF_SYMBOL",
-        "IGNORE_SYMBOL",
-        "IGNORE_SERVER_IDS_SYMBOL",
-        "IMPORT_SYMBOL",
-        "INDEXES_SYMBOL",
-        "INDEX_SYMBOL",
-        "INFILE_SYMBOL",
-        "INITIAL_SIZE_SYMBOL",
-        "INNER_SYMBOL",
-        "INOUT_SYMBOL",
-        "INSENSITIVE_SYMBOL",
-        "INSERT_SYMBOL",
-        "INSERT_METHOD_SYMBOL",
-        "INSTANCE_SYMBOL",
-        "INSTALL_SYMBOL",
-        "INTEGER_SYMBOL",
-        "INTERVAL_SYMBOL",
-        "INTO_SYMBOL",
-        "INT_SYMBOL",
-        "INVOKER_SYMBOL",
-        "IN_SYMBOL",
-        "IO_AFTER_GTIDS_SYMBOL",
-        "IO_BEFORE_GTIDS_SYMBOL",
-        "IO_THREAD_SYMBOL",
-        "IO_SYMBOL",
-        "IPC_SYMBOL",
-        "IS_SYMBOL",
-        "ISOLATION_SYMBOL",
-        "ISSUER_SYMBOL",
-        "ITERATE_SYMBOL",
-        "JOIN_SYMBOL",
-        "JSON_SYMBOL",
-        "KEYS_SYMBOL",
-        "KEY_BLOCK_SIZE_SYMBOL",
-        "KEY_SYMBOL",
-        "KILL_SYMBOL",
-        "LANGUAGE_SYMBOL",
-        "LAST_SYMBOL",
-        "LEADING_SYMBOL",
-        "LEAVES_SYMBOL",
-        "LEAVE_SYMBOL",
-        "LEFT_SYMBOL",
-        "LESS_SYMBOL",
-        "LEVEL_SYMBOL",
-        "LIKE_SYMBOL",
-        "LIMIT_SYMBOL",
-        "LINEAR_SYMBOL",
-        "LINES_SYMBOL",
-        "LINESTRING_SYMBOL",
-        "LIST_SYMBOL",
-        "LOAD_SYMBOL",
-        "LOCALTIME_SYMBOL",
-        "LOCALTIMESTAMP_SYMBOL",
-        "LOCAL_SYMBOL",
-        "LOCATOR_SYMBOL",
-        "LOCKS_SYMBOL",
-        "LOCK_SYMBOL",
-        "LOGFILE_SYMBOL",
-        "LOGS_SYMBOL",
-        "LONGBLOB_SYMBOL",
-        "LONGTEXT_SYMBOL",
-        "LONG_NUM_SYMBOL",
-        "LONG_SYMBOL",
-        "LOOP_SYMBOL",
-        "LOW_PRIORITY_SYMBOL",
-        "MASTER_AUTO_POSITION_SYMBOL",
-        "MASTER_BIND_SYMBOL",
-        "MASTER_CONNECT_RETRY_SYMBOL",
-        "MASTER_DELAY_SYMBOL",
-        "MASTER_HOST_SYMBOL",
-        "MASTER_LOG_FILE_SYMBOL",
-        "MASTER_LOG_POS_SYMBOL",
-        "MASTER_PASSWORD_SYMBOL",
-        "MASTER_PORT_SYMBOL",
-        "MASTER_RETRY_COUNT_SYMBOL",
-        "MASTER_SERVER_ID_SYMBOL",
-        "MASTER_SSL_CAPATH_SYMBOL",
-        "MASTER_SSL_CA_SYMBOL",
-        "MASTER_SSL_CERT_SYMBOL",
-        "MASTER_SSL_CIPHER_SYMBOL",
-        "MASTER_SSL_CRL_SYMBOL",
-        "MASTER_SSL_CRLPATH_SYMBOL",
-        "MASTER_SSL_KEY_SYMBOL",
-        "MASTER_SSL_SYMBOL",
-        "MASTER_SSL_VERIFY_SERVER_CERT_SYMBOL",
-        "MASTER_SYMBOL",
-        "MASTER_TLS_VERSION_SYMBOL",
-        "MASTER_USER_SYMBOL",
-        "MASTER_HEARTBEAT_PERIOD_SYMBOL",
-        "MATCH_SYMBOL",
-        "MAX_CONNECTIONS_PER_HOUR_SYMBOL",
-        "MAX_QUERIES_PER_HOUR_SYMBOL",
-        "MAX_ROWS_SYMBOL",
-        "MAX_SIZE_SYMBOL",
-        "MAX_STATEMENT_TIME_SYMBOL",
-        "MAX_SYMBOL",
-        "MAX_UPDATES_PER_HOUR_SYMBOL",
-        "MAX_USER_CONNECTIONS_SYMBOL",
-        "MAXVALUE_SYMBOL",
-        "MEDIUMBLOB_SYMBOL",
-        "MEDIUMINT_SYMBOL",
-        "MEDIUMTEXT_SYMBOL",
-        "MEDIUM_SYMBOL",
-        "MEMORY_SYMBOL",
-        "MERGE_SYMBOL",
-        "MESSAGE_TEXT_SYMBOL",
-        "MICROSECOND_SYMBOL",
-        "MID_SYMBOL",
-        "MIDDLEINT_SYMBOL",
-        "MIGRATE_SYMBOL",
-        "MINUTE_MICROSECOND_SYMBOL",
-        "MINUTE_SECOND_SYMBOL",
-        "MINUTE_SYMBOL",
-        "MIN_ROWS_SYMBOL",
-        "MIN_SYMBOL",
-        "MODE_SYMBOL",
-        "MODIFIES_SYMBOL",
-        "MODIFY_SYMBOL",
-        "MOD_SYMBOL",
-        "MONTH_SYMBOL",
-        "MULTILINESTRING_SYMBOL",
-        "MULTIPOINT_SYMBOL",
-        "MULTIPOLYGON_SYMBOL",
-        "MUTEX_SYMBOL",
-        "MYSQL_ERRNO_SYMBOL",
-        "NAMES_SYMBOL",
-        "NAME_SYMBOL",
-        "NATIONAL_SYMBOL",
-        "NATURAL_SYMBOL",
-        "NCHAR_STRING_SYMBOL",
-        "NCHAR_SYMBOL",
-        "NDB_SYMBOL",
-        "NDBCLUSTER_SYMBOL",
-        "NEG_SYMBOL",
-        "NEVER_SYMBOL",
-        "NEW_SYMBOL",
-        "NEXT_SYMBOL",
-        "NODEGROUP_SYMBOL",
-        "NONE_SYMBOL",
-        "NONBLOCKING_SYMBOL",
-        "NOT_SYMBOL",
-        "NOW_SYMBOL",
-        "NO_SYMBOL",
-        "NO_WAIT_SYMBOL",
-        "NO_WRITE_TO_BINLOG_SYMBOL",
-        "NULL_SYMBOL",
-        "NUMBER_SYMBOL",
-        "NUMERIC_SYMBOL",
-        "NVARCHAR_SYMBOL",
-        "OFFLINE_SYMBOL",
-        "OFFSET_SYMBOL",
-        "OLD_PASSWORD_SYMBOL",
-        "ON_SYMBOL",
-        "ONE_SYMBOL",
-        "ONLINE_SYMBOL",
-        "ONLY_SYMBOL",
-        "OPEN_SYMBOL",
-        "OPTIMIZE_SYMBOL",
-        "OPTIMIZER_COSTS_SYMBOL",
-        "OPTIONS_SYMBOL",
-        "OPTION_SYMBOL",
-        "OPTIONALLY_SYMBOL",
-        "ORDER_SYMBOL",
-        "OR_SYMBOL",
-        "OUTER_SYMBOL",
-        "OUTFILE_SYMBOL",
-        "OUT_SYMBOL",
-        "OWNER_SYMBOL",
-        "PACK_KEYS_SYMBOL",
-        "PAGE_SYMBOL",
-        "PARSER_SYMBOL",
-        "PARTIAL_SYMBOL",
-        "PARTITIONING_SYMBOL",
-        "PARTITIONS_SYMBOL",
-        "PARTITION_SYMBOL",
-        "PASSWORD_SYMBOL",
-        "PHASE_SYMBOL",
-        "PLUGINS_SYMBOL",
-        "PLUGIN_DIR_SYMBOL",
-        "PLUGIN_SYMBOL",
-        "POINT_SYMBOL",
-        "POLYGON_SYMBOL",
-        "PORT_SYMBOL",
-        "POSITION_SYMBOL",
-        "PRECEDES_SYMBOL",
-        "PRECISION_SYMBOL",
-        "PREPARE_SYMBOL",
-        "PRESERVE_SYMBOL",
-        "PREV_SYMBOL",
-        "PRIMARY_SYMBOL",
-        "PRIVILEGES_SYMBOL",
-        "PROCEDURE_SYMBOL",
-        "PROCESS_SYMBOL",
-        "PROCESSLIST_SYMBOL",
-        "PROFILE_SYMBOL",
-        "PROFILES_SYMBOL",
-        "PROXY_SYMBOL",
-        "PURGE_SYMBOL",
-        "QUARTER_SYMBOL",
-        "QUERY_SYMBOL",
-        "QUICK_SYMBOL",
-        "RANGE_SYMBOL",
-        "READS_SYMBOL",
-        "READ_ONLY_SYMBOL",
-        "READ_SYMBOL",
-        "READ_WRITE_SYMBOL",
-        "REAL_SYMBOL",
-        "REBUILD_SYMBOL",
-        "RECOVER_SYMBOL",
-        "REDOFILE_SYMBOL",
-        "REDO_BUFFER_SIZE_SYMBOL",
-        "REDUNDANT_SYMBOL",
-        "REFERENCES_SYMBOL",
-        "REGEXP_SYMBOL",
-        "RELAY_SYMBOL",
-        "RELAYLOG_SYMBOL",
-        "RELAY_LOG_FILE_SYMBOL",
-        "RELAY_LOG_POS_SYMBOL",
-        "RELAY_THREAD_SYMBOL",
-        "RELEASE_SYMBOL",
-        "RELOAD_SYMBOL",
-        "REMOVE_SYMBOL",
-        "RENAME_SYMBOL",
-        "REORGANIZE_SYMBOL",
-        "REPAIR_SYMBOL",
-        "REPEATABLE_SYMBOL",
-        "REPEAT_SYMBOL",
-        "REPLACE_SYMBOL",
-        "REPLICATION_SYMBOL",
-        "REPLICATE_DO_DB_SYMBOL",
-        "REPLICATE_IGNORE_DB_SYMBOL",
-        "REPLICATE_DO_TABLE_SYMBOL",
-        "REPLICATE_IGNORE_TABLE_SYMBOL",
-        "REPLICATE_WILD_DO_TABLE_SYMBOL",
-        "REPLICATE_WILD_IGNORE_TABLE_SYMBOL",
-        "REPLICATE_REWRITE_DB_SYMBOL",
-        "REQUIRE_SYMBOL",
-        "RESET_SYMBOL",
-        "RESIGNAL_SYMBOL",
-        "RESTORE_SYMBOL",
-        "RESTRICT_SYMBOL",
-        "RESUME_SYMBOL",
-        "RETURNED_SQLSTATE_SYMBOL",
-        "RETURNS_SYMBOL",
-        "RETURN_SYMBOL",
-        "REVERSE_SYMBOL",
-        "REVOKE_SYMBOL",
-        "RIGHT_SYMBOL",
-        "RLIKE_SYMBOL",
-        "ROLLBACK_SYMBOL",
-        "ROLLUP_SYMBOL",
-        "ROTATE_SYMBOL",
-        "ROUTINE_SYMBOL",
-        "ROWS_SYMBOL",
-        "ROW_COUNT_SYMBOL",
-        "ROW_FORMAT_SYMBOL",
-        "ROW_SYMBOL",
-        "RTREE_SYMBOL",
-        "SAVEPOINT_SYMBOL",
-        "SCHEDULE_SYMBOL",
-        "SCHEMA_SYMBOL",
-        "SCHEMA_NAME_SYMBOL",
-        "SCHEMAS_SYMBOL",
-        "SECOND_MICROSECOND_SYMBOL",
-        "SECOND_SYMBOL",
-        "SECURITY_SYMBOL",
-        "SELECT_SYMBOL",
-        "SENSITIVE_SYMBOL",
-        "SEPARATOR_SYMBOL",
-        "SERIALIZABLE_SYMBOL",
-        "SERIAL_SYMBOL",
-        "SESSION_SYMBOL",
-        "SERVER_SYMBOL",
-        "SERVER_OPTIONS_SYMBOL",
-        "SESSION_USER_SYMBOL",
-        "SET_SYMBOL",
-        "SET_VAR_SYMBOL",
-        "SHARE_SYMBOL",
-        "SHOW_SYMBOL",
-        "SHUTDOWN_SYMBOL",
-        "SIGNAL_SYMBOL",
-        "SIGNED_SYMBOL",
-        "SIMPLE_SYMBOL",
-        "SLAVE_SYMBOL",
-        "SLOW_SYMBOL",
-        "SMALLINT_SYMBOL",
-        "SNAPSHOT_SYMBOL",
-        "SOME_SYMBOL",
-        "SOCKET_SYMBOL",
-        "SONAME_SYMBOL",
-        "SOUNDS_SYMBOL",
-        "SOURCE_SYMBOL",
-        "SPATIAL_SYMBOL",
-        "SPECIFIC_SYMBOL",
-        "SQLEXCEPTION_SYMBOL",
-        "SQLSTATE_SYMBOL",
-        "SQLWARNING_SYMBOL",
-        "SQL_AFTER_GTIDS_SYMBOL",
-        "SQL_AFTER_MTS_GAPS_SYMBOL",
-        "SQL_BEFORE_GTIDS_SYMBOL",
-        "SQL_BIG_RESULT_SYMBOL",
-        "SQL_BUFFER_RESULT_SYMBOL",
-        "SQL_CACHE_SYMBOL",
-        "SQL_CALC_FOUND_ROWS_SYMBOL",
-        "SQL_NO_CACHE_SYMBOL",
-        "SQL_SMALL_RESULT_SYMBOL",
-        "SQL_SYMBOL",
-        "SQL_THREAD_SYMBOL",
-        "SSL_SYMBOL",
-        "STACKED_SYMBOL",
-        "STARTING_SYMBOL",
-        "STARTS_SYMBOL",
-        "START_SYMBOL",
-        "STATS_AUTO_RECALC_SYMBOL",
-        "STATS_PERSISTENT_SYMBOL",
-        "STATS_SAMPLE_PAGES_SYMBOL",
-        "STATUS_SYMBOL",
-        "STDDEV_SAMP_SYMBOL",
-        "STDDEV_SYMBOL",
-        "STDDEV_POP_SYMBOL",
-        "STD_SYMBOL",
-        "STOP_SYMBOL",
-        "STORAGE_SYMBOL",
-        "STORED_SYMBOL",
-        "STRAIGHT_JOIN_SYMBOL",
-        "STRING_SYMBOL",
-        "SUBCLASS_ORIGIN_SYMBOL",
-        "SUBDATE_SYMBOL",
-        "SUBJECT_SYMBOL",
-        "SUBPARTITIONS_SYMBOL",
-        "SUBPARTITION_SYMBOL",
-        "SUBSTR_SYMBOL",
-        "SUBSTRING_SYMBOL",
-        "SUM_SYMBOL",
-        "SUPER_SYMBOL",
-        "SUSPEND_SYMBOL",
-        "SWAPS_SYMBOL",
-        "SWITCHES_SYMBOL",
-        "SYSDATE_SYMBOL",
-        "SYSTEM_USER_SYMBOL",
-        "TABLES_SYMBOL",
-        "TABLESPACE_SYMBOL",
-        "TABLE_REF_PRIORITY_SYMBOL",
-        "TABLE_SYMBOL",
-        "TABLE_CHECKSUM_SYMBOL",
-        "TABLE_NAME_SYMBOL",
-        "TEMPORARY_SYMBOL",
-        "TEMPTABLE_SYMBOL",
-        "TERMINATED_SYMBOL",
-        "TEXT_SYMBOL",
-        "THAN_SYMBOL",
-        "THEN_SYMBOL",
-        "TIMESTAMP_SYMBOL",
-        "TIMESTAMP_ADD_SYMBOL",
-        "TIMESTAMP_DIFF_SYMBOL",
-        "TIME_SYMBOL",
-        "TINYBLOB_SYMBOL",
-        "TINYINT_SYMBOL",
-        "TINYTEXT_SYMBOL",
-        "TO_SYMBOL",
-        "TRAILING_SYMBOL",
-        "TRANSACTION_SYMBOL",
-        "TRIGGERS_SYMBOL",
-        "TRIGGER_SYMBOL",
-        "TRIM_SYMBOL",
-        "TRUE_SYMBOL",
-        "TRUNCATE_SYMBOL",
-        "TYPES_SYMBOL",
-        "TYPE_SYMBOL",
-        "UDF_RETURNS_SYMBOL",
-        "UNCOMMITTED_SYMBOL",
-        "UNDEFINED_SYMBOL",
-        "UNDOFILE_SYMBOL",
-        "UNDO_BUFFER_SIZE_SYMBOL",
-        "UNDO_SYMBOL",
-        "UNICODE_SYMBOL",
-        "UNINSTALL_SYMBOL",
-        "UNION_SYMBOL",
-        "UNIQUE_SYMBOL",
-        "UNKNOWN_SYMBOL",
-        "UNLOCK_SYMBOL",
-        "UNSIGNED_SYMBOL",
-        "UNTIL_SYMBOL",
-        "UPDATE_SYMBOL",
-        "UPGRADE_SYMBOL",
-        "USAGE_SYMBOL",
-        "USER_RESOURCES_SYMBOL",
-        "USER_SYMBOL",
-        "USE_FRM_SYMBOL",
-        "USE_SYMBOL",
-        "USING_SYMBOL",
-        "UTC_DATE_SYMBOL",
-        "UTC_TIMESTAMP_SYMBOL",
-        "UTC_TIME_SYMBOL",
-        "VALIDATION_SYMBOL",
-        "VALUES_SYMBOL",
-        "VALUE_SYMBOL",
-        "VARBINARY_SYMBOL",
-        "VARCHAR_SYMBOL",
-        "VARCHARACTER_SYMBOL",
-        "VARIABLES_SYMBOL",
-        "VARIANCE_SYMBOL",
-        "VARYING_SYMBOL",
-        "VAR_POP_SYMBOL",
-        "VAR_SAMP_SYMBOL",
-        "VIEW_SYMBOL",
-        "VIRTUAL_SYMBOL",
-        "WAIT_SYMBOL",
-        "WARNINGS_SYMBOL",
-        "WEEK_SYMBOL",
-        "WEIGHT_STRING_SYMBOL",
-        "WHEN_SYMBOL",
-        "WHERE_SYMBOL",
-        "WHILE_SYMBOL",
-        "WITH_SYMBOL",
-        "WITHOUT_SYMBOL",
-        "WORK_SYMBOL",
-        "WRAPPER_SYMBOL",
-        "WRITE_SYMBOL",
-        "X509_SYMBOL",
-        "XA_SYMBOL",
-        "XID_SYMBOL",
-        "XML_SYMBOL",
-        "XOR_SYMBOL",
-        "YEAR_MONTH_SYMBOL",
-        "YEAR_SYMBOL",
-        "ZEROFILL_SYMBOL",
-        "PERSIST_SYMBOL",
-        "ROLE_SYMBOL",
-        "ADMIN_SYMBOL",
-        "INVISIBLE_SYMBOL",
-        "VISIBLE_SYMBOL",
-        "EXCEPT_SYMBOL",
-        "COMPONENT_SYMBOL",
-        "RECURSIVE_SYMBOL",
-        "JSON_OBJECTAGG_SYMBOL",
-        "JSON_ARRAYAGG_SYMBOL",
-        "OF_SYMBOL",
-        "SKIP_SYMBOL",
-        "LOCKED_SYMBOL",
-        "NOWAIT_SYMBOL",
-        "GROUPING_SYMBOL",
-        "PERSIST_ONLY_SYMBOL",
-        "HISTOGRAM_SYMBOL",
-        "BUCKETS_SYMBOL",
-        "REMOTE_SYMBOL",
-        "CLONE_SYMBOL",
-        "CUME_DIST_SYMBOL",
-        "DENSE_RANK_SYMBOL",
-        "EXCLUDE_SYMBOL",
-        "FIRST_VALUE_SYMBOL",
-        "FOLLOWING_SYMBOL",
-        "GROUPS_SYMBOL",
-        "LAG_SYMBOL",
-        "LAST_VALUE_SYMBOL",
-        "LEAD_SYMBOL",
-        "NTH_VALUE_SYMBOL",
-        "NTILE_SYMBOL",
-        "NULLS_SYMBOL",
-        "OTHERS_SYMBOL",
-        "OVER_SYMBOL",
-        "PERCENT_RANK_SYMBOL",
-        "PRECEDING_SYMBOL",
-        "RANK_SYMBOL",
-        "RESPECT_SYMBOL",
-        "ROW_NUMBER_SYMBOL",
-        "TIES_SYMBOL",
-        "UNBOUNDED_SYMBOL",
-        "WINDOW_SYMBOL",
-        "EMPTY_SYMBOL",
-        "JSON_TABLE_SYMBOL",
-        "NESTED_SYMBOL",
-        "ORDINALITY_SYMBOL",
-        "PATH_SYMBOL",
-        "HISTORY_SYMBOL",
-        "REUSE_SYMBOL",
-        "SRID_SYMBOL",
-        "THREAD_PRIORITY_SYMBOL",
-        "RESOURCE_SYMBOL",
-        "SYSTEM_SYMBOL",
-        "VCPU_SYMBOL",
-        "MASTER_PUBLIC_KEY_PATH_SYMBOL",
-        "GET_MASTER_PUBLIC_KEY_SYMBOL",
-        "RESTART_SYMBOL",
-        "DEFINITION_SYMBOL",
-        "DESCRIPTION_SYMBOL",
-        "ORGANIZATION_SYMBOL",
-        "REFERENCE_SYMBOL",
-        "OPTIONAL_SYMBOL",
-        "SECONDARY_SYMBOL",
-        "SECONDARY_ENGINE_SYMBOL",
-        "SECONDARY_LOAD_SYMBOL",
-        "SECONDARY_UNLOAD_SYMBOL",
-        "ACTIVE_SYMBOL",
-        "INACTIVE_SYMBOL",
-        "LATERAL_SYMBOL",
-        "RETAIN_SYMBOL",
-        "OLD_SYMBOL",
-        "NETWORK_NAMESPACE_SYMBOL",
-        "ENFORCED_SYMBOL",
-        "ARRAY_SYMBOL",
-        "OJ_SYMBOL",
-        "MEMBER_SYMBOL",
-        "RANDOM_SYMBOL",
-        "MASTER_COMPRESSION_ALGORITHM_SYMBOL",
-        "MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOL",
-        "PRIVILEGE_CHECKS_USER_SYMBOL",
-        "MASTER_TLS_CIPHERSUITES_SYMBOL",
-        "REQUIRE_ROW_FORMAT_SYMBOL",
-        "PASSWORD_LOCK_TIME_SYMBOL",
-        "FAILED_LOGIN_ATTEMPTS_SYMBOL",
-        "REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOL",
-        "STREAM_SYMBOL",
-        "OFF_SYMBOL",
-        "INT1_SYMBOL",
-        "INT2_SYMBOL",
-        "INT3_SYMBOL",
-        "INT4_SYMBOL",
-        "INT8_SYMBOL",
-        "SQL_TSI_SECOND_SYMBOL",
-        "SQL_TSI_MINUTE_SYMBOL",
-        "SQL_TSI_HOUR_SYMBOL",
-        "SQL_TSI_DAY_SYMBOL",
-        "SQL_TSI_WEEK_SYMBOL",
-        "SQL_TSI_MONTH_SYMBOL",
-        "SQL_TSI_QUARTER_SYMBOL",
-        "SQL_TSI_YEAR_SYMBOL",
-        "WHITESPACE",
-        "INVALID_INPUT",
-        "UNDERSCORE_CHARSET",
-        "IDENTIFIER",
-        "NCHAR_TEXT",
-        "BACK_TICK",
-        "SINGLE_QUOTE",
-        "DOUBLE_QUOTE",
-        "BACK_TICK_QUOTED_ID",
-        "DOUBLE_QUOTED_TEXT",
-        "SINGLE_QUOTED_TEXT",
-        "VERSION_COMMENT_START",
-        "MYSQL_COMMENT_START",
-        "VERSION_COMMENT_END",
-        "BLOCK_COMMENT",
-        "POUND_COMMENT",
-        "DASHDASH_COMMENT",
-        "DOUBLE_DASH",
-        "LINEBREAK",
-        "SIMPLE_IDENTIFIER",
-        "ML_COMMENT_HEAD",
-        "ML_COMMENT_END",
-        "LETTER_WHEN_UNQUOTED",
-        "LETTER_WHEN_UNQUOTED_NO_DIGIT",
-        "LETTER_WITHOUT_FLOAT_PART",
-    ]
+    ruleNames = [ "EQUAL_OPERATOR", "ASSIGN_OPERATOR", "NULL_SAFE_EQUAL_OPERATOR", 
+                  "GREATER_OR_EQUAL_OPERATOR", "GREATER_THAN_OPERATOR", 
+                  "LESS_OR_EQUAL_OPERATOR", "LESS_THAN_OPERATOR", "NOT_EQUAL_OPERATOR", 
+                  "NOT_EQUAL2_OPERATOR", "PLUS_OPERATOR", "MINUS_OPERATOR", 
+                  "MULT_OPERATOR", "DIV_OPERATOR", "MOD_OPERATOR", "LOGICAL_NOT_OPERATOR", 
+                  "BITWISE_NOT_OPERATOR", "SHIFT_LEFT_OPERATOR", "SHIFT_RIGHT_OPERATOR", 
+                  "LOGICAL_AND_OPERATOR", "BITWISE_AND_OPERATOR", "BITWISE_XOR_OPERATOR", 
+                  "LOGICAL_OR_OPERATOR", "BITWISE_OR_OPERATOR", "DOT_SYMBOL", 
+                  "COMMA_SYMBOL", "SEMICOLON_SYMBOL", "COLON_SYMBOL", "OPEN_PAR_SYMBOL", 
+                  "CLOSE_PAR_SYMBOL", "OPEN_CURLY_SYMBOL", "CLOSE_CURLY_SYMBOL", 
+                  "UNDERLINE_SYMBOL", "JSON_SEPARATOR_SYMBOL", "JSON_UNQUOTED_SEPARATOR_SYMBOL", 
+                  "AT_SIGN_SYMBOL", "AT_TEXT_SUFFIX", "AT_AT_SIGN_SYMBOL", 
+                  "NULL2_SYMBOL", "PARAM_MARKER", "A", "B", "C", "D", "E", 
+                  "F", "G", "H", "I", "J", "K", "L", "M", "N", "O", "P", 
+                  "Q", "R", "S", "T", "U", "V", "W", "X", "Y", "Z", "DIGIT", 
+                  "DIGITS", "HEXDIGIT", "HEX_NUMBER", "BIN_NUMBER", "INT_NUMBER", 
+                  "DECIMAL_NUMBER", "FLOAT_NUMBER", "DOT_IDENTIFIER", "ACCESSIBLE_SYMBOL", 
+                  "ACCOUNT_SYMBOL", "ACTION_SYMBOL", "ADD_SYMBOL", "ADDDATE_SYMBOL", 
+                  "AFTER_SYMBOL", "AGAINST_SYMBOL", "AGGREGATE_SYMBOL", 
+                  "ALGORITHM_SYMBOL", "ALL_SYMBOL", "ALTER_SYMBOL", "ALWAYS_SYMBOL", 
+                  "ANALYSE_SYMBOL", "ANALYZE_SYMBOL", "AND_SYMBOL", "ANY_SYMBOL", 
+                  "AS_SYMBOL", "ASC_SYMBOL", "ASCII_SYMBOL", "ASENSITIVE_SYMBOL", 
+                  "AT_SYMBOL", "AUTHORS_SYMBOL", "AUTOEXTEND_SIZE_SYMBOL", 
+                  "AUTO_INCREMENT_SYMBOL", "AVG_ROW_LENGTH_SYMBOL", "AVG_SYMBOL", 
+                  "BACKUP_SYMBOL", "BEFORE_SYMBOL", "BEGIN_SYMBOL", "BETWEEN_SYMBOL", 
+                  "BIGINT_SYMBOL", "BINARY_SYMBOL", "BINLOG_SYMBOL", "BIN_NUM_SYMBOL", 
+                  "BIT_AND_SYMBOL", "BIT_OR_SYMBOL", "BIT_SYMBOL", "BIT_XOR_SYMBOL", 
+                  "BLOB_SYMBOL", "BLOCK_SYMBOL", "BOOLEAN_SYMBOL", "BOOL_SYMBOL", 
+                  "BOTH_SYMBOL", "BTREE_SYMBOL", "BY_SYMBOL", "BYTE_SYMBOL", 
+                  "CACHE_SYMBOL", "CALL_SYMBOL", "CASCADE_SYMBOL", "CASCADED_SYMBOL", 
+                  "CASE_SYMBOL", "CAST_SYMBOL", "CATALOG_NAME_SYMBOL", "CHAIN_SYMBOL", 
+                  "CHANGE_SYMBOL", "CHANGED_SYMBOL", "CHANNEL_SYMBOL", "CHARSET_SYMBOL", 
+                  "CHARACTER_SYMBOL", "CHAR_SYMBOL", "CHECKSUM_SYMBOL", 
+                  "CHECK_SYMBOL", "CIPHER_SYMBOL", "CLASS_ORIGIN_SYMBOL", 
+                  "CLIENT_SYMBOL", "CLOSE_SYMBOL", "COALESCE_SYMBOL", "CODE_SYMBOL", 
+                  "COLLATE_SYMBOL", "COLLATION_SYMBOL", "COLUMNS_SYMBOL", 
+                  "COLUMN_SYMBOL", "COLUMN_NAME_SYMBOL", "COLUMN_FORMAT_SYMBOL", 
+                  "COMMENT_SYMBOL", "COMMITTED_SYMBOL", "COMMIT_SYMBOL", 
+                  "COMPACT_SYMBOL", "COMPLETION_SYMBOL", "COMPRESSED_SYMBOL", 
+                  "COMPRESSION_SYMBOL", "CONCURRENT_SYMBOL", "CONDITION_SYMBOL", 
+                  "CONNECTION_SYMBOL", "CONSISTENT_SYMBOL", "CONSTRAINT_SYMBOL", 
+                  "CONSTRAINT_CATALOG_SYMBOL", "CONSTRAINT_NAME_SYMBOL", 
+                  "CONSTRAINT_SCHEMA_SYMBOL", "CONTAINS_SYMBOL", "CONTEXT_SYMBOL", 
+                  "CONTINUE_SYMBOL", "CONTRIBUTORS_SYMBOL", "CONVERT_SYMBOL", 
+                  "COUNT_SYMBOL", "CPU_SYMBOL", "CREATE_SYMBOL", "CROSS_SYMBOL", 
+                  "CUBE_SYMBOL", "CURDATE_SYMBOL", "CURRENT_SYMBOL", "CURRENT_DATE_SYMBOL", 
+                  "CURRENT_TIME_SYMBOL", "CURRENT_TIMESTAMP_SYMBOL", "CURRENT_USER_SYMBOL", 
+                  "CURSOR_SYMBOL", "CURSOR_NAME_SYMBOL", "CURTIME_SYMBOL", 
+                  "DATABASE_SYMBOL", "DATABASES_SYMBOL", "DATAFILE_SYMBOL", 
+                  "DATA_SYMBOL", "DATETIME_SYMBOL", "DATE_ADD_SYMBOL", "DATE_SUB_SYMBOL", 
+                  "DATE_SYMBOL", "DAYOFMONTH_SYMBOL", "DAY_HOUR_SYMBOL", 
+                  "DAY_MICROSECOND_SYMBOL", "DAY_MINUTE_SYMBOL", "DAY_SECOND_SYMBOL", 
+                  "DAY_SYMBOL", "DEALLOCATE_SYMBOL", "DEC_SYMBOL", "DECIMAL_NUM_SYMBOL", 
+                  "DECIMAL_SYMBOL", "DECLARE_SYMBOL", "DEFAULT_SYMBOL", 
+                  "DEFAULT_AUTH_SYMBOL", "DEFINER_SYMBOL", "DELAYED_SYMBOL", 
+                  "DELAY_KEY_WRITE_SYMBOL", "DELETE_SYMBOL", "DESC_SYMBOL", 
+                  "DESCRIBE_SYMBOL", "DES_KEY_FILE_SYMBOL", "DETERMINISTIC_SYMBOL", 
+                  "DIAGNOSTICS_SYMBOL", "DIRECTORY_SYMBOL", "DISABLE_SYMBOL", 
+                  "DISCARD_SYMBOL", "DISK_SYMBOL", "DISTINCT_SYMBOL", "DISTINCTROW_SYMBOL", 
+                  "DIV_SYMBOL", "DOUBLE_SYMBOL", "DO_SYMBOL", "DROP_SYMBOL", 
+                  "DUAL_SYMBOL", "DUMPFILE_SYMBOL", "DUPLICATE_SYMBOL", 
+                  "DYNAMIC_SYMBOL", "EACH_SYMBOL", "ELSE_SYMBOL", "ELSEIF_SYMBOL", 
+                  "ENABLE_SYMBOL", "ENCLOSED_SYMBOL", "ENCRYPTION_SYMBOL", 
+                  "END_SYMBOL", "ENDS_SYMBOL", "END_OF_INPUT_SYMBOL", "ENGINES_SYMBOL", 
+                  "ENGINE_SYMBOL", "ENUM_SYMBOL", "ERROR_SYMBOL", "ERRORS_SYMBOL", 
+                  "ESCAPED_SYMBOL", "ESCAPE_SYMBOL", "EVENTS_SYMBOL", "EVENT_SYMBOL", 
+                  "EVERY_SYMBOL", "EXCHANGE_SYMBOL", "EXECUTE_SYMBOL", "EXISTS_SYMBOL", 
+                  "EXIT_SYMBOL", "EXPANSION_SYMBOL", "EXPIRE_SYMBOL", "EXPLAIN_SYMBOL", 
+                  "EXPORT_SYMBOL", "EXTENDED_SYMBOL", "EXTENT_SIZE_SYMBOL", 
+                  "EXTRACT_SYMBOL", "FALSE_SYMBOL", "FAST_SYMBOL", "FAULTS_SYMBOL", 
+                  "FETCH_SYMBOL", "FIELDS_SYMBOL", "FILE_SYMBOL", "FILE_BLOCK_SIZE_SYMBOL", 
+                  "FILTER_SYMBOL", "FIRST_SYMBOL", "FIXED_SYMBOL", "FLOAT4_SYMBOL", 
+                  "FLOAT8_SYMBOL", "FLOAT_SYMBOL", "FLUSH_SYMBOL", "FOLLOWS_SYMBOL", 
+                  "FORCE_SYMBOL", "FOREIGN_SYMBOL", "FOR_SYMBOL", "FORMAT_SYMBOL", 
+                  "FOUND_SYMBOL", "FROM_SYMBOL", "FULL_SYMBOL", "FULLTEXT_SYMBOL", 
+                  "FUNCTION_SYMBOL", "GET_SYMBOL", "GENERAL_SYMBOL", "GENERATED_SYMBOL", 
+                  "GROUP_REPLICATION_SYMBOL", "GEOMETRYCOLLECTION_SYMBOL", 
+                  "GEOMETRY_SYMBOL", "GET_FORMAT_SYMBOL", "GLOBAL_SYMBOL", 
+                  "GRANT_SYMBOL", "GRANTS_SYMBOL", "GROUP_SYMBOL", "GROUP_CONCAT_SYMBOL", 
+                  "HANDLER_SYMBOL", "HASH_SYMBOL", "HAVING_SYMBOL", "HELP_SYMBOL", 
+                  "HIGH_PRIORITY_SYMBOL", "HOST_SYMBOL", "HOSTS_SYMBOL", 
+                  "HOUR_MICROSECOND_SYMBOL", "HOUR_MINUTE_SYMBOL", "HOUR_SECOND_SYMBOL", 
+                  "HOUR_SYMBOL", "IDENTIFIED_SYMBOL", "IF_SYMBOL", "IGNORE_SYMBOL", 
+                  "IGNORE_SERVER_IDS_SYMBOL", "IMPORT_SYMBOL", "INDEXES_SYMBOL", 
+                  "INDEX_SYMBOL", "INFILE_SYMBOL", "INITIAL_SIZE_SYMBOL", 
+                  "INNER_SYMBOL", "INOUT_SYMBOL", "INSENSITIVE_SYMBOL", 
+                  "INSERT_SYMBOL", "INSERT_METHOD_SYMBOL", "INSTANCE_SYMBOL", 
+                  "INSTALL_SYMBOL", "INTEGER_SYMBOL", "INTERVAL_SYMBOL", 
+                  "INTO_SYMBOL", "INT_SYMBOL", "INVOKER_SYMBOL", "IN_SYMBOL", 
+                  "IO_AFTER_GTIDS_SYMBOL", "IO_BEFORE_GTIDS_SYMBOL", "IO_THREAD_SYMBOL", 
+                  "IO_SYMBOL", "IPC_SYMBOL", "IS_SYMBOL", "ISOLATION_SYMBOL", 
+                  "ISSUER_SYMBOL", "ITERATE_SYMBOL", "JOIN_SYMBOL", "JSON_SYMBOL", 
+                  "KEYS_SYMBOL", "KEY_BLOCK_SIZE_SYMBOL", "KEY_SYMBOL", 
+                  "KILL_SYMBOL", "LANGUAGE_SYMBOL", "LAST_SYMBOL", "LEADING_SYMBOL", 
+                  "LEAVES_SYMBOL", "LEAVE_SYMBOL", "LEFT_SYMBOL", "LESS_SYMBOL", 
+                  "LEVEL_SYMBOL", "LIKE_SYMBOL", "LIMIT_SYMBOL", "LINEAR_SYMBOL", 
+                  "LINES_SYMBOL", "LINESTRING_SYMBOL", "LIST_SYMBOL", "LOAD_SYMBOL", 
+                  "LOCALTIME_SYMBOL", "LOCALTIMESTAMP_SYMBOL", "LOCAL_SYMBOL", 
+                  "LOCATOR_SYMBOL", "LOCKS_SYMBOL", "LOCK_SYMBOL", "LOGFILE_SYMBOL", 
+                  "LOGS_SYMBOL", "LONGBLOB_SYMBOL", "LONGTEXT_SYMBOL", "LONG_NUM_SYMBOL", 
+                  "LONG_SYMBOL", "LOOP_SYMBOL", "LOW_PRIORITY_SYMBOL", "MASTER_AUTO_POSITION_SYMBOL", 
+                  "MASTER_BIND_SYMBOL", "MASTER_CONNECT_RETRY_SYMBOL", "MASTER_DELAY_SYMBOL", 
+                  "MASTER_HOST_SYMBOL", "MASTER_LOG_FILE_SYMBOL", "MASTER_LOG_POS_SYMBOL", 
+                  "MASTER_PASSWORD_SYMBOL", "MASTER_PORT_SYMBOL", "MASTER_RETRY_COUNT_SYMBOL", 
+                  "MASTER_SERVER_ID_SYMBOL", "MASTER_SSL_CAPATH_SYMBOL", 
+                  "MASTER_SSL_CA_SYMBOL", "MASTER_SSL_CERT_SYMBOL", "MASTER_SSL_CIPHER_SYMBOL", 
+                  "MASTER_SSL_CRL_SYMBOL", "MASTER_SSL_CRLPATH_SYMBOL", 
+                  "MASTER_SSL_KEY_SYMBOL", "MASTER_SSL_SYMBOL", "MASTER_SSL_VERIFY_SERVER_CERT_SYMBOL", 
+                  "MASTER_SYMBOL", "MASTER_TLS_VERSION_SYMBOL", "MASTER_USER_SYMBOL", 
+                  "MASTER_HEARTBEAT_PERIOD_SYMBOL", "MATCH_SYMBOL", "MAX_CONNECTIONS_PER_HOUR_SYMBOL", 
+                  "MAX_QUERIES_PER_HOUR_SYMBOL", "MAX_ROWS_SYMBOL", "MAX_SIZE_SYMBOL", 
+                  "MAX_STATEMENT_TIME_SYMBOL", "MAX_SYMBOL", "MAX_UPDATES_PER_HOUR_SYMBOL", 
+                  "MAX_USER_CONNECTIONS_SYMBOL", "MAXVALUE_SYMBOL", "MEDIUMBLOB_SYMBOL", 
+                  "MEDIUMINT_SYMBOL", "MEDIUMTEXT_SYMBOL", "MEDIUM_SYMBOL", 
+                  "MEMORY_SYMBOL", "MERGE_SYMBOL", "MESSAGE_TEXT_SYMBOL", 
+                  "MICROSECOND_SYMBOL", "MID_SYMBOL", "MIDDLEINT_SYMBOL", 
+                  "MIGRATE_SYMBOL", "MINUTE_MICROSECOND_SYMBOL", "MINUTE_SECOND_SYMBOL", 
+                  "MINUTE_SYMBOL", "MIN_ROWS_SYMBOL", "MIN_SYMBOL", "MODE_SYMBOL", 
+                  "MODIFIES_SYMBOL", "MODIFY_SYMBOL", "MOD_SYMBOL", "MONTH_SYMBOL", 
+                  "MULTILINESTRING_SYMBOL", "MULTIPOINT_SYMBOL", "MULTIPOLYGON_SYMBOL", 
+                  "MUTEX_SYMBOL", "MYSQL_ERRNO_SYMBOL", "NAMES_SYMBOL", 
+                  "NAME_SYMBOL", "NATIONAL_SYMBOL", "NATURAL_SYMBOL", "NCHAR_STRING_SYMBOL", 
+                  "NCHAR_SYMBOL", "NDB_SYMBOL", "NDBCLUSTER_SYMBOL", "NEG_SYMBOL", 
+                  "NEVER_SYMBOL", "NEW_SYMBOL", "NEXT_SYMBOL", "NODEGROUP_SYMBOL", 
+                  "NONE_SYMBOL", "NONBLOCKING_SYMBOL", "NOT_SYMBOL", "NOW_SYMBOL", 
+                  "NO_SYMBOL", "NO_WAIT_SYMBOL", "NO_WRITE_TO_BINLOG_SYMBOL", 
+                  "NULL_SYMBOL", "NUMBER_SYMBOL", "NUMERIC_SYMBOL", "NVARCHAR_SYMBOL", 
+                  "OFFLINE_SYMBOL", "OFFSET_SYMBOL", "OLD_PASSWORD_SYMBOL", 
+                  "ON_SYMBOL", "ONE_SYMBOL", "ONLINE_SYMBOL", "ONLY_SYMBOL", 
+                  "OPEN_SYMBOL", "OPTIMIZE_SYMBOL", "OPTIMIZER_COSTS_SYMBOL", 
+                  "OPTIONS_SYMBOL", "OPTION_SYMBOL", "OPTIONALLY_SYMBOL", 
+                  "ORDER_SYMBOL", "OR_SYMBOL", "OUTER_SYMBOL", "OUTFILE_SYMBOL", 
+                  "OUT_SYMBOL", "OWNER_SYMBOL", "PACK_KEYS_SYMBOL", "PAGE_SYMBOL", 
+                  "PARSER_SYMBOL", "PARTIAL_SYMBOL", "PARTITIONING_SYMBOL", 
+                  "PARTITIONS_SYMBOL", "PARTITION_SYMBOL", "PASSWORD_SYMBOL", 
+                  "PHASE_SYMBOL", "PLUGINS_SYMBOL", "PLUGIN_DIR_SYMBOL", 
+                  "PLUGIN_SYMBOL", "POINT_SYMBOL", "POLYGON_SYMBOL", "PORT_SYMBOL", 
+                  "POSITION_SYMBOL", "PRECEDES_SYMBOL", "PRECISION_SYMBOL", 
+                  "PREPARE_SYMBOL", "PRESERVE_SYMBOL", "PREV_SYMBOL", "PRIMARY_SYMBOL", 
+                  "PRIVILEGES_SYMBOL", "PROCEDURE_SYMBOL", "PROCESS_SYMBOL", 
+                  "PROCESSLIST_SYMBOL", "PROFILE_SYMBOL", "PROFILES_SYMBOL", 
+                  "PROXY_SYMBOL", "PURGE_SYMBOL", "QUARTER_SYMBOL", "QUERY_SYMBOL", 
+                  "QUICK_SYMBOL", "RANGE_SYMBOL", "READS_SYMBOL", "READ_ONLY_SYMBOL", 
+                  "READ_SYMBOL", "READ_WRITE_SYMBOL", "REAL_SYMBOL", "REBUILD_SYMBOL", 
+                  "RECOVER_SYMBOL", "REDOFILE_SYMBOL", "REDO_BUFFER_SIZE_SYMBOL", 
+                  "REDUNDANT_SYMBOL", "REFERENCES_SYMBOL", "REGEXP_SYMBOL", 
+                  "RELAY_SYMBOL", "RELAYLOG_SYMBOL", "RELAY_LOG_FILE_SYMBOL", 
+                  "RELAY_LOG_POS_SYMBOL", "RELAY_THREAD_SYMBOL", "RELEASE_SYMBOL", 
+                  "RELOAD_SYMBOL", "REMOVE_SYMBOL", "RENAME_SYMBOL", "REORGANIZE_SYMBOL", 
+                  "REPAIR_SYMBOL", "REPEATABLE_SYMBOL", "REPEAT_SYMBOL", 
+                  "REPLACE_SYMBOL", "REPLICATION_SYMBOL", "REPLICATE_DO_DB_SYMBOL", 
+                  "REPLICATE_IGNORE_DB_SYMBOL", "REPLICATE_DO_TABLE_SYMBOL", 
+                  "REPLICATE_IGNORE_TABLE_SYMBOL", "REPLICATE_WILD_DO_TABLE_SYMBOL", 
+                  "REPLICATE_WILD_IGNORE_TABLE_SYMBOL", "REPLICATE_REWRITE_DB_SYMBOL", 
+                  "REQUIRE_SYMBOL", "RESET_SYMBOL", "RESIGNAL_SYMBOL", "RESTORE_SYMBOL", 
+                  "RESTRICT_SYMBOL", "RESUME_SYMBOL", "RETURNED_SQLSTATE_SYMBOL", 
+                  "RETURNS_SYMBOL", "RETURN_SYMBOL", "REVERSE_SYMBOL", "REVOKE_SYMBOL", 
+                  "RIGHT_SYMBOL", "RLIKE_SYMBOL", "ROLLBACK_SYMBOL", "ROLLUP_SYMBOL", 
+                  "ROTATE_SYMBOL", "ROUTINE_SYMBOL", "ROWS_SYMBOL", "ROW_COUNT_SYMBOL", 
+                  "ROW_FORMAT_SYMBOL", "ROW_SYMBOL", "RTREE_SYMBOL", "SAVEPOINT_SYMBOL", 
+                  "SCHEDULE_SYMBOL", "SCHEMA_SYMBOL", "SCHEMA_NAME_SYMBOL", 
+                  "SCHEMAS_SYMBOL", "SECOND_MICROSECOND_SYMBOL", "SECOND_SYMBOL", 
+                  "SECURITY_SYMBOL", "SELECT_SYMBOL", "SENSITIVE_SYMBOL", 
+                  "SEPARATOR_SYMBOL", "SERIALIZABLE_SYMBOL", "SERIAL_SYMBOL", 
+                  "SESSION_SYMBOL", "SERVER_SYMBOL", "SERVER_OPTIONS_SYMBOL", 
+                  "SESSION_USER_SYMBOL", "SET_SYMBOL", "SET_VAR_SYMBOL", 
+                  "SHARE_SYMBOL", "SHOW_SYMBOL", "SHUTDOWN_SYMBOL", "SIGNAL_SYMBOL", 
+                  "SIGNED_SYMBOL", "SIMPLE_SYMBOL", "SLAVE_SYMBOL", "SLOW_SYMBOL", 
+                  "SMALLINT_SYMBOL", "SNAPSHOT_SYMBOL", "SOME_SYMBOL", "SOCKET_SYMBOL", 
+                  "SONAME_SYMBOL", "SOUNDS_SYMBOL", "SOURCE_SYMBOL", "SPATIAL_SYMBOL", 
+                  "SPECIFIC_SYMBOL", "SQLEXCEPTION_SYMBOL", "SQLSTATE_SYMBOL", 
+                  "SQLWARNING_SYMBOL", "SQL_AFTER_GTIDS_SYMBOL", "SQL_AFTER_MTS_GAPS_SYMBOL", 
+                  "SQL_BEFORE_GTIDS_SYMBOL", "SQL_BIG_RESULT_SYMBOL", "SQL_BUFFER_RESULT_SYMBOL", 
+                  "SQL_CACHE_SYMBOL", "SQL_CALC_FOUND_ROWS_SYMBOL", "SQL_NO_CACHE_SYMBOL", 
+                  "SQL_SMALL_RESULT_SYMBOL", "SQL_SYMBOL", "SQL_THREAD_SYMBOL", 
+                  "SSL_SYMBOL", "STACKED_SYMBOL", "STARTING_SYMBOL", "STARTS_SYMBOL", 
+                  "START_SYMBOL", "STATS_AUTO_RECALC_SYMBOL", "STATS_PERSISTENT_SYMBOL", 
+                  "STATS_SAMPLE_PAGES_SYMBOL", "STATUS_SYMBOL", "STDDEV_SAMP_SYMBOL", 
+                  "STDDEV_SYMBOL", "STDDEV_POP_SYMBOL", "STD_SYMBOL", "STOP_SYMBOL", 
+                  "STORAGE_SYMBOL", "STORED_SYMBOL", "STRAIGHT_JOIN_SYMBOL", 
+                  "STRING_SYMBOL", "SUBCLASS_ORIGIN_SYMBOL", "SUBDATE_SYMBOL", 
+                  "SUBJECT_SYMBOL", "SUBPARTITIONS_SYMBOL", "SUBPARTITION_SYMBOL", 
+                  "SUBSTR_SYMBOL", "SUBSTRING_SYMBOL", "SUM_SYMBOL", "SUPER_SYMBOL", 
+                  "SUSPEND_SYMBOL", "SWAPS_SYMBOL", "SWITCHES_SYMBOL", "SYSDATE_SYMBOL", 
+                  "SYSTEM_USER_SYMBOL", "TABLES_SYMBOL", "TABLESPACE_SYMBOL", 
+                  "TABLE_REF_PRIORITY_SYMBOL", "TABLE_SYMBOL", "TABLE_CHECKSUM_SYMBOL", 
+                  "TABLE_NAME_SYMBOL", "TEMPORARY_SYMBOL", "TEMPTABLE_SYMBOL", 
+                  "TERMINATED_SYMBOL", "TEXT_SYMBOL", "THAN_SYMBOL", "THEN_SYMBOL", 
+                  "TIMESTAMP_SYMBOL", "TIMESTAMP_ADD_SYMBOL", "TIMESTAMP_DIFF_SYMBOL", 
+                  "TIME_SYMBOL", "TINYBLOB_SYMBOL", "TINYINT_SYMBOL", "TINYTEXT_SYMBOL", 
+                  "TO_SYMBOL", "TRAILING_SYMBOL", "TRANSACTION_SYMBOL", 
+                  "TRIGGERS_SYMBOL", "TRIGGER_SYMBOL", "TRIM_SYMBOL", "TRUE_SYMBOL", 
+                  "TRUNCATE_SYMBOL", "TYPES_SYMBOL", "TYPE_SYMBOL", "UDF_RETURNS_SYMBOL", 
+                  "UNCOMMITTED_SYMBOL", "UNDEFINED_SYMBOL", "UNDOFILE_SYMBOL", 
+                  "UNDO_BUFFER_SIZE_SYMBOL", "UNDO_SYMBOL", "UNICODE_SYMBOL", 
+                  "UNINSTALL_SYMBOL", "UNION_SYMBOL", "UNIQUE_SYMBOL", "UNKNOWN_SYMBOL", 
+                  "UNLOCK_SYMBOL", "UNSIGNED_SYMBOL", "UNTIL_SYMBOL", "UPDATE_SYMBOL", 
+                  "UPGRADE_SYMBOL", "USAGE_SYMBOL", "USER_RESOURCES_SYMBOL", 
+                  "USER_SYMBOL", "USE_FRM_SYMBOL", "USE_SYMBOL", "USING_SYMBOL", 
+                  "UTC_DATE_SYMBOL", "UTC_TIMESTAMP_SYMBOL", "UTC_TIME_SYMBOL", 
+                  "VALIDATION_SYMBOL", "VALUES_SYMBOL", "VALUE_SYMBOL", 
+                  "VARBINARY_SYMBOL", "VARCHAR_SYMBOL", "VARCHARACTER_SYMBOL", 
+                  "VARIABLES_SYMBOL", "VARIANCE_SYMBOL", "VARYING_SYMBOL", 
+                  "VAR_POP_SYMBOL", "VAR_SAMP_SYMBOL", "VIEW_SYMBOL", "VIRTUAL_SYMBOL", 
+                  "WAIT_SYMBOL", "WARNINGS_SYMBOL", "WEEK_SYMBOL", "WEIGHT_STRING_SYMBOL", 
+                  "WHEN_SYMBOL", "WHERE_SYMBOL", "WHILE_SYMBOL", "WITH_SYMBOL", 
+                  "WITHOUT_SYMBOL", "WORK_SYMBOL", "WRAPPER_SYMBOL", "WRITE_SYMBOL", 
+                  "X509_SYMBOL", "XA_SYMBOL", "XID_SYMBOL", "XML_SYMBOL", 
+                  "XOR_SYMBOL", "YEAR_MONTH_SYMBOL", "YEAR_SYMBOL", "ZEROFILL_SYMBOL", 
+                  "PERSIST_SYMBOL", "ROLE_SYMBOL", "ADMIN_SYMBOL", "INVISIBLE_SYMBOL", 
+                  "VISIBLE_SYMBOL", "EXCEPT_SYMBOL", "COMPONENT_SYMBOL", 
+                  "RECURSIVE_SYMBOL", "JSON_OBJECTAGG_SYMBOL", "JSON_ARRAYAGG_SYMBOL", 
+                  "OF_SYMBOL", "SKIP_SYMBOL", "LOCKED_SYMBOL", "NOWAIT_SYMBOL", 
+                  "GROUPING_SYMBOL", "PERSIST_ONLY_SYMBOL", "HISTOGRAM_SYMBOL", 
+                  "BUCKETS_SYMBOL", "REMOTE_SYMBOL", "CLONE_SYMBOL", "CUME_DIST_SYMBOL", 
+                  "DENSE_RANK_SYMBOL", "EXCLUDE_SYMBOL", "FIRST_VALUE_SYMBOL", 
+                  "FOLLOWING_SYMBOL", "GROUPS_SYMBOL", "LAG_SYMBOL", "LAST_VALUE_SYMBOL", 
+                  "LEAD_SYMBOL", "NTH_VALUE_SYMBOL", "NTILE_SYMBOL", "NULLS_SYMBOL", 
+                  "OTHERS_SYMBOL", "OVER_SYMBOL", "PERCENT_RANK_SYMBOL", 
+                  "PRECEDING_SYMBOL", "RANK_SYMBOL", "RESPECT_SYMBOL", "ROW_NUMBER_SYMBOL", 
+                  "TIES_SYMBOL", "UNBOUNDED_SYMBOL", "WINDOW_SYMBOL", "EMPTY_SYMBOL", 
+                  "JSON_TABLE_SYMBOL", "NESTED_SYMBOL", "ORDINALITY_SYMBOL", 
+                  "PATH_SYMBOL", "HISTORY_SYMBOL", "REUSE_SYMBOL", "SRID_SYMBOL", 
+                  "THREAD_PRIORITY_SYMBOL", "RESOURCE_SYMBOL", "SYSTEM_SYMBOL", 
+                  "VCPU_SYMBOL", "MASTER_PUBLIC_KEY_PATH_SYMBOL", "GET_MASTER_PUBLIC_KEY_SYMBOL", 
+                  "RESTART_SYMBOL", "DEFINITION_SYMBOL", "DESCRIPTION_SYMBOL", 
+                  "ORGANIZATION_SYMBOL", "REFERENCE_SYMBOL", "OPTIONAL_SYMBOL", 
+                  "SECONDARY_SYMBOL", "SECONDARY_ENGINE_SYMBOL", "SECONDARY_LOAD_SYMBOL", 
+                  "SECONDARY_UNLOAD_SYMBOL", "ACTIVE_SYMBOL", "INACTIVE_SYMBOL", 
+                  "LATERAL_SYMBOL", "RETAIN_SYMBOL", "OLD_SYMBOL", "NETWORK_NAMESPACE_SYMBOL", 
+                  "ENFORCED_SYMBOL", "ARRAY_SYMBOL", "OJ_SYMBOL", "MEMBER_SYMBOL", 
+                  "RANDOM_SYMBOL", "MASTER_COMPRESSION_ALGORITHM_SYMBOL", 
+                  "MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOL", "PRIVILEGE_CHECKS_USER_SYMBOL", 
+                  "MASTER_TLS_CIPHERSUITES_SYMBOL", "REQUIRE_ROW_FORMAT_SYMBOL", 
+                  "PASSWORD_LOCK_TIME_SYMBOL", "FAILED_LOGIN_ATTEMPTS_SYMBOL", 
+                  "REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOL", "STREAM_SYMBOL", 
+                  "OFF_SYMBOL", "INT1_SYMBOL", "INT2_SYMBOL", "INT3_SYMBOL", 
+                  "INT4_SYMBOL", "INT8_SYMBOL", "SQL_TSI_SECOND_SYMBOL", 
+                  "SQL_TSI_MINUTE_SYMBOL", "SQL_TSI_HOUR_SYMBOL", "SQL_TSI_DAY_SYMBOL", 
+                  "SQL_TSI_WEEK_SYMBOL", "SQL_TSI_MONTH_SYMBOL", "SQL_TSI_QUARTER_SYMBOL", 
+                  "SQL_TSI_YEAR_SYMBOL", "WHITESPACE", "INVALID_INPUT", 
+                  "UNDERSCORE_CHARSET", "IDENTIFIER", "NCHAR_TEXT", "BACK_TICK", 
+                  "SINGLE_QUOTE", "DOUBLE_QUOTE", "BACK_TICK_QUOTED_ID", 
+                  "DOUBLE_QUOTED_TEXT", "SINGLE_QUOTED_TEXT", "VERSION_COMMENT_START", 
+                  "MYSQL_COMMENT_START", "VERSION_COMMENT_END", "BLOCK_COMMENT", 
+                  "POUND_COMMENT", "DASHDASH_COMMENT", "DOUBLE_DASH", "LINEBREAK", 
+                  "SIMPLE_IDENTIFIER", "ML_COMMENT_HEAD", "ML_COMMENT_END", 
+                  "LETTER_WHEN_UNQUOTED", "LETTER_WHEN_UNQUOTED_NO_DIGIT", 
+                  "LETTER_WITHOUT_FLOAT_PART" ]
 
     grammarFileName = "SQLLexer.g4"
 
-    def __init__(self, input=None, output: TextIO = sys.stdout):
+    def __init__(self, input=None, output:TextIO = sys.stdout):
         super().__init__(input, output)
         self.checkVersion("4.9.2")
-        self._interp = LexerATNSimulator(
-            self, self.atn, self.decisionsToDFA, PredictionContextCache()
-        )
+        self._interp = LexerATNSimulator(self, self.atn, self.decisionsToDFA, PredictionContextCache())
         self._actions = None
         self._predicates = None
 
-    def action(self, localctx: RuleContext, ruleIndex: int, actionIndex: int):
+
+    def action(self, localctx:RuleContext, ruleIndex:int, actionIndex:int):
         if self._actions is None:
             actions = dict()
-            actions[21] = self.LOGICAL_OR_OPERATOR_action
-            actions[70] = self.INT_NUMBER_action
-            actions[73] = self.DOT_IDENTIFIER_action
-            actions[78] = self.ADDDATE_SYMBOL_action
-            actions[108] = self.BIT_AND_SYMBOL_action
-            actions[109] = self.BIT_OR_SYMBOL_action
-            actions[111] = self.BIT_XOR_SYMBOL_action
-            actions[125] = self.CAST_SYMBOL_action
-            actions[168] = self.COUNT_SYMBOL_action
-            actions[173] = self.CURDATE_SYMBOL_action
-            actions[175] = self.CURRENT_DATE_SYMBOL_action
-            actions[176] = self.CURRENT_TIME_SYMBOL_action
-            actions[181] = self.CURTIME_SYMBOL_action
-            actions[187] = self.DATE_ADD_SYMBOL_action
-            actions[188] = self.DATE_SUB_SYMBOL_action
-            actions[255] = self.EXTRACT_SYMBOL_action
-            actions[291] = self.GROUP_CONCAT_SYMBOL_action
-            actions[399] = self.MAX_SYMBOL_action
-            actions[411] = self.MID_SYMBOL_action
-            actions[418] = self.MIN_SYMBOL_action
-            actions[444] = self.NOT_SYMBOL_action
-            actions[445] = self.NOW_SYMBOL_action
-            actions[487] = self.POSITION_SYMBOL_action
-            actions[578] = self.SESSION_USER_SYMBOL_action
-            actions[621] = self.STDDEV_SAMP_SYMBOL_action
-            actions[622] = self.STDDEV_SYMBOL_action
-            actions[623] = self.STDDEV_POP_SYMBOL_action
-            actions[624] = self.STD_SYMBOL_action
-            actions[631] = self.SUBDATE_SYMBOL_action
-            actions[635] = self.SUBSTR_SYMBOL_action
-            actions[636] = self.SUBSTRING_SYMBOL_action
-            actions[637] = self.SUM_SYMBOL_action
-            actions[642] = self.SYSDATE_SYMBOL_action
-            actions[643] = self.SYSTEM_USER_SYMBOL_action
-            actions[668] = self.TRIM_SYMBOL_action
-            actions[705] = self.VARIANCE_SYMBOL_action
-            actions[707] = self.VAR_POP_SYMBOL_action
-            actions[708] = self.VAR_SAMP_SYMBOL_action
-            actions[833] = self.UNDERSCORE_CHARSET_action
-            actions[843] = self.MYSQL_COMMENT_START_action
-            actions[844] = self.VERSION_COMMENT_END_action
+            actions[21] = self.LOGICAL_OR_OPERATOR_action 
+            actions[70] = self.INT_NUMBER_action 
+            actions[73] = self.DOT_IDENTIFIER_action 
+            actions[78] = self.ADDDATE_SYMBOL_action 
+            actions[108] = self.BIT_AND_SYMBOL_action 
+            actions[109] = self.BIT_OR_SYMBOL_action 
+            actions[111] = self.BIT_XOR_SYMBOL_action 
+            actions[125] = self.CAST_SYMBOL_action 
+            actions[168] = self.COUNT_SYMBOL_action 
+            actions[173] = self.CURDATE_SYMBOL_action 
+            actions[175] = self.CURRENT_DATE_SYMBOL_action 
+            actions[176] = self.CURRENT_TIME_SYMBOL_action 
+            actions[181] = self.CURTIME_SYMBOL_action 
+            actions[187] = self.DATE_ADD_SYMBOL_action 
+            actions[188] = self.DATE_SUB_SYMBOL_action 
+            actions[255] = self.EXTRACT_SYMBOL_action 
+            actions[291] = self.GROUP_CONCAT_SYMBOL_action 
+            actions[399] = self.MAX_SYMBOL_action 
+            actions[411] = self.MID_SYMBOL_action 
+            actions[418] = self.MIN_SYMBOL_action 
+            actions[444] = self.NOT_SYMBOL_action 
+            actions[445] = self.NOW_SYMBOL_action 
+            actions[487] = self.POSITION_SYMBOL_action 
+            actions[578] = self.SESSION_USER_SYMBOL_action 
+            actions[621] = self.STDDEV_SAMP_SYMBOL_action 
+            actions[622] = self.STDDEV_SYMBOL_action 
+            actions[623] = self.STDDEV_POP_SYMBOL_action 
+            actions[624] = self.STD_SYMBOL_action 
+            actions[631] = self.SUBDATE_SYMBOL_action 
+            actions[635] = self.SUBSTR_SYMBOL_action 
+            actions[636] = self.SUBSTRING_SYMBOL_action 
+            actions[637] = self.SUM_SYMBOL_action 
+            actions[642] = self.SYSDATE_SYMBOL_action 
+            actions[643] = self.SYSTEM_USER_SYMBOL_action 
+            actions[668] = self.TRIM_SYMBOL_action 
+            actions[705] = self.VARIANCE_SYMBOL_action 
+            actions[707] = self.VAR_POP_SYMBOL_action 
+            actions[708] = self.VAR_SAMP_SYMBOL_action 
+            actions[833] = self.UNDERSCORE_CHARSET_action 
+            actions[843] = self.MYSQL_COMMENT_START_action 
+            actions[844] = self.VERSION_COMMENT_END_action 
             self._actions = actions
         action = self._actions.get(ruleIndex, None)
         if action is not None:
@@ -7259,177 +6026,213 @@ class SQLLexer(SQLBaseLexer):
         else:
             raise Exception("No registered action for:" + str(ruleIndex))
 
-    def LOGICAL_OR_OPERATOR_action(self, localctx: RuleContext, actionIndex: int):
+
+    def LOGICAL_OR_OPERATOR_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 0:
-            self.type = (
-                CONCAT_PIPES_SYMBOL
-                if self.isSqlModeActive(PipesAsConcat)
-                else LOGICAL_OR_OPERATOR
-            )
+             self.type = CONCAT_PIPES_SYMBOL if self.isSqlModeActive(PipesAsConcat) else LOGICAL_OR_OPERATOR 
+     
 
-    def INT_NUMBER_action(self, localctx: RuleContext, actionIndex: int):
+    def INT_NUMBER_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 1:
-            self.type = self.determineNumericType(self.getText())
+             self.type = self.determineNumericType(self.getText()) 
+     
 
-    def DOT_IDENTIFIER_action(self, localctx: RuleContext, actionIndex: int):
+    def DOT_IDENTIFIER_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 2:
-            self.emitDot()
+             self.emitDot() 
+     
 
-    def ADDDATE_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def ADDDATE_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 3:
-            self.type = self.determineFunction(self.ADDDATE_SYMBOL)
+             self.type = self.determineFunction(self.ADDDATE_SYMBOL) 
+     
 
-    def BIT_AND_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def BIT_AND_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 4:
-            self.type = self.determineFunction(self.BIT_AND_SYMBOL)
+             self.type = self.determineFunction(self.BIT_AND_SYMBOL) 
+     
 
-    def BIT_OR_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def BIT_OR_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 5:
-            self.type = self.determineFunction(self.BIT_OR_SYMBOL)
+             self.type = self.determineFunction(self.BIT_OR_SYMBOL) 
+     
 
-    def BIT_XOR_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def BIT_XOR_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 6:
-            self.type = self.determineFunction(self.BIT_XOR_SYMBOL)
+             self.type = self.determineFunction(self.BIT_XOR_SYMBOL) 
+     
 
-    def CAST_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def CAST_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 7:
-            self.type = self.determineFunction(self.CAST_SYMBOL)
+             self.type = self.determineFunction(self.CAST_SYMBOL) 
+     
 
-    def COUNT_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def COUNT_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 8:
-            self.type = self.determineFunction(self.COUNT_SYMBOL)
+             self.type = self.determineFunction(self.COUNT_SYMBOL) 
+     
 
-    def CURDATE_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def CURDATE_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 9:
-            self.type = self.determineFunction(self.CURDATE_SYMBOL)
+             self.type = self.determineFunction(self.CURDATE_SYMBOL) 
+     
 
-    def CURRENT_DATE_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def CURRENT_DATE_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 10:
-            self.type = self.determineFunction(self.CURDATE_SYMBOL)
+             self.type = self.determineFunction(self.CURDATE_SYMBOL) 
+     
 
-    def CURRENT_TIME_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def CURRENT_TIME_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 11:
-            self.type = self.determineFunction(self.CURTIME_SYMBOL)
+             self.type = self.determineFunction(self.CURTIME_SYMBOL) 
+     
 
-    def CURTIME_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def CURTIME_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 12:
-            self.type = self.determineFunction(self.CURTIME_SYMBOL)
+             self.type = self.determineFunction(self.CURTIME_SYMBOL) 
+     
 
-    def DATE_ADD_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def DATE_ADD_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 13:
-            self.type = self.determineFunction(self.DATE_ADD_SYMBOL)
+             self.type = self.determineFunction(self.DATE_ADD_SYMBOL) 
+     
 
-    def DATE_SUB_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def DATE_SUB_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 14:
-            self.type = self.determineFunction(self.DATE_SUB_SYMBOL)
+             self.type = self.determineFunction(self.DATE_SUB_SYMBOL) 
+     
 
-    def EXTRACT_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def EXTRACT_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 15:
-            self.type = self.determineFunction(self.EXTRACT_SYMBOL)
+             self.type = self.determineFunction(self.EXTRACT_SYMBOL) 
+     
 
-    def GROUP_CONCAT_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def GROUP_CONCAT_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 16:
-            self.type = self.determineFunction(self.GROUP_CONCAT_SYMBOL)
+             self.type = self.determineFunction(self.GROUP_CONCAT_SYMBOL) 
+     
 
-    def MAX_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def MAX_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 17:
-            self.type = self.determineFunction(self.MAX_SYMBOL)
+             self.type = self.determineFunction(self.MAX_SYMBOL) 
+     
 
-    def MID_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def MID_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 18:
-            self.type = self.determineFunction(self.SUBSTRING_SYMBOL)
+             self.type = self.determineFunction(self.SUBSTRING_SYMBOL) 
+     
 
-    def MIN_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def MIN_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 19:
-            self.type = self.determineFunction(self.MIN_SYMBOL)
+             self.type = self.determineFunction(self.MIN_SYMBOL) 
+     
 
-    def NOT_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def NOT_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 20:
-            self.type = (
-                NOT2_SYMBOL if self.isSqlModeActive(HighNotPrecedence) else NOT_SYMBOL
-            )
+             self.type = NOT2_SYMBOL if self.isSqlModeActive(HighNotPrecedence) else NOT_SYMBOL 
+     
 
-    def NOW_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def NOW_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 21:
-            self.type = self.determineFunction(self.NOW_SYMBOL)
+             self.type = self.determineFunction(self.NOW_SYMBOL) 
+     
 
-    def POSITION_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def POSITION_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 22:
-            self.type = self.determineFunction(self.POSITION_SYMBOL)
+             self.type = self.determineFunction(self.POSITION_SYMBOL) 
+     
 
-    def SESSION_USER_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def SESSION_USER_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 23:
-            self.type = self.determineFunction(self.USER_SYMBOL)
+             self.type = self.determineFunction(self.USER_SYMBOL) 
+     
 
-    def STDDEV_SAMP_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def STDDEV_SAMP_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 24:
-            self.type = self.determineFunction(self.STDDEV_SAMP_SYMBOL)
+             self.type = self.determineFunction(self.STDDEV_SAMP_SYMBOL) 
+     
 
-    def STDDEV_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def STDDEV_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 25:
-            self.type = self.determineFunction(self.STD_SYMBOL)
+             self.type = self.determineFunction(self.STD_SYMBOL) 
+     
 
-    def STDDEV_POP_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def STDDEV_POP_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 26:
-            self.type = self.determineFunction(self.STD_SYMBOL)
+             self.type = self.determineFunction(self.STD_SYMBOL) 
+     
 
-    def STD_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def STD_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 27:
-            self.type = self.determineFunction(self.STD_SYMBOL)
+             self.type = self.determineFunction(self.STD_SYMBOL) 
+     
 
-    def SUBDATE_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def SUBDATE_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 28:
-            self.type = self.determineFunction(self.SUBDATE_SYMBOL)
+             self.type = self.determineFunction(self.SUBDATE_SYMBOL) 
+     
 
-    def SUBSTR_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def SUBSTR_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 29:
-            self.type = self.determineFunction(self.SUBSTRING_SYMBOL)
+             self.type = self.determineFunction(self.SUBSTRING_SYMBOL) 
+     
 
-    def SUBSTRING_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def SUBSTRING_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 30:
-            self.type = self.determineFunction(self.SUBSTRING_SYMBOL)
+             self.type = self.determineFunction(self.SUBSTRING_SYMBOL) 
+     
 
-    def SUM_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def SUM_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 31:
-            self.type = self.determineFunction(self.SUM_SYMBOL)
+             self.type = self.determineFunction(self.SUM_SYMBOL) 
+     
 
-    def SYSDATE_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def SYSDATE_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 32:
-            self.type = self.determineFunction(self.SYSDATE_SYMBOL)
+             self.type = self.determineFunction(self.SYSDATE_SYMBOL) 
+     
 
-    def SYSTEM_USER_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def SYSTEM_USER_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 33:
-            self.type = self.determineFunction(self.USER_SYMBOL)
+             self.type = self.determineFunction(self.USER_SYMBOL) 
+     
 
-    def TRIM_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def TRIM_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 34:
-            self.type = self.determineFunction(self.TRIM_SYMBOL)
+             self.type = self.determineFunction(self.TRIM_SYMBOL) 
+     
 
-    def VARIANCE_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def VARIANCE_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 35:
-            self.type = self.determineFunction(self.VARIANCE_SYMBOL)
+             self.type = self.determineFunction(self.VARIANCE_SYMBOL) 
+     
 
-    def VAR_POP_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def VAR_POP_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 36:
-            self.type = self.determineFunction(self.VARIANCE_SYMBOL)
+             self.type = self.determineFunction(self.VARIANCE_SYMBOL) 
+     
 
-    def VAR_SAMP_SYMBOL_action(self, localctx: RuleContext, actionIndex: int):
+    def VAR_SAMP_SYMBOL_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 37:
-            self.type = self.determineFunction(self.VAR_SAMP_SYMBOL)
+             self.type = self.determineFunction(self.VAR_SAMP_SYMBOL) 
+     
 
-    def UNDERSCORE_CHARSET_action(self, localctx: RuleContext, actionIndex: int):
+    def UNDERSCORE_CHARSET_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 38:
-            self.type = self.checkCharset(self.getText())
+             self.type = self.checkCharset(self.getText()) 
+     
 
-    def MYSQL_COMMENT_START_action(self, localctx: RuleContext, actionIndex: int):
+    def MYSQL_COMMENT_START_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 39:
-            self.inVersionComment = true
+             self.inVersionComment = true 
+     
 
-    def VERSION_COMMENT_END_action(self, localctx: RuleContext, actionIndex: int):
+    def VERSION_COMMENT_END_action(self, localctx:RuleContext , actionIndex:int):
         if actionIndex == 40:
-            self.inVersionComment = false
+             self.inVersionComment = false 
+     
 
-    def sempred(self, localctx: RuleContext, ruleIndex: int, predIndex: int):
+    def sempred(self, localctx:RuleContext, ruleIndex:int, predIndex:int):
         if self._predicates is None:
             preds = dict()
             preds[32] = self.JSON_SEPARATOR_SYMBOL_sempred
@@ -7586,618 +6389,739 @@ class SQLLexer(SQLBaseLexer):
         else:
             raise Exception("No registered predicate for:" + str(ruleIndex))
 
-    def JSON_SEPARATOR_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 0:
-            return self.serverVersion >= 50708
-
-    def JSON_UNQUOTED_SEPARATOR_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 1:
-            return self.serverVersion >= 50713
-
-    def ACCOUNT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 2:
-            return self.serverVersion >= 50707
-
-    def ALWAYS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 3:
-            return self.serverVersion >= 50707
-
-    def ANALYSE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 4:
-            return self.serverVersion < 80000
-
-    def AUTHORS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 5:
-            return self.serverVersion < 50700
-
-    def CHANNEL_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 6:
-            return self.serverVersion >= 50706
-
-    def COMPRESSION_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 7:
-            return self.serverVersion >= 50707
-
-    def CONTRIBUTORS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 8:
-            return self.serverVersion < 50700
-
-    def CURRENT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 9:
-            return self.serverVersion >= 50604
-
-    def DEFAULT_AUTH_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 10:
-            return self.serverVersion >= 50604
-
-    def DES_KEY_FILE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 11:
-            return self.serverVersion < 80000
-
-    def ENCRYPTION_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 12:
-            return self.serverVersion >= 50711
-
-    def EXPIRE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 13:
-            return self.serverVersion >= 50606
-
-    def EXPORT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 14:
-            return self.serverVersion >= 50606
-
-    def FILE_BLOCK_SIZE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 15:
-            return self.serverVersion >= 50707
-
-    def FILTER_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 16:
-            return self.serverVersion >= 50700
-
-    def FOLLOWS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 17:
-            return self.serverVersion >= 50700
-
-    def GET_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 18:
-            return self.serverVersion >= 50604
-
-    def GENERATED_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 19:
-            return self.serverVersion >= 50707
-
-    def GROUP_REPLICATION_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 20:
-            return self.serverVersion >= 50707
-
-    def INSTANCE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 21:
-            return self.serverVersion >= 50713
-
-    def JSON_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 22:
-            return self.serverVersion >= 50708
-
-    def MASTER_AUTO_POSITION_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 23:
-            return self.serverVersion >= 50605
-
-    def MASTER_BIND_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 24:
-            return self.serverVersion >= 50602
-
-    def MASTER_RETRY_COUNT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 25:
-            return self.serverVersion >= 50601
-
-    def MASTER_SSL_CRL_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 26:
-            return self.serverVersion >= 50603
-
-    def MASTER_SSL_CRLPATH_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 27:
-            return self.serverVersion >= 50603
-
-    def MASTER_TLS_VERSION_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 28:
-            return self.serverVersion >= 50713
-
-    def MAX_STATEMENT_TIME_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 29:
-            return 50704 < self.serverVersion and self.serverVersion < 50708
-
-    def NEVER_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 30:
-            return self.serverVersion >= 50704
-
-    def NONBLOCKING_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 31:
-            return 50700 < self.serverVersion and self.serverVersion < 50706
-
-    def NUMBER_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 32:
-            return self.serverVersion >= 50606
-
-    def OLD_PASSWORD_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 33:
-            return self.serverVersion < 50706
-
-    def ONLY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 34:
-            return self.serverVersion >= 50605
-
-    def OPTIMIZER_COSTS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 35:
-            return self.serverVersion >= 50706
-
-    def PLUGIN_DIR_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 36:
-            return self.serverVersion >= 50604
-
-    def PRECEDES_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 37:
-            return self.serverVersion >= 50700
-
-    def REDOFILE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 38:
-            return self.serverVersion < 80000
-
-    def REPLICATE_DO_DB_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 39:
-            return self.serverVersion >= 50700
-
-    def REPLICATE_IGNORE_DB_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 40:
-            return self.serverVersion >= 50700
-
-    def REPLICATE_DO_TABLE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 41:
-            return self.serverVersion >= 50700
-
-    def REPLICATE_IGNORE_TABLE_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 42:
-            return self.serverVersion >= 50700
-
-    def REPLICATE_WILD_DO_TABLE_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 43:
-            return self.serverVersion >= 50700
-
-    def REPLICATE_WILD_IGNORE_TABLE_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 44:
-            return self.serverVersion >= 50700
-
-    def REPLICATE_REWRITE_DB_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 45:
-            return self.serverVersion >= 50700
-
-    def ROTATE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 46:
-            return self.serverVersion >= 50713
-
-    def SQL_AFTER_MTS_GAPS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 47:
-            return self.serverVersion >= 50606
-
-    def SQL_CACHE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 48:
-            return self.serverVersion < 80000
-
-    def STACKED_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 49:
-            return self.serverVersion >= 50700
-
-    def STORED_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 50:
-            return self.serverVersion >= 50707
-
-    def TABLE_REF_PRIORITY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 51:
-            return self.serverVersion < 80000
-
-    def VALIDATION_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 52:
-            return self.serverVersion >= 50706
-
-    def VIRTUAL_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 53:
-            return self.serverVersion >= 50707
-
-    def XID_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 54:
-            return self.serverVersion >= 50704
-
-    def PERSIST_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 55:
-            return self.serverVersion >= 80000
-
-    def ROLE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 56:
-            return self.serverVersion >= 80000
-
-    def ADMIN_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 57:
-            return self.serverVersion >= 80000
-
-    def INVISIBLE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 58:
-            return self.serverVersion >= 80000
-
-    def VISIBLE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 59:
-            return self.serverVersion >= 80000
-
-    def EXCEPT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 60:
-            return self.serverVersion >= 80000
-
-    def COMPONENT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 61:
-            return self.serverVersion >= 80000
-
-    def RECURSIVE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 62:
-            return self.serverVersion >= 80000
-
-    def JSON_OBJECTAGG_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 63:
-            return self.serverVersion >= 80000
-
-    def JSON_ARRAYAGG_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 64:
-            return self.serverVersion >= 80000
-
-    def OF_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 65:
-            return self.serverVersion >= 80000
-
-    def SKIP_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 66:
-            return self.serverVersion >= 80000
-
-    def LOCKED_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 67:
-            return self.serverVersion >= 80000
-
-    def NOWAIT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 68:
-            return self.serverVersion >= 80000
-
-    def GROUPING_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 69:
-            return self.serverVersion >= 80000
-
-    def PERSIST_ONLY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 70:
-            return self.serverVersion >= 80000
-
-    def HISTOGRAM_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 71:
-            return self.serverVersion >= 80000
-
-    def BUCKETS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 72:
-            return self.serverVersion >= 80000
-
-    def REMOTE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 73:
-            return self.serverVersion >= 80003 and self.serverVersion < 80014
-
-    def CLONE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 74:
-            return self.serverVersion >= 80000
-
-    def CUME_DIST_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 75:
-            return self.serverVersion >= 80000
-
-    def DENSE_RANK_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 76:
-            return self.serverVersion >= 80000
-
-    def EXCLUDE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 77:
-            return self.serverVersion >= 80000
-
-    def FIRST_VALUE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 78:
-            return self.serverVersion >= 80000
-
-    def FOLLOWING_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 79:
-            return self.serverVersion >= 80000
-
-    def GROUPS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 80:
-            return self.serverVersion >= 80000
-
-    def LAG_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 81:
-            return self.serverVersion >= 80000
-
-    def LAST_VALUE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 82:
-            return self.serverVersion >= 80000
-
-    def LEAD_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 83:
-            return self.serverVersion >= 80000
-
-    def NTH_VALUE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 84:
-            return self.serverVersion >= 80000
-
-    def NTILE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 85:
-            return self.serverVersion >= 80000
-
-    def NULLS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 86:
-            return self.serverVersion >= 80000
-
-    def OTHERS_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 87:
-            return self.serverVersion >= 80000
-
-    def OVER_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 88:
-            return self.serverVersion >= 80000
-
-    def PERCENT_RANK_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 89:
-            return self.serverVersion >= 80000
-
-    def PRECEDING_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 90:
-            return self.serverVersion >= 80000
-
-    def RANK_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 91:
-            return self.serverVersion >= 80000
-
-    def RESPECT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 92:
-            return self.serverVersion >= 80000
-
-    def ROW_NUMBER_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 93:
-            return self.serverVersion >= 80000
-
-    def TIES_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 94:
-            return self.serverVersion >= 80000
-
-    def UNBOUNDED_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 95:
-            return self.serverVersion >= 80000
-
-    def WINDOW_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 96:
-            return self.serverVersion >= 80000
-
-    def EMPTY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 97:
-            return self.serverVersion >= 80000
-
-    def JSON_TABLE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 98:
-            return self.serverVersion >= 80000
-
-    def NESTED_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 99:
-            return self.serverVersion >= 80000
-
-    def ORDINALITY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 100:
-            return self.serverVersion >= 80000
-
-    def PATH_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 101:
-            return self.serverVersion >= 80000
-
-    def HISTORY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 102:
-            return self.serverVersion >= 80000
-
-    def REUSE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 103:
-            return self.serverVersion >= 80000
-
-    def SRID_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 104:
-            return self.serverVersion >= 80000
-
-    def THREAD_PRIORITY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 105:
-            return self.serverVersion >= 80000
-
-    def RESOURCE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 106:
-            return self.serverVersion >= 80000
-
-    def SYSTEM_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 107:
-            return self.serverVersion >= 80000
-
-    def VCPU_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 108:
-            return self.serverVersion >= 80000
-
-    def MASTER_PUBLIC_KEY_PATH_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 109:
-            return self.serverVersion >= 80000
-
-    def GET_MASTER_PUBLIC_KEY_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 110:
-            return self.serverVersion >= 80000
-
-    def RESTART_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 111:
-            return self.serverVersion >= 80011
-
-    def DEFINITION_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 112:
-            return self.serverVersion >= 80011
-
-    def DESCRIPTION_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 113:
-            return self.serverVersion >= 80011
-
-    def ORGANIZATION_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 114:
-            return self.serverVersion >= 80011
-
-    def REFERENCE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 115:
-            return self.serverVersion >= 80011
-
-    def OPTIONAL_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 116:
-            return self.serverVersion >= 80013
-
-    def SECONDARY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 117:
-            return self.serverVersion >= 80013
-
-    def SECONDARY_ENGINE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 118:
-            return self.serverVersion >= 80013
-
-    def SECONDARY_LOAD_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 119:
-            return self.serverVersion >= 80013
-
-    def SECONDARY_UNLOAD_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 120:
-            return self.serverVersion >= 80013
-
-    def ACTIVE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 121:
-            return self.serverVersion >= 80014
-
-    def INACTIVE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 122:
-            return self.serverVersion >= 80014
-
-    def LATERAL_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 123:
-            return self.serverVersion >= 80014
-
-    def RETAIN_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 124:
-            return self.serverVersion >= 80014
-
-    def OLD_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 125:
-            return self.serverVersion >= 80014
-
-    def NETWORK_NAMESPACE_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 126:
-            return self.serverVersion >= 80017
-
-    def ENFORCED_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 127:
-            return self.serverVersion >= 80017
-
-    def ARRAY_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 128:
-            return self.serverVersion >= 80017
-
-    def OJ_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 129:
-            return self.serverVersion >= 80017
-
-    def MEMBER_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 130:
-            return self.serverVersion >= 80017
-
-    def RANDOM_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 131:
-            return self.serverVersion >= 80018
-
-    def MASTER_COMPRESSION_ALGORITHM_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 132:
-            return self.serverVersion >= 80018
-
-    def MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 133:
-            return self.serverVersion >= 80018
-
-    def PRIVILEGE_CHECKS_USER_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 134:
-            return self.serverVersion >= 80018
-
-    def MASTER_TLS_CIPHERSUITES_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 135:
-            return self.serverVersion >= 80018
-
-    def REQUIRE_ROW_FORMAT_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 136:
-            return self.serverVersion >= 80019
-
-    def PASSWORD_LOCK_TIME_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 137:
-            return self.serverVersion >= 80019
-
-    def FAILED_LOGIN_ATTEMPTS_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 138:
-            return self.serverVersion >= 80019
-
-    def REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOL_sempred(
-        self, localctx: RuleContext, predIndex: int
-    ):
-        if predIndex == 139:
-            return self.serverVersion >= 80019
-
-    def STREAM_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 140:
-            return self.serverVersion >= 80019
-
-    def OFF_SYMBOL_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 141:
-            return self.serverVersion >= 80019
-
-    def BACK_TICK_QUOTED_ID_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 142:
-            return not self.isSqlModeActive(NoBackslashEscapes)
-
-    def DOUBLE_QUOTED_TEXT_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 143:
-            return not self.isSqlModeActive(NoBackslashEscapes)
-
-    def SINGLE_QUOTED_TEXT_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 144:
-            return not self.isSqlModeActive(NoBackslashEscapes)
-
-    def VERSION_COMMENT_START_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 145:
-            return self.checkVersion(self.getText())
-
-    def VERSION_COMMENT_END_sempred(self, localctx: RuleContext, predIndex: int):
-        if predIndex == 146:
-            return self.inVersionComment
+    def JSON_SEPARATOR_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 0:
+                return self.serverVersion >= 50708
+         
+
+    def JSON_UNQUOTED_SEPARATOR_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 1:
+                return self.serverVersion >= 50713
+         
+
+    def ACCOUNT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 2:
+                return self.serverVersion >= 50707
+         
+
+    def ALWAYS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 3:
+                return self.serverVersion >= 50707
+         
+
+    def ANALYSE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 4:
+                return self.serverVersion < 80000
+         
+
+    def AUTHORS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 5:
+                return self.serverVersion < 50700
+         
+
+    def CHANNEL_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 6:
+                return self.serverVersion >= 50706
+         
+
+    def COMPRESSION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 7:
+                return self.serverVersion >= 50707
+         
+
+    def CONTRIBUTORS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 8:
+                return self.serverVersion < 50700
+         
+
+    def CURRENT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 9:
+                return self.serverVersion >= 50604
+         
+
+    def DEFAULT_AUTH_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 10:
+                return self.serverVersion >= 50604
+         
+
+    def DES_KEY_FILE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 11:
+                return self.serverVersion < 80000
+         
+
+    def ENCRYPTION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 12:
+                return self.serverVersion >= 50711
+         
+
+    def EXPIRE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 13:
+                return self.serverVersion >= 50606
+         
+
+    def EXPORT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 14:
+                return self.serverVersion >= 50606
+         
+
+    def FILE_BLOCK_SIZE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 15:
+                return self.serverVersion >= 50707
+         
+
+    def FILTER_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 16:
+                return self.serverVersion >= 50700
+         
+
+    def FOLLOWS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 17:
+                return self.serverVersion >= 50700
+         
+
+    def GET_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 18:
+                return self.serverVersion >= 50604
+         
+
+    def GENERATED_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 19:
+                return self.serverVersion >= 50707
+         
+
+    def GROUP_REPLICATION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 20:
+                return self.serverVersion >= 50707
+         
+
+    def INSTANCE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 21:
+                return self.serverVersion >= 50713
+         
+
+    def JSON_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 22:
+                return self.serverVersion >= 50708
+         
+
+    def MASTER_AUTO_POSITION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 23:
+                return self.serverVersion >= 50605
+         
+
+    def MASTER_BIND_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 24:
+                return self.serverVersion >= 50602
+         
+
+    def MASTER_RETRY_COUNT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 25:
+                return self.serverVersion >= 50601
+         
+
+    def MASTER_SSL_CRL_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 26:
+                return self.serverVersion >= 50603
+         
+
+    def MASTER_SSL_CRLPATH_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 27:
+                return self.serverVersion >= 50603
+         
+
+    def MASTER_TLS_VERSION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 28:
+                return self.serverVersion >= 50713
+         
+
+    def MAX_STATEMENT_TIME_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 29:
+                return 50704 < self.serverVersion and self.serverVersion < 50708
+         
+
+    def NEVER_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 30:
+                return self.serverVersion >= 50704
+         
+
+    def NONBLOCKING_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 31:
+                return 50700 < self.serverVersion and self.serverVersion < 50706
+         
+
+    def NUMBER_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 32:
+                return self.serverVersion >= 50606
+         
+
+    def OLD_PASSWORD_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 33:
+                return self.serverVersion < 50706
+         
+
+    def ONLY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 34:
+                return self.serverVersion >= 50605
+         
+
+    def OPTIMIZER_COSTS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 35:
+                return self.serverVersion >= 50706
+         
+
+    def PLUGIN_DIR_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 36:
+                return self.serverVersion >= 50604
+         
+
+    def PRECEDES_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 37:
+                return self.serverVersion >= 50700
+         
+
+    def REDOFILE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 38:
+                return self.serverVersion < 80000
+         
+
+    def REPLICATE_DO_DB_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 39:
+                return self.serverVersion >= 50700
+         
+
+    def REPLICATE_IGNORE_DB_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 40:
+                return self.serverVersion >= 50700
+         
+
+    def REPLICATE_DO_TABLE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 41:
+                return self.serverVersion >= 50700
+         
+
+    def REPLICATE_IGNORE_TABLE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 42:
+                return self.serverVersion >= 50700
+         
+
+    def REPLICATE_WILD_DO_TABLE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 43:
+                return self.serverVersion >= 50700
+         
+
+    def REPLICATE_WILD_IGNORE_TABLE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 44:
+                return self.serverVersion >= 50700
+         
+
+    def REPLICATE_REWRITE_DB_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 45:
+                return self.serverVersion >= 50700
+         
+
+    def ROTATE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 46:
+                return self.serverVersion >= 50713
+         
+
+    def SQL_AFTER_MTS_GAPS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 47:
+                return self.serverVersion >= 50606
+         
+
+    def SQL_CACHE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 48:
+                return self.serverVersion < 80000
+         
+
+    def STACKED_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 49:
+                return self.serverVersion >= 50700
+         
+
+    def STORED_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 50:
+                return self.serverVersion >= 50707
+         
+
+    def TABLE_REF_PRIORITY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 51:
+                return self.serverVersion < 80000
+         
+
+    def VALIDATION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 52:
+                return self.serverVersion >= 50706
+         
+
+    def VIRTUAL_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 53:
+                return self.serverVersion >= 50707
+         
+
+    def XID_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 54:
+                return self.serverVersion >= 50704
+         
+
+    def PERSIST_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 55:
+                return self.serverVersion >= 80000
+         
+
+    def ROLE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 56:
+                return self.serverVersion >= 80000
+         
+
+    def ADMIN_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 57:
+                return self.serverVersion >= 80000
+         
+
+    def INVISIBLE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 58:
+                return self.serverVersion >= 80000
+         
+
+    def VISIBLE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 59:
+                return self.serverVersion >= 80000
+         
+
+    def EXCEPT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 60:
+                return self.serverVersion >= 80000
+         
+
+    def COMPONENT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 61:
+                return self.serverVersion >= 80000
+         
+
+    def RECURSIVE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 62:
+                return self.serverVersion >= 80000
+         
+
+    def JSON_OBJECTAGG_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 63:
+                return self.serverVersion >= 80000
+         
+
+    def JSON_ARRAYAGG_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 64:
+                return self.serverVersion >= 80000
+         
+
+    def OF_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 65:
+                return self.serverVersion >= 80000
+         
+
+    def SKIP_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 66:
+                return self.serverVersion >= 80000
+         
+
+    def LOCKED_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 67:
+                return self.serverVersion >= 80000
+         
+
+    def NOWAIT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 68:
+                return self.serverVersion >= 80000
+         
+
+    def GROUPING_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 69:
+                return self.serverVersion >= 80000
+         
+
+    def PERSIST_ONLY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 70:
+                return self.serverVersion >= 80000
+         
+
+    def HISTOGRAM_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 71:
+                return self.serverVersion >= 80000
+         
+
+    def BUCKETS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 72:
+                return self.serverVersion >= 80000
+         
+
+    def REMOTE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 73:
+                return self.serverVersion >= 80003 and self.serverVersion < 80014
+         
+
+    def CLONE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 74:
+                return self.serverVersion >= 80000
+         
+
+    def CUME_DIST_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 75:
+                return self.serverVersion >= 80000
+         
+
+    def DENSE_RANK_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 76:
+                return self.serverVersion >= 80000
+         
+
+    def EXCLUDE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 77:
+                return self.serverVersion >= 80000
+         
+
+    def FIRST_VALUE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 78:
+                return self.serverVersion >= 80000
+         
+
+    def FOLLOWING_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 79:
+                return self.serverVersion >= 80000
+         
+
+    def GROUPS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 80:
+                return self.serverVersion >= 80000
+         
+
+    def LAG_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 81:
+                return self.serverVersion >= 80000
+         
+
+    def LAST_VALUE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 82:
+                return self.serverVersion >= 80000
+         
+
+    def LEAD_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 83:
+                return self.serverVersion >= 80000
+         
+
+    def NTH_VALUE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 84:
+                return self.serverVersion >= 80000
+         
+
+    def NTILE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 85:
+                return self.serverVersion >= 80000
+         
+
+    def NULLS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 86:
+                return self.serverVersion >= 80000
+         
+
+    def OTHERS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 87:
+                return self.serverVersion >= 80000
+         
+
+    def OVER_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 88:
+                return self.serverVersion >= 80000
+         
+
+    def PERCENT_RANK_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 89:
+                return self.serverVersion >= 80000
+         
+
+    def PRECEDING_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 90:
+                return self.serverVersion >= 80000
+         
+
+    def RANK_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 91:
+                return self.serverVersion >= 80000
+         
+
+    def RESPECT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 92:
+                return self.serverVersion >= 80000
+         
+
+    def ROW_NUMBER_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 93:
+                return self.serverVersion >= 80000
+         
+
+    def TIES_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 94:
+                return self.serverVersion >= 80000
+         
+
+    def UNBOUNDED_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 95:
+                return self.serverVersion >= 80000
+         
+
+    def WINDOW_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 96:
+                return self.serverVersion >= 80000
+         
+
+    def EMPTY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 97:
+                return self.serverVersion >= 80000
+         
+
+    def JSON_TABLE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 98:
+                return self.serverVersion >= 80000
+         
+
+    def NESTED_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 99:
+                return self.serverVersion >= 80000
+         
+
+    def ORDINALITY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 100:
+                return self.serverVersion >= 80000
+         
+
+    def PATH_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 101:
+                return self.serverVersion >= 80000
+         
+
+    def HISTORY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 102:
+                return self.serverVersion >= 80000
+         
+
+    def REUSE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 103:
+                return self.serverVersion >= 80000
+         
+
+    def SRID_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 104:
+                return self.serverVersion >= 80000
+         
+
+    def THREAD_PRIORITY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 105:
+                return self.serverVersion >= 80000
+         
+
+    def RESOURCE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 106:
+                return self.serverVersion >= 80000
+         
+
+    def SYSTEM_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 107:
+                return self.serverVersion >= 80000
+         
+
+    def VCPU_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 108:
+                return self.serverVersion >= 80000
+         
+
+    def MASTER_PUBLIC_KEY_PATH_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 109:
+                return self.serverVersion >= 80000
+         
+
+    def GET_MASTER_PUBLIC_KEY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 110:
+                return self.serverVersion >= 80000
+         
+
+    def RESTART_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 111:
+                return self.serverVersion >= 80011
+         
+
+    def DEFINITION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 112:
+                return self.serverVersion >= 80011
+         
+
+    def DESCRIPTION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 113:
+                return self.serverVersion >= 80011
+         
+
+    def ORGANIZATION_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 114:
+                return self.serverVersion >= 80011
+         
+
+    def REFERENCE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 115:
+                return self.serverVersion >= 80011
+         
+
+    def OPTIONAL_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 116:
+                return self.serverVersion >= 80013
+         
+
+    def SECONDARY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 117:
+                return self.serverVersion >= 80013
+         
+
+    def SECONDARY_ENGINE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 118:
+                return self.serverVersion >= 80013
+         
+
+    def SECONDARY_LOAD_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 119:
+                return self.serverVersion >= 80013
+         
+
+    def SECONDARY_UNLOAD_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 120:
+                return self.serverVersion >= 80013
+         
+
+    def ACTIVE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 121:
+                return self.serverVersion >= 80014
+         
+
+    def INACTIVE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 122:
+                return self.serverVersion >= 80014
+         
+
+    def LATERAL_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 123:
+                return self.serverVersion >= 80014
+         
+
+    def RETAIN_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 124:
+                return self.serverVersion >= 80014
+         
+
+    def OLD_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 125:
+                return self.serverVersion >= 80014
+         
+
+    def NETWORK_NAMESPACE_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 126:
+                return self.serverVersion >= 80017
+         
+
+    def ENFORCED_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 127:
+                return self.serverVersion >= 80017
+         
+
+    def ARRAY_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 128:
+                return self.serverVersion >= 80017
+         
+
+    def OJ_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 129:
+                return self.serverVersion >= 80017
+         
+
+    def MEMBER_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 130:
+                return self.serverVersion >= 80017
+         
+
+    def RANDOM_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 131:
+                return self.serverVersion >= 80018
+         
+
+    def MASTER_COMPRESSION_ALGORITHM_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 132:
+                return self.serverVersion >= 80018
+         
+
+    def MASTER_ZSTD_COMPRESSION_LEVEL_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 133:
+                return self.serverVersion >= 80018
+         
+
+    def PRIVILEGE_CHECKS_USER_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 134:
+                return self.serverVersion >= 80018
+         
+
+    def MASTER_TLS_CIPHERSUITES_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 135:
+                return self.serverVersion >= 80018
+         
+
+    def REQUIRE_ROW_FORMAT_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 136:
+                return self.serverVersion >= 80019
+         
+
+    def PASSWORD_LOCK_TIME_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 137:
+                return self.serverVersion >= 80019
+         
+
+    def FAILED_LOGIN_ATTEMPTS_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 138:
+                return self.serverVersion >= 80019
+         
+
+    def REQUIRE_TABLE_PRIMARY_KEY_CHECK_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 139:
+                return self.serverVersion >= 80019
+         
+
+    def STREAM_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 140:
+                return self.serverVersion >= 80019
+         
+
+    def OFF_SYMBOL_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 141:
+                return self.serverVersion >= 80019
+         
+
+    def BACK_TICK_QUOTED_ID_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 142:
+                return not self.isSqlModeActive(NoBackslashEscapes)
+         
+
+    def DOUBLE_QUOTED_TEXT_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 143:
+                return not self.isSqlModeActive(NoBackslashEscapes)
+         
+
+    def SINGLE_QUOTED_TEXT_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 144:
+                return not self.isSqlModeActive(NoBackslashEscapes)
+         
+
+    def VERSION_COMMENT_START_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 145:
+                return self.checkVersion(self.getText())
+         
+
+    def VERSION_COMMENT_END_sempred(self, localctx:RuleContext, predIndex:int):
+            if predIndex == 146:
+                return self.inVersionComment
+         
+
+
