@@ -8,6 +8,13 @@ Usage
 =====
 There are some packages required for this tool.
 You'll have to figure them out yourself.
+These may be helpful:
+- https://developers.google.com/sheets/api/quickstart/python
+
+I used this:
+- `pip install --upgrade google-api-python-client google-auth-httplib2 google-auth-oauthlib oauth2client`
+
+
 
 Place an appropriate oauth2 token in the `credentials.json` file.
 You may create new app credentials or just copy the ones from another dev.
