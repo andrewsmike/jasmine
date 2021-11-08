@@ -48,7 +48,7 @@ SELECT (
     SELECT SUM ( cost )
       FROM a_sub
      WHERE b.a_id = a_sub.id
-     ) 1
+     ) a
   FROM blah.my_table a
   JOIN bleh.extra_table b
     ON a.id = db.b.a_id

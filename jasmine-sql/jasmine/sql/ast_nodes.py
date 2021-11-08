@@ -50,6 +50,50 @@ class ParseTreeNode(ASTNode):
             return super().__str__()
 
 
+ParserSymbol = int
+ASTNodePattern = Type[ASTNode] | Type[ParserRuleContext] | ParserSymbol
+
+
+def node_matches(node: ASTNode, node_pattern: ASTNodePattern) -> bool:
+    """
+    Is the given AST node one of:
+    - An instance of the given type directly
+    - A ParseTreeNode with a base_node of the given SQLParser context type
+    - A ParseTreeNode of a terminal node with the given symbol.
+
+    This is useful for interacting with mixed-type children.
+    """
+    return (
+        (
+            isinstance(node_pattern, type)
+            and issubclass(node_pattern, ASTNode)
+            and isinstance(node, node_pattern)
+        )
+        or (
+            isinstance(node_pattern, type)
+            and issubclass(node_pattern, ParserRuleContext)
+            and isinstance(node, ParseTreeNode)
+            and isinstance(node.base_node, node_pattern)
+        )
+        or (
+            isinstance(node_pattern, int)
+            and isinstance(node, ParseTreeNode)
+            and isinstance(node.base_node, TerminalNodeImpl)
+            and node.base_node.symbol.type == node_pattern
+        )
+    )
+
+
+def matching_nodes(
+    nodes: list[ASTNode], node_patterns: set[ASTNodePattern]
+) -> list[ASTNode]:
+    return [
+        node
+        for node in nodes
+        if any(node_matches(node, node_pattern) for node_pattern in node_patterns)
+    ]
+
+
 # TODO: Clean this up a bit.
 @dataclass
 class TableRef:
@@ -128,8 +172,8 @@ def sql_ast_clauses_from_expr(expr_node: SQLParser.ExprContext) -> list[ASTNode]
     Input: `1 AND my_column = other_table.other_column AND (4 IS NULL OR CONCAT('Hi', 'yo') = 'Hiyo')`:
     Output:
     ['1',
-     'my_column = other_table . other_column',
-     "( 4 IS NULL OR CONCAT ( 'Hi' , 'yo' ) = 'Hiyo' )"]
+     'my_column = other_table.other_column',
+     "(4 IS NULL OR CONCAT('Hi', 'yo') = 'Hiyo')"]
     """
     if not isinstance(expr_node, SQLParser.ExprAndContext):
         return [sql_ast(expr_node)]
@@ -208,10 +252,10 @@ class TableJoin(ASTNode):
             assert (
                 not has_join_condition
             ), "Natural JOINs cannot have ON or USING clauses."
-
-        assert (
-            not outer_join(self.join_type) or has_join_condition
-        ), "OUTER JOINs must have ON or USING clauses."
+        else:
+            assert (
+                not outer_join(self.join_type) or has_join_condition
+            ), "OUTER JOINs must have ON or USING clauses."
 
     @classmethod
     def from_parse_tree(cls, node: ParseTree) -> ASTNode:

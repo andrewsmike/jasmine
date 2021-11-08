@@ -14,5 +14,5 @@ def test_formatted_sql(query_path: str):
         query_str = f.read()
 
     assert (
-        sql_pretty_printed(query_str) == query_str
+        sql_pretty_printed(query_str).strip() == query_str.strip()
     ), "Query is not correctly formatted."

@@ -1,5 +1,5 @@
 SELECT DISTINCT a, b
-  FROM abcd l
+  FROM my_db.my_table l
   LEFT JOIN ljkm mm
     ON l.id = mm.l_id
    AND mm.start_time <= l.timestamp

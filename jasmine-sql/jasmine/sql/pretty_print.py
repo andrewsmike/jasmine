@@ -110,6 +110,7 @@ from contextlib import contextmanager
 from dataclasses import dataclass
 from functools import partial, singledispatchmethod
 from hashlib import sha256
+from itertools import zip_longest
 from os.path import dirname, join
 from sys import argv
 from typing import Any, Optional
@@ -122,6 +123,7 @@ from jasmine.sql.ast_nodes import (
     ParseTreeNode,
     QuerySpecNode,
     TableJoin,
+    matching_nodes,
     sql_ast,
 )
 from jasmine.sql.parser.sql import (
@@ -346,6 +348,20 @@ class PrettyPrintVisitor:
     """
     Pretty print SQL expressions encoded as an AST.
     Uses IndentContext to manage indentation state.
+
+    There are three parts here:
+    - Helpers for recursively pretty printing / formatting expression lists
+
+    - Pretty print functions for ASTNodes.
+        These handle pretty printing AST-represented nodes.
+        self.pretty_print() is the entry point and singledispatches out to
+        self.pretty_print_{node_type}_{inline|multiline}.
+        It handles multiline v inline logic sanely.
+
+    - Pretty print functions for raw / ParseTreeNodes, by SQLParser context type.
+        These handle pretty printing nodes that don't have an explicit AST representation yet.
+        These aren't yet separated by inline/multiline.
+        Singledispatch'd from self.pretty_print_raw_parse_tree_node by context type.
     """
 
     indent: IndentContext
@@ -567,7 +583,7 @@ class PrettyPrintVisitor:
         return node.text
 
     @pretty_print_inline.register
-    def pretty_print_parse_tree_node(self, node: ParseTreeNode) -> str:
+    def pretty_print_ast_parse_tree_node(self, node: ParseTreeNode) -> str:
         """
         Pretty print terminals (including comments) and ParseTreeNode nodes.
         Terminals include their attached comments, whereas nonterminals handle remaining-width tracking.
@@ -575,27 +591,43 @@ class PrettyPrintVisitor:
         >>> from jasmine.sql.ast_nodes import sql_ast
 
         >>> sql_pretty_printed("SELECT 1 FROM my_table")
-        'SELECT 1 FROM my_table'
+        'SELECT 1 FROM my_table;'
         """
-        if isinstance(node.base_node, TerminalNodeImpl):
-            return self.pretty_print_terminal_parse_tree_node(node)
-        else:
-            return self.pretty_print_nonterminal_parse_tree_node(node)
+        return self.pretty_print_raw_parse_tree_node(
+            node.base_node,
+            node.children,
+        )
 
-    def pretty_print_terminal_parse_tree_node(self, parse_tree: ParseTreeNode) -> str:
+    @singledispatchmethod
+    def pretty_print_raw_parse_tree_node(self, node, children: list[ASTNode]) -> str:
+        """
+        Pretty-print a nonterminal node. This is a fallback handler.
+
+        This handles remaining-width logic, and tries to avoid thinking about
+        multiline shenanigans for now. It strips all children before combining them.
+        """
+        return self.inline_expr_list_str(
+            "",
+            children,
+            " ",
+            use_commas=False,
+        )
+
+    @pretty_print_raw_parse_tree_node.register
+    def pretty_print_raw_terminal_node(
+        self, node: TerminalNodeImpl, children: list[ASTNode]
+    ) -> str:
         """
         Terminals have left-comments at the beginning of statements, and otherwise
         right-comments.
         (/* left-comment */\n{indent})?TOKEN(  /* right-comment */)?
         """
-        terminal = parse_tree.base_node
-
-        if terminal.symbol.type == SQLParser.EOF:
+        if node.symbol.type == SQLParser.EOF:
             return ""
 
-        left_comment = getattr(terminal, "before_comments_str", "").strip()
-        token_text = terminal.getText().strip()
-        right_comment = getattr(terminal, "after_comments_str", "").strip()
+        left_comment = getattr(node, "before_comments_str", "").strip()
+        token_text = node.getText().strip()
+        right_comment = getattr(node, "after_comments_str", "").strip()
 
         if left_comment:
             left_comment = left_comment + self.indent.newline_indent()
@@ -604,19 +636,123 @@ class PrettyPrintVisitor:
 
         return f"{left_comment}{token_text}{right_comment}"
 
-    def pretty_print_nonterminal_parse_tree_node(
-        self, parse_tree: ParseTreeNode
+    @pretty_print_raw_parse_tree_node.register
+    def pretty_print_raw_sql_program_node(
+        self, node: SQLParser.SqlProgramContext, children: list[ASTNode]
     ) -> str:
-        """
-        Pretty-print a nonterminal node.
-        This handles remaining-width logic, and tries to avoid thinking about
-        multiline shenanigans for now. It strips all children before combining them.
-        """
+        statements = matching_nodes(children, {SQLParser.StatementContext})
+        return (
+            ";\n".join(self.pretty_print(statement) for statement in statements) + ";"
+        )
+
+    @pretty_print_raw_parse_tree_node.register
+    def pretty_print_raw_simple_expr_node(
+        self, node: SQLParser.SimpleExprContext, children: list[ASTNode]
+    ) -> str:
+        # Only strip separators before / after OPEN_PAR_SYMBOL and before CLOSE_PAR_SYMBOL.
+        no_sep_before_nodes = matching_nodes(
+            children,
+            {
+                SQLParser.OPEN_PAR_SYMBOL,
+                SQLParser.CLOSE_PAR_SYMBOL,
+                SQLParser.JsonOperatorContext,
+            },
+        )
+        no_sep_after_nodes = matching_nodes(
+            children,
+            {
+                SQLParser.OPEN_PAR_SYMBOL,
+            },
+        )
+
+        result = ""
+        for child, next_child in zip_longest(children, children[1:]):
+            needs_sep = (
+                next_child is not None
+                and next_child not in no_sep_before_nodes
+                and child not in no_sep_after_nodes
+            )
+            sep = " " if needs_sep else ""
+
+            with self.indent.shrink_width(len(result)):
+                result += self.pretty_print(child) + sep
+
+        return result
+
+    @pretty_print_raw_parse_tree_node.register
+    def pretty_print_raw_sum_expr_node(
+        self, node: SQLParser.SumExprContext, children: list[ASTNode]
+    ) -> str:
+        # Put an extra space before this node.
+        before_nodes = matching_nodes(
+            children,
+            {
+                SQLParser.WindowingClauseContext,
+            },
+        )
+        # Put spaces between nodes of these types.
+        between_nodes = matching_nodes(
+            children,
+            {
+                SQLParser.DISTINCT_SYMBOL,
+                SQLParser.ALL_SYMBOL,
+                SQLParser.MULT_OPERATOR,
+                SQLParser.InSumExprContext,
+                SQLParser.ExprListContext,
+                SQLParser.OrderClauseContext,
+                SQLParser.SEPARATOR_SYMBOL,
+                SQLParser.TextStringContext,
+            },
+        )
+
+        result = ""
+        for child, next_child in zip_longest(children, children[1:]):
+            needs_sep = next_child is not None and (
+                next_child in before_nodes
+                or ((child in between_nodes) and (next_child in between_nodes))
+            )
+            sep = " " if needs_sep else ""
+
+            with self.indent.shrink_width(len(result)):
+                result += self.pretty_print(child) + sep
+
+        return result
+
+    @pretty_print_raw_parse_tree_node.register(SQLParser.DotIdentifierContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.FieldIdentifierContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.FunctionCallContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.GrantIdentifierContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.JsonOperatorContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.QualifiedIdentifierContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.SimpleIdentifierContext)
+    @pretty_print_raw_parse_tree_node.register(
+        SQLParser.TableReferenceListParensContext
+    )
+    @pretty_print_raw_parse_tree_node.register(SQLParser.WindowSpecContext)
+    def pretty_print_raw_no_spaces(self, node, children: list[ASTNode]) -> str:
         return self.inline_expr_list_str(
             "",
-            parse_tree.children,
-            " ",
+            children,
+            "",
             use_commas=False,
+        )
+
+    @pretty_print_raw_parse_tree_node.register(SQLParser.ExprListContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.OrderListContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.TableReferenceListContext)
+    @pretty_print_raw_parse_tree_node.register(SQLParser.UdfExprListContext)
+    def pretty_print_raw_comma_exprs(self, node, children: list[ASTNode]) -> str:
+        subexpr_types = {
+            SQLParser.OrderExpressionContext,
+            SQLParser.ExprContext,
+            SQLParser.UdfExprContext,
+            SQLParser.TableReferenceContext,
+        }
+        return self.inline_expr_list_str(
+            "",
+            matching_nodes(children, subexpr_types),
+            " ",
+            use_commas=True,
         )
 
     @pretty_print_inline.register
@@ -726,7 +862,7 @@ class PrettyPrintVisitor:
     def pretty_print_query_spec_inline(self, node: QuerySpecNode) -> str:
         """
         >>> print(sql_pretty_printed("SELECT 1 FROM my_table GROUP BY 1, 2, 3"))
-        SELECT 1 FROM my_table GROUP BY 1, 2, 3
+        SELECT 1 FROM my_table GROUP BY 1, 2, 3;
         """
         select_options_str = ""
         if node.select_options:
@@ -781,7 +917,7 @@ class PrettyPrintVisitor:
            WHERE uhteautneoanuetoahuoueoa IS NULL
              AND uaoetnueohueotautnoauhtuoa / 2 = 4
              AND uheaonuteuheaonueoatuhaeohtnu > 3
-           GROUP BY uehatnua, ueahtnu, ueahtonuao WITH ROLLUP
+           GROUP BY uehatnua, ueahtnu, ueahtonuao WITH ROLLUP;
 
           >>> print(sql_pretty_printed(
           ...     "SELECT uhteautneoanuetoahuoueoa, uehtaonuteountoeuhoanueo "
@@ -794,14 +930,14 @@ class PrettyPrintVisitor:
            WHERE uhteautneoanuetoahuoueoa IS NULL
              AND uaoetnueohueotautnoauhtuoa / 2 = 4
              AND uhetanuetoahuetaonuhoean > 3
-           GROUP BY uehatnua, ueahtnu, ueahtonuao WITH ROLLUP
+           GROUP BY uehatnua, ueahtnu, ueahtonuao WITH ROLLUP;
 
           >>> print(sql_pretty_printed(
           ...     "SELECT 1 FROM my_table GROUP BY uehatnua, ueahtnu, ueahtonuao WITH ROLLUP"
           ... ))
           SELECT 1
             FROM my_table
-           GROUP BY uehatnua, ueahtnu, ueahtonuao WITH ROLLUP
+           GROUP BY uehatnua, ueahtnu, ueahtonuao WITH ROLLUP;
 
           Prefixes:
           SELECT
@@ -853,11 +989,10 @@ class PrettyPrintVisitor:
 
         group_by_exprs_str = ""
         if node.group_by_exprs:
-            group_by_exprs_str = (
-                self.expr_list_str(padded("GROUP BY "), node.group_by_exprs)
-                + (" " + self.pretty_print(node.olap_options))
-                if node.olap_options
-                else ""
+            group_by_exprs_str = self.expr_list_str(
+                padded("GROUP BY "), node.group_by_exprs
+            ) + (
+                " " + self.pretty_print(node.olap_options) if node.olap_options else ""
             )
 
         having_clauses_str = ""
@@ -951,15 +1086,15 @@ def sql_query_semantic_hash(query: str) -> str:
     Currently throws out some JOIN formatting stuff.
 
     >>> sql_query_semantic_hash('SELECT 1   FROM my_data /* woop! */;')
-    '7665a994'
+    'e1c0904a'
     >>> sql_query_semantic_hash('/* blaaaah */ SELECT    1 FROM my_data;')
-    '7665a994'
+    'e1c0904a'
 
     Note: It throws away some semantically irrelevant syntactic changes.
     >>> sql_query_semantic_hash('SELECT 1 FROM my_data LEFT OUTER JOIN a ON 1')
-    'fa3d5e75'
+    '768b4ffb'
     >>> sql_query_semantic_hash('SELECT 1 FROM my_data LEFT JOIN a ON 1')
-    'fa3d5e75'
+    '768b4ffb'
     """
     pretty_sql_str = sql_pretty_printed(query, record_comments=False)
 
