@@ -86,9 +86,9 @@ multiline-after for longer queries.
 
 # Formatted examples
 ```sql
-SELECT organization.name as Organization,
-       CONCAT("[", project.name, "]") as Project,
-       `view`.path as Path,
+SELECT organization.name AS Organization,
+       CONCAT("[", project.name, "]") AS Project,
+       `view`.path AS Path,
        CAST(AVG(LENGTH(`view`.spec->>"$.query_text")) AS SIGNED) AS `Query length`,
        COUNT(DISTINCT backend_event.backend_event_id) AS Events,
        COUNT(DISTINCT `user`.user_id) AS `Possible users`
@@ -113,16 +113,25 @@ from hashlib import sha256
 from itertools import zip_longest
 from os.path import dirname, join
 from sys import argv
+from time import time
 from typing import Any, Optional
 
 from antlr4.tree.Tree import ParseTree, TerminalNodeImpl
 
-from jasmine.sql.ast_base import ASTNode
 from jasmine.sql.ast_nodes import (
+    ASTNode,
+    CTEOrderLimitNode,
+    CTESubqueryNode,
     JoinSpec,
+    MockNode,
+    OrderExpr,
     ParseTreeNode,
     QuerySpecNode,
+    SelectExpr,
+    SqlProgram,
     TableJoin,
+    TableRef,
+    UnionNode,
     matching_nodes,
     sql_ast,
 )
@@ -198,7 +207,7 @@ class SQLCommentInjector(SQLParserVisitor):
 
 
 subexpr_indent_spaces = 4
-subquery_indent_spaces = 4
+subquery_indent_spaces = 2
 
 
 @dataclass
@@ -301,18 +310,6 @@ def is_multiline(value: str, indent: IndentContext) -> bool:
     return "\n" in value or len(value) > indent.max_width
 
 
-@dataclass
-class MockNode(ASTNode):
-    text: str
-
-    def from_parse_tree(cls, parse_tree: Optional[ParseTree]) -> ASTNode:
-        raise RuntimeError
-
-
-def mock_node(text: str):
-    return MockNode(text)
-
-
 def table_join_type_str(node: TableJoin, first: bool = False) -> str:
     if first:
         return "FROM"
@@ -344,6 +341,16 @@ def prefix_padded(prefix, max_prefix_width):
     return prefix_first_token.rjust(max_prefix_width) + prefix_rest
 
 
+def exposed_with_prefix(node: ASTNode) -> bool:
+    return isinstance(node, CTEOrderLimitNode) and (node.cte_subqueries is not None)
+
+
+def exposed_order_limit_suffix(node: ASTNode) -> bool:
+    return isinstance(node, CTEOrderLimitNode) and (
+        node.order_by_clauses is not None or node.limit_options is not None
+    )
+
+
 class PrettyPrintVisitor:
     """
     Pretty print SQL expressions encoded as an AST.
@@ -362,6 +369,14 @@ class PrettyPrintVisitor:
         These handle pretty printing nodes that don't have an explicit AST representation yet.
         These aren't yet separated by inline/multiline.
         Singledispatch'd from self.pretty_print_raw_parse_tree_node by context type.
+
+    TODOs:
+    - TableRef
+    - SelectExpr
+    - OrderExpr
+    - UnionNode
+    - CTESubqueryNode
+    - CTEOrderLimitNode
     """
 
     indent: IndentContext
@@ -393,6 +408,8 @@ class PrettyPrintVisitor:
         Inline formatted list.
         Tracks remaining width properly, and correctly handles multiline elements
         resetting the remaining line width.
+
+        >>> from jasmine.sql.ast_nodes import mock_node
 
         >>> nodes = [mock_node(c) for c in "ABCDE"]
         >>> print(PrettyPrintVisitor().inline_expr_list_str(
@@ -440,7 +457,7 @@ class PrettyPrintVisitor:
 
             line_length = len(result.split("\n")[-1])
             with self.indent.shrink_width(line_length):
-                elem_str = self.pretty_print(element)
+                elem_str = self.pretty_print_inline(element)
 
             result = (result + elem_str).rstrip()
 
@@ -456,6 +473,8 @@ class PrettyPrintVisitor:
     ):
         """
         Multiline-after formatted list.
+
+        >>> from jasmine.sql.ast_nodes import mock_node
 
         >>> nodes = [mock_node(c) for c in "ABCDE"]
         >>> print(PrettyPrintVisitor().multiline_after_expr_list_str(
@@ -569,20 +588,26 @@ class PrettyPrintVisitor:
         Pretty print a string using inline / multiline, depending on what's available
         and requested.
         """
-        inline_str = self.pretty_print_inline(node, **kwargs)
-        if force_multiline or is_multiline(inline_str, self.indent):
-            try:
-                return self.pretty_print_multiline(node, **kwargs)
-            except ValueError:
-                pass
+        # Extra-weird logic to avoid unnecessary calculations.
+        if force_multiline:
+            inline_str = None
+        else:
+            inline_str = self.pretty_print_inline(node, **kwargs)
 
-        return inline_str
+        use_multiline = force_multiline or is_multiline(inline_str, self.indent)
+
+        if use_multiline:
+            return self.pretty_print_multiline(node, **kwargs)
+        else:
+            return inline_str
 
     @pretty_print_inline.register
+    @pretty_print_multiline.register
     def pretty_print_mock_node(self, node: MockNode):
         return node.text
 
     @pretty_print_inline.register
+    @pretty_print_multiline.register
     def pretty_print_ast_parse_tree_node(self, node: ParseTreeNode) -> str:
         """
         Pretty print terminals (including comments) and ParseTreeNode nodes.
@@ -644,6 +669,49 @@ class PrettyPrintVisitor:
         return (
             ";\n".join(self.pretty_print(statement) for statement in statements) + ";"
         )
+
+    @pretty_print_raw_parse_tree_node.register(SQLParser.SubqueryContext)
+    def pretty_print_raw_subquery(self, node, children: list[ASTNode]) -> str:
+        (subquery,) = children
+        with self.indent.indent_subquery():
+            # TODO: format this correctly.
+            return (
+                "("
+                + self.indent.newline_indent()
+                + self.pretty_print(subquery)
+                + self.indent.newline_indent()
+                + ")"
+            )
+
+    @pretty_print_raw_parse_tree_node.register
+    def pretty_print_raw_query_expr_parens_node(
+        self, node: SQLParser.QueryExpressionParensContext, children: list[ASTNode]
+    ) -> str:
+        subquery_children = matching_nodes(
+            children,
+            {
+                SQLParser.QueryExpressionParensContext,
+                SQLParser.QueryExpressionContext,
+                SQLParser.LockingClauseListContext,
+            },
+        )
+        with self.indent.indent_subquery():
+            inner_query_expr_str = " ".join(
+                self.pretty_print(child) for child in subquery_children
+            )
+            inner_newline_indent = self.indent.newline_indent()
+        outer_newline_indent = self.indent.newline_indent()
+
+        if is_multiline(inner_query_expr_str, self.indent):
+            return (
+                "("
+                + inner_newline_indent
+                + inner_query_expr_str
+                + outer_newline_indent
+                + ")"
+            )
+        else:
+            return "(" + inner_query_expr_str + ")"
 
     @pretty_print_raw_parse_tree_node.register
     def pretty_print_raw_simple_expr_node(
@@ -754,6 +822,253 @@ class PrettyPrintVisitor:
             " ",
             use_commas=True,
         )
+
+    @pretty_print_inline.register
+    def pretty_print_table_sql_program_inline(
+        self,
+        node: SqlProgram,
+    ) -> str:
+        return (
+            "; ".join(self.pretty_print_inline(query) for query in node.queries) + ";"
+        )
+
+    @pretty_print_multiline.register
+    def pretty_print_table_sql_program_multiline(
+        self,
+        node: SqlProgram,
+    ) -> str:
+        return ";\n".join(self.pretty_print(query) for query in node.queries) + ";"
+
+    @pretty_print_inline.register
+    @pretty_print_multiline.register
+    def pretty_print_table_ref(
+        self,
+        node: TableRef,
+    ) -> str:
+        return node.ref
+
+    @pretty_print_inline.register
+    @pretty_print_multiline.register
+    def pretty_print_select_expr(
+        self,
+        node: SelectExpr,
+    ) -> str:
+        if node.select_expr_type == "table_star":
+            return self.pretty_print_inline(node.star_table) + ".*"
+        elif node.select_expr_type == "expr":
+            suffix = (
+                f" AS {self.pretty_print(node.expr_alias)}"
+                if node.expr_alias is not None
+                else ""
+            )
+            return self.pretty_print_inline(node.expr) + suffix
+        else:
+            raise ValueError(f"Unknown node type: {node.select_expr_type}")
+
+    @pretty_print_inline.register
+    @pretty_print_multiline.register
+    def pretty_print_order_expr_inline(
+        self,
+        node: OrderExpr,
+    ) -> str:
+        return self.pretty_print_inline(node.expr) + " " + node.direction
+
+    @pretty_print_inline.register
+    @pretty_print_multiline.register
+    def pretty_print_union_node_inline(
+        self,
+        node: UnionNode,
+    ) -> str:
+        def is_prefixed_with_union_any(index: int) -> bool:
+            """
+            When iterating over QUERIES, is the previous UNION a UNION ALL?
+            Example: For one unfiltered_subquery:
+                [[QUERY@0: False], [QUERY@1: False], [QUERY-ALL@2: True]]
+            """
+            return len(node.subqueries) - node.unfiltered_subqueries <= index
+
+        line = ""
+        for query_index, query in enumerate(node.subqueries):
+            is_first_query = query_index == 0
+            is_last_query = query_index == len(node.subqueries) - 1
+
+            if is_first_query:
+                prefix = ""
+            elif is_prefixed_with_union_any(query_index):
+                prefix = " UNION ANY "
+            else:
+                prefix = " UNION "
+            line += prefix
+
+            needs_parens = (is_first_query and exposed_with_prefix(query)) or (
+                is_last_query and exposed_order_limit_suffix(query)
+            )
+            if needs_parens:
+                line += "("
+
+            with self.indent.shrink_width(len(line)):
+                line += self.pretty_print_inline(query)
+
+            # This is broken out into pieces so shrink_width can respond to the open paren.
+            if needs_parens:
+                line += ")"
+
+        return line
+
+    @pretty_print_inline.register
+    def pretty_print_cte_subquery_node_inline(
+        self,
+        node: CTESubqueryNode,
+        with_clause_indent: int = 6,  # len("SELECT")
+    ) -> str:
+        line = node.name
+
+        if node.column_names is not None:
+            line += " (" + ", ".join(node.column_names) + ")"
+
+        line += " AS "
+
+        line += "("
+        with self.indent.shrink_width(len(line)):
+            line += self.pretty_print_inline(node.query) + ")"
+
+        # Note: allow_recursion is handled at the parent level.
+        return line
+
+    @pretty_print_multiline.register
+    def pretty_print_cte_subquery_node_multiline(
+        self,
+        node: CTESubqueryNode,
+        with_clause_indent: int = 6,  # len("SELECT")
+    ) -> str:
+        line = node.name
+
+        if node.column_names is not None:
+            line += " (" + ", ".join(node.column_names) + ")"
+
+        line += " AS "
+
+        line += "("
+        with self.indent.shrink_width(len(line)):
+            inline_query_str = self.pretty_print_inline(node.query)
+
+        if is_multiline(inline_query_str, self.indent):
+            line += "\n"
+            with self.indent.indent_subquery():
+                line += self.pretty_print_multiline(node.query)
+
+            # Close parens are pushed into the indent / not treated like keywords.
+            # See examples to understand this.
+            close_paren_prefix = " " * (with_clause_indent - 1)
+
+            line += self.indent.newline_indent() + close_paren_prefix + ")"
+
+        return line
+
+    @pretty_print_inline.register
+    def pretty_print_cte_order_limit_node_inline(
+        self,
+        node: CTEOrderLimitNode,
+    ) -> str:
+        line = ""
+        if node.cte_subqueries is not None:
+            if any(subquery.allow_recursion for subquery in node.cte_subqueries):
+                line += "WITH RECURSION "
+            else:
+                line += "WITH "
+
+            for cte_subquery_index, cte_subquery in enumerate(node.cte_subqueries):
+                if cte_subquery_index != 0:
+                    line += ", "
+
+                with self.indent.shrink_width(len(line)):
+                    line += self.pretty_print_inline(cte_subquery)
+            line += " "
+
+        needs_parens = exposed_with_prefix(node.subquery) or exposed_order_limit_suffix(
+            node.subquery
+        )
+        if needs_parens:
+            line += "("
+
+        with self.indent.shrink_width(len(line)):
+            line += self.pretty_print_inline(node.subquery)
+
+        if needs_parens:
+            line += ")"
+
+        if node.order_by_clauses is not None:
+            line += " ORDER BY "
+            for order_by_clause_index, order_by_clause in enumerate(
+                node.order_by_clauses
+            ):
+                if order_by_clause_index != 0:
+                    line += ", "
+
+                with self.indent.shrink_width(len(line)):
+                    line += self.pretty_print_inline(order_by_clause)
+
+        if node.limit_options is not None:
+            line += " LIMIT "
+            with self.indent.shrink_width(len(line)):
+                line += self.pretty_print_inline(node.limit_options)
+
+        return line
+
+    @pretty_print_multiline.register
+    def pretty_print_cte_order_limit_node_multiline(
+        self,
+        node: CTEOrderLimitNode,
+    ) -> str:
+        # TODO: Refactor this using the list processing tools?
+        # TODO: Handle max prefix keyword length
+
+        line = ""
+        if node.cte_subqueries is not None:
+            if any(subquery.allow_recursion for subquery in node.cte_subqueries):
+                line += "WITH RECURSION "
+            else:
+                line += "WITH "
+
+            for cte_subquery_index, cte_subquery in enumerate(node.cte_subqueries):
+                if cte_subquery_index != 0:
+                    line += ", "
+
+                with self.indent.shrink_width(len(line)):
+                    line += self.pretty_print_inline(cte_subquery)
+            line += " "
+
+        needs_parens = exposed_with_prefix(node.subquery) or exposed_order_limit_suffix(
+            node.subquery
+        )
+        if needs_parens:
+            line += "("
+
+        # This will need keyword-width extraction.
+        with self.indent.shrink_width(len(line)):
+            line += self.pretty_print_multiline(node.subquery)
+
+        if needs_parens:
+            line += ")"
+
+        # This will need multiline-breakout.
+        if node.order_by_clauses is not None:
+            line += " ORDER BY "
+            for order_by_clause_index, order_by_clause in enumerate(
+                node.order_by_clauses
+            ):
+                if order_by_clause_index != 0:
+                    line += ", "
+
+                with self.indent.shrink_width(len(line)):
+                    line += self.pretty_print_inline(order_by_clause)
+
+        if node.limit_options is not None:
+            line += " LIMIT "
+            with self.indent.shrink_width(len(line)):
+                line += self.pretty_print_inline(node.limit_options)
+
+        return line
 
     @pretty_print_inline.register
     def pretty_print_table_join_inline(
@@ -877,7 +1192,9 @@ class PrettyPrintVisitor:
 
         where_clauses_str = ""
         if node.where_clauses:
-            where_clauses_str = self.inline_expr_list_str("WHERE ", node.where_clauses)
+            where_clauses_str = self.inline_expr_list_str(
+                "WHERE ", node.where_clauses, sep="AND", use_commas=False
+            )
 
         group_by_exprs_str = ""
         if node.group_by_exprs:
@@ -963,8 +1280,11 @@ class PrettyPrintVisitor:
         # FROM clause contains all keywords that are longer than "SELECT".
         # Calculate its multiline string first, extract the prefix, then use
         # that for all future padding.
-        from_clause_str = self.pretty_print(node.from_clause, force_multiline=True)
-        from_clause_indent = len("FROM") + len(from_clause_str.split("FROM")[0])
+        if node.from_clause is not None:
+            from_clause_str = self.pretty_print(node.from_clause, force_multiline=True)
+            from_clause_indent = len("FROM") + len(from_clause_str.split("FROM")[0])
+        else:
+            from_clause_str, from_clause_indent = "", 0
 
         max_prefix_width = max(len("SELECT"), from_clause_indent)
 
@@ -1039,6 +1359,10 @@ def pretty_printed_parse_tree(
     return PrettyPrintVisitor().pretty_print(sql_ast(parse_tree))
 
 
+def pretty_printed_sql_ast(sql_ast: ASTNode) -> str:
+    return PrettyPrintVisitor().pretty_print(sql_ast)
+
+
 def display_example_query():
     sql_source_path = join(
         dirname(__file__),
@@ -1047,7 +1371,9 @@ def display_example_query():
     )
 
     try:
+        start_time = time()
         sql_tree = sql_tree_from_file(sql_source_path)
+        parsed_time = time() - start_time
     except SyntaxError as e:
         print("Failed to parse, dropping into debugger mode.")
         from pdb import post_mortem
@@ -1062,10 +1388,15 @@ def display_example_query():
     print(bracket_printed_sql_parse_tree(sql_tree))
 
     print("SQL string:")
+    start_time = time()
     print(pretty_printed_parse_tree(sql_tree))
+    printed_time = time() - start_time
 
     print("Rendering graph...")
     display_parse_tree(sql_tree)
+    print(
+        f"Parsed in {parsed_time} seconds, rendered in {printed_time} seconds (total {parsed_time + printed_time}s)"
+    )
 
 
 def hash_str_prefix(value, chars=8):
