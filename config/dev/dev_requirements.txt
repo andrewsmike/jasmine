@@ -1,6 +1,6 @@
 alembic==1.7.4
 amqp==5.0.6
-antlr4-python3-runtime==4.9.2
+antlr4-python3-runtime==4.9.3
 ariadne==0.13.0
 asgiref==3.4.1
 attrs==21.2.0
