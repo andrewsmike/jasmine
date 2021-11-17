@@ -14,7 +14,7 @@ from jasmine.models import (
     View,
     orm_registry,
 )
-from jasmine.sql.pretty_print import pretty_printed_sql_str
+from jasmine.sql.pretty_print import sql_pretty_printed
 from jasmine.webserver.app_base import app_db_engine_session
 
 query_type_defs = """
@@ -140,7 +140,7 @@ def resolve_sql_query_from_path(
 @with_sqla_session
 def formatted_query_text(session, obj, info, query_text: str):
     try:
-        query_text = pretty_printed_sql_str(query_text)
+        query_text = sql_pretty_printed(query_text)
     except Exception as e:
         query_text = f"/* Could not format query: {e}. */\n" + query_text
 
