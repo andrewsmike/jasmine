@@ -32,8 +32,6 @@ from jasmine.sql.ast_nodes import (
 from jasmine.sql.parser.sql import sql_parser_from_str, sql_tree_from_file
 from jasmine.sql.pretty_print import pretty_printed_sql_ast
 
-# TODO: Replace MockNode with ParseNode construction system. Maybe through pretty printing, then parsing?
-
 
 def sql_subexpr_ast(sql_subexpr: str, expr_type_str: str):
     parser = sql_parser_from_str(sql_subexpr)

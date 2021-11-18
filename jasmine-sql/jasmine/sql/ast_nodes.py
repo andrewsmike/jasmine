@@ -21,6 +21,7 @@ from jasmine.sql.parser.sql import (
     ParseTree,
     SQLParser,
     children_contexts,
+    sql_tree_from_file,
     sql_tree_from_str,
 )
 
@@ -1031,10 +1032,10 @@ def union_sequence_unfiltered_subqueries(children: list[ParseTree]) -> int:
         if not is_terminal(child, SQLParser.UNION_SYMBOL):
             continue
 
-        is_any_symbol = isinstance(next_child, SQLParser.UnionOptionContext) and (
+        is_all_symbol = isinstance(next_child, SQLParser.UnionOptionContext) and (
             next_child.ALL_SYMBOL() is not None
         )
-        if is_any_symbol:
+        if is_all_symbol:
             unfiltered_subqueries += 2 if first_union else 1
         else:
             unfiltered_subqueries = 0
@@ -1159,9 +1160,18 @@ def sql_ast_repr(sql_query: str) -> str:
     return pformat(ast_repr(sql_ast(parse_tree)))
 
 
+def sql_ast_from_file(query_path: str) -> ASTNode:
+    return sql_ast(sql_tree_from_file(query_path))
+
+
+def sql_ast_from_str(query: str) -> ASTNode:
+    return sql_ast(sql_tree_from_str(query))
+
+
+# TODO:
 # - WITH CTE, UNION, ORDER BY, LIMIT [CHECK]
-# - comments-after-statement?
 # - Incremental improvements: caps'ing symbols, [converting implicit joins to explicit], [reordering ON clauses].
+# - comments-after-statement?
 # - Symbol capitalization visitor?
 # Uncorrelated subqueries: Just align the last character.
 # Correlated / inline subqueries / IN() clause subqueries: ?!?

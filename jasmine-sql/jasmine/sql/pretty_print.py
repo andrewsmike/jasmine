@@ -318,7 +318,7 @@ def table_join_type_str(node: TableJoin, first: bool = False) -> str:
         if node.join_type == "INNER":
             return "NATURAL JOIN"
         else:
-            return "NATURAL" + node.join_type.replace("_", " ") + " JOIN"
+            return "NATURAL " + node.join_type.replace("_", " ") + " JOIN"
 
     elif node.straight_inner_join:
         return "STRAIGHT_JOIN"
@@ -339,16 +339,6 @@ def prefix_padded(prefix, max_prefix_width):
     prefix_rest = prefix[prefix_width:]
 
     return prefix_first_token.rjust(max_prefix_width) + prefix_rest
-
-
-def exposed_with_prefix(node: ASTNode) -> bool:
-    return isinstance(node, CTEOrderLimitNode) and (node.cte_subqueries is not None)
-
-
-def exposed_order_limit_suffix(node: ASTNode) -> bool:
-    return isinstance(node, CTEOrderLimitNode) and (
-        node.order_by_clauses is not None or node.limit_options is not None
-    )
 
 
 class PrettyPrintVisitor:
@@ -815,7 +805,9 @@ class PrettyPrintVisitor:
             SQLParser.ExprContext,
             SQLParser.UdfExprContext,
             SQLParser.TableReferenceContext,
+            OrderExpr,
         }
+
         return self.inline_expr_list_str(
             "",
             matching_nodes(children, subexpr_types),
@@ -865,6 +857,15 @@ class PrettyPrintVisitor:
         else:
             raise ValueError(f"Unknown node type: {node.select_expr_type}")
 
+    @pretty_print_inline.register(tuple)
+    @pretty_print_inline.register(list)
+    @pretty_print_inline.register(dict)
+    @pretty_print_multiline.register(tuple)
+    @pretty_print_multiline.register(list)
+    @pretty_print_multiline.register(dict)
+    def pretty_print_invalid(self, node):
+        raise ValueError(f"Cannot pprint node of type {type(node)}")
+
     @pretty_print_inline.register
     @pretty_print_multiline.register
     def pretty_print_order_expr_inline(
@@ -879,7 +880,7 @@ class PrettyPrintVisitor:
         self,
         node: UnionNode,
     ) -> str:
-        def is_prefixed_with_union_any(index: int) -> bool:
+        def is_prefixed_with_union_all(index: int) -> bool:
             """
             When iterating over QUERIES, is the previous UNION a UNION ALL?
             Example: For one unfiltered_subquery:
@@ -890,19 +891,17 @@ class PrettyPrintVisitor:
         line = ""
         for query_index, query in enumerate(node.subqueries):
             is_first_query = query_index == 0
-            is_last_query = query_index == len(node.subqueries) - 1
 
             if is_first_query:
                 prefix = ""
-            elif is_prefixed_with_union_any(query_index):
-                prefix = " UNION ANY "
+            elif is_prefixed_with_union_all(query_index):
+                prefix = " UNION ALL "
             else:
                 prefix = " UNION "
             line += prefix
 
-            needs_parens = (is_first_query and exposed_with_prefix(query)) or (
-                is_last_query and exposed_order_limit_suffix(query)
-            )
+            # Everything except direct, non WITH/ORDER BY/LIMIT subqueries need parens.
+            needs_parens = not isinstance(query, QuerySpecNode)
             if needs_parens:
                 line += "("
 
@@ -973,7 +972,7 @@ class PrettyPrintVisitor:
         line = ""
         if node.cte_subqueries is not None:
             if any(subquery.allow_recursion for subquery in node.cte_subqueries):
-                line += "WITH RECURSION "
+                line += "WITH RECURSIVE "
             else:
                 line += "WITH "
 
@@ -985,9 +984,7 @@ class PrettyPrintVisitor:
                     line += self.pretty_print_inline(cte_subquery)
             line += " "
 
-        needs_parens = exposed_with_prefix(node.subquery) or exposed_order_limit_suffix(
-            node.subquery
-        )
+        needs_parens = not isinstance(node.subquery, (QuerySpecNode, UnionNode))
         if needs_parens:
             line += "("
 
@@ -1026,7 +1023,7 @@ class PrettyPrintVisitor:
         line = ""
         if node.cte_subqueries is not None:
             if any(subquery.allow_recursion for subquery in node.cte_subqueries):
-                line += "WITH RECURSION "
+                line += "WITH RECURSIVE "
             else:
                 line += "WITH "
 
@@ -1038,9 +1035,7 @@ class PrettyPrintVisitor:
                     line += self.pretty_print_inline(cte_subquery)
             line += " "
 
-        needs_parens = exposed_with_prefix(node.subquery) or exposed_order_limit_suffix(
-            node.subquery
-        )
+        needs_parens = not isinstance(node.subquery, (QuerySpecNode, UnionNode))
         if needs_parens:
             line += "("
 
@@ -1187,25 +1182,33 @@ class PrettyPrintVisitor:
             )
 
         select_exprs_str = self.inline_expr_list_str(
-            f"SELECT {select_options_str}", node.select_exprs
+            f"SELECT {select_options_str}",
+            node.select_exprs,
         )
 
         where_clauses_str = ""
         if node.where_clauses:
             where_clauses_str = self.inline_expr_list_str(
-                "WHERE ", node.where_clauses, sep="AND", use_commas=False
+                "WHERE ",
+                node.where_clauses,
+                sep="AND",
+                use_commas=False,
             )
 
         group_by_exprs_str = ""
         if node.group_by_exprs:
             group_by_exprs_str = self.inline_expr_list_str(
-                "GROUP BY ", node.group_by_exprs
+                "GROUP BY ",
+                node.group_by_exprs,
             )
 
         having_clauses_str = ""
         if node.having_clauses:
             having_clauses_str = self.inline_expr_list_str(
-                "HAVING ", node.having_clauses
+                "HAVING ",
+                node.having_clauses,
+                sep="AND",
+                use_commas=False,
             )
 
         return self.padded_concat_node_pprints(
@@ -1298,13 +1301,17 @@ class PrettyPrintVisitor:
             )
 
         select_exprs_str = self.expr_list_str(
-            padded(f"SELECT {select_options_str}"), node.select_exprs
+            padded(f"SELECT {select_options_str}"),
+            node.select_exprs,
         )
 
         where_clauses_str = ""
         if node.where_clauses:
             where_clauses_str = self.expr_list_str(
-                padded("WHERE "), node.where_clauses, sep="AND", use_commas=False
+                padded("WHERE "),
+                node.where_clauses,
+                sep="AND",
+                use_commas=False,
             )
 
         group_by_exprs_str = ""
@@ -1318,7 +1325,10 @@ class PrettyPrintVisitor:
         having_clauses_str = ""
         if node.having_clauses:
             having_clauses_str = self.expr_list_str(
-                padded("HAVING "), node.having_clauses
+                padded("HAVING "),
+                node.having_clauses,
+                sep="AND",
+                use_commas=False,
             )
 
         return self.indent.newline_indent().join(

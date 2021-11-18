@@ -1,3 +1,16 @@
+(
+  SELECT 1
+   UNION
+  SELECT 2
+)
+UNION
+(
+  SELECT 3
+   UNION
+  SELECT 4
+);
+
+
 SELECT 1
   FROM a
  UNION ALL
