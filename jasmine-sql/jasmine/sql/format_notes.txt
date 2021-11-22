@@ -1,0 +1,171 @@
+==UNION clause rejected syntaxes:
+
+        SELECT 1
+         UNION
+        SELECT 2;
+
+         SELECT 1
+           FROM a
+        STRAIGHT_JOIN b
+          UNION (
+         SELECT 1
+           FROM b
+          ORDER BY 1
+        ) UNION (
+         SELECT 1
+        );
+
+         SELECT 1
+           FROM a
+        STRAIGHT_JOIN b
+          UNION
+        (SELECT 1
+           FROM b
+          ORDER BY 1)
+          UNION
+        (SELECT 1);
+
+        (
+           SELECT 1
+             FROM a
+          STRAIGHT_JOIN b
+        )
+        UNION
+        (
+          SELECT 1
+            FROM b
+           ORDER BY 1
+        )
+        UNION
+        (
+          SELECT 1
+        );
+
+
+        (SELECT 1
+           FROM my_table)
+          UNION
+         SELECT 2;
+
+        (
+         SELECT 1
+           FROM my_table
+        ) UNION
+         SELECT 2;
+
+        (
+          SELECT 1
+            FROM my_table
+        )
+           UNION
+        (
+          SELECT 2
+        );
+
+        (
+          SELECT 1
+            FROM my_table
+        )
+         UNION
+        SELECT 2
+          FROM my_table
+         GROUP BY blah
+         UNION (
+            SELECT blah
+              FROM my_table
+          STRAIGHT_JOIN bleh
+             GROUP BY 1
+             )
+
+        (
+            SELECT a
+              FROM my_table
+             GROUP BY 1
+        )
+        UNION (
+            SELECT 2
+        );
+
+          SELECT 2
+            FROM my_table
+           GROUP BY blah
+           UNION
+          SELECT blah
+            FROM my_table
+        STRAIGHT_JOIN bleh
+           GROUP BY 1
+
+        (
+            SELECT 2
+              FROM my_table
+             GROUP BY blah
+        )
+             UNION
+        (
+            SELECT blah
+              FROM my_table
+          STRAIGHT_JOIN bleh
+             GROUP BY 1
+        )
+
+==WITH clause (CTESubqueryNode) rejected syntaxes:
+
+        WITH blah (a, b, c, d) AS (
+          SELECT 1
+            FROM my_table
+           GROUP BY 1
+          ), bleh (...) AS (
+          SELECT 1
+          )
+
+        WITH blah (a, b, c, d) AS (
+          SELECT 1
+            FROM my_table
+           GROUP BY 1
+               ),
+             bleh (...) AS (
+          SELECT 1
+               )
+
+        WITH blah (a, b, c, d) AS
+        (
+          SELECT 1
+            FROM my_table
+           GROUP BY 1
+        ),
+        bleh (...) AS
+        (
+          SELECT 1
+        )
+
+        WITH blah (a, b, c, d) AS
+        (
+          SELECT 1
+            FROM my_table
+           GROUP BY 1
+        ),
+             bleh (...) AS
+        (
+          SELECT 1
+        )
+
+        WITH blah (a, b, c, d) AS
+          (
+            SELECT 1
+              FROM my_table
+             GROUP BY 1
+          ),
+             bleh (...) AS
+          (
+            SELECT 1
+          )
+
+        WITH blah (a, b, c, d) AS
+          (
+            SELECT 1
+              FROM my_table
+             GROUP BY 1
+          ), bleh (...) AS
+          (
+            SELECT 1
+          )

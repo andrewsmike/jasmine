@@ -265,17 +265,14 @@ class IndentContext:
         indent_width = indent_width or subquery_indent_spaces
         try:
             self.subquery_indent += indent_width
+
+            original_subexpr_indent = self.subexpr_indent
+            self.subexpr_indent = 0
+
             yield
         finally:
             self.subquery_indent -= indent_width
 
-    @contextmanager
-    def new_subquery(self):
-        try:
-            original_subexpr_indent = self.subexpr_indent
-            self.subexpr_indent = 0
-            yield
-        finally:
             self.subexpr_indent = original_subexpr_indent
 
     @contextmanager
@@ -285,16 +282,6 @@ class IndentContext:
             yield
         finally:
             self.max_width += width
-
-    @contextmanager
-    def expr_prefix(self, prefix: str):
-        try:
-            self.max_width -= len(prefix)
-            self.subexpr_indent += len(prefix)
-            yield prefix
-        finally:
-            self.subexpr_indent -= len(prefix)
-            self.max_width += len(prefix)
 
 
 def list_joined(separator_item: Any, items: list[Any]) -> list[Any]:
@@ -342,7 +329,7 @@ def table_join_type_str(node: TableJoin, first: bool = False) -> str:
         if node.join_type == "INNER":
             return "NATURAL JOIN"
         else:
-            return "NATURAL " + node.join_type.replace("_", " ") + " JOIN"
+            return "NATURAL " + node.join_type.split("_")[0] + " JOIN"
 
     elif node.straight_inner_join:
         return "STRAIGHT_JOIN"
@@ -738,17 +725,26 @@ class PrettyPrintVisitor:
     @pretty_print_raw_parse_tree_node.register(SQLParser.SubqueryContext)
     def pretty_print_raw_subquery(self, node, children: list[ASTNode]) -> str:
         (subquery,) = children
-        with self.indent.indent_subquery():
-            # TODO: format this correctly.
-            return (
-                "("
-                + self.indent.newline_indent()
-                + self.pretty_print(subquery)
-                + self.indent.newline_indent()
-                + ")"
-            )
 
-    @pretty_print_raw_parse_tree_node.register
+        base_newline_indent = self.indent.newline_indent()
+        if len(base_newline_indent) > 3:
+            base_newline_indent = base_newline_indent[:-2]
+
+        with self.indent.indent_subquery(indent_width=4):
+            subquery_str = self.pretty_print(subquery)
+            if is_multiline(subquery_str, self.indent):
+                return (
+                    "("
+                    + self.indent.newline_indent()
+                    + subquery_str
+                    + base_newline_indent
+                    + ")"
+                )
+            else:
+                return f"({subquery_str})"
+
+                # @pretty_print_raw_parse_tree_node.register
+
     def pretty_print_raw_query_expr_parens_node(
         self, node: SQLParser.QueryExpressionParensContext, children: list[ASTNode]
     ) -> str:
@@ -1054,7 +1050,7 @@ class PrettyPrintVisitor:
 
                 prefix = f"{newline_indent}{rjust_keyword}{newline_indent}("
 
-            with self.indent.indent_subquery():
+            with self.indent.indent_subquery(2):
                 result += prefix + self.indent.newline_indent()
                 result += self.pretty_print(query)
             result += newline_indent + ")"
@@ -1304,7 +1300,10 @@ class PrettyPrintVisitor:
 
         padded = partial(prefix_padded, max_prefix_width=max_prefix_width)
 
-        table_str = self.pretty_print(node.table_factor)
+        # For subquery tables. It's a weird arrangement, but this gets pickede up by
+        # the raw subquery rule.
+        with self.indent.indent_subexpr(max_prefix_width + 1):
+            table_str = self.pretty_print(node.table_factor)
 
         using_str = ""
         if node.using_columns:
