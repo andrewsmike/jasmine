@@ -10,25 +10,31 @@ NATURAL LEFT JOIN my_table_blah
  having c = "hi\nyo" AND (SELECT 1 WHERE e = 4 LIMIT 1) = 1
   ORDER BY a
   LIMIT 1;
+
 SELECT DISTINCT STRAIGHT_JOIN *
   FROM abcd
  ORDER BY a /* bcdefghihuteaouhteoanuhaoeuhetoanunaeohsueaohtnuhaeotnhu */
  LIMIT 10;
+
 SELECT *
   FROM abcd
  ORDER BY a /* uehaotn */
  LIMIT 10;
+
 SELECT *
   FROM abcd /* uuehtonauhoanuaeotnuhoaenhueoahsnueohuntanauuehaotn */
  ORDER BY a 
  LIMIT 10;
+
 SELECT 4
   FROM abcd
  WHERE i = 4
  UNION
+
 SELECT 1
   FROM abcd /* uuehtonauhoanuaeotnuhoaenhueoahsnueohuntanauuehaotn */
  WHERE i = 3;
+
 SELECT (
     SELECT SUM(cost)
       FROM a_sub
@@ -44,6 +50,7 @@ SELECT (
 having c
  ORDER BY a
  LIMIT 1;
+
 SELECT (
     SELECT SUM ( cost )
       FROM a_sub

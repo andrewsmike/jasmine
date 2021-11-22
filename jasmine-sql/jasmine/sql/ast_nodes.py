@@ -883,6 +883,10 @@ def from_clause_sql_ast(parse_tree: SQLParser.FromClauseContext) -> ASTNode:
 @sql_ast.register
 def order_expr_sql_ast(parse_tree: SQLParser.OrderExpressionContext) -> ASTNode:
 
+    # When not in an ORDER BY clause, revert to ParseTree node.
+    if not isinstance(parse_tree.parentCtx.parentCtx, SQLParser.OrderClauseContext):
+        return parse_tree_sql_ast(parse_tree)
+
     direction = parse_tree.direction()
     if direction is None or direction.ASC_SYMBOL() is not None:
         direction = "ASC"

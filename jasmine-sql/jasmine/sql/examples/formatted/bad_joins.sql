@@ -1,5 +1,7 @@
 SELECT 1 FROM dual;
+
 SELECT 1 FROM a JOIN b JOIN c USING(l) USING (m);
+
 SELECT *
   FROM users `user`
   LEFT JOIN team_memberships team_membership
@@ -7,6 +9,7 @@ SELECT *
     ON team_membership.team_id = team.team_id
     ON `user`.user_id = team_membership.user_id;
 /* TODO: This is incremental / gets improved by the pretty printer. Test it! */
+
 SELECT 1
    FROM my_table a
    JOIN b,
@@ -23,4 +26,3 @@ SELECT 1
      ON meh.a = a.meh_id
 NATURAL JOIN blih
   WHERE 1;
-

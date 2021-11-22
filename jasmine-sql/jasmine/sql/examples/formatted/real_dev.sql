@@ -1,6 +1,6 @@
-SELECT organization.name as Organization,
-       CONCAT("[", project.name, "]") as Project,
-       `view`.path as Path,
+SELECT organization.name AS Organization,
+       CONCAT("[", project.name, "]") AS Project,
+       `view`.path AS Path,
        CAST(AVG(LENGTH(`view`.spec->>"$.query_text")) AS SIGNED) AS `Query length`,
        COUNT(DISTINCT backend_event.backend_event_id) AS Events,
        COUNT(DISTINCT `user`.user_id) AS `Possible users`
@@ -14,5 +14,5 @@ SELECT organization.name as Organization,
   LEFT JOIN users `user`
     ON user.organization_id = organization.organization_id
  GROUP BY 1, 2, 3
- ORDER BY 1, 2, 3;
+ ORDER BY 1 ASC, 2 ASC, 3 ASC;
 

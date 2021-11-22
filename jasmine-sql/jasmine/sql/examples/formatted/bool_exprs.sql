@@ -4,5 +4,5 @@ SELECT DISTINCT a, b
     ON l.id = mm.l_id
    AND mm.start_time <= l.timestamp
    AND l.timestamp <= mm.end_time
- ORDER BY a /* bcdefghihuteaouhteoanuhaoeuhetoanunaeohsueaohtnuhaeotnhu */
+ ORDER BY a ASC
  LIMIT 10;

@@ -5,10 +5,17 @@ Note: Since these are large dataclass datastructures, use recursive replace() ca
 Deepcopy() may not work well here, and you risk stepping on other queries' toes.
 
 Initial tests:
-- Add criteria on first two SELECT columns
+- Add criteria on first two SELECT columns [CHECK]
+- Add "WHERE updated_ts > NOW() - weeks" [CHECK]
+
+- Extract set of table/column references by paths
+- Map identifiers to table/column references
+
+- Propagate WHERE criteria down to subqueries where applicable
+    - Ex: INNER joins w/o RIGHT joins, right side of RIGHT joins, WHERE IN clauses?
 - Remove a JOIN
-- Replace a table
 - Add a JOIN
+- Replace a table
 - UNION multiple variants of a query (IE sharding).
 - Remove GROUP BY
 - Building an aggregate table
@@ -17,8 +24,12 @@ Initial tests:
 - Renaming columns
 """
 from dataclasses import replace
+from datetime import datetime, timedelta
+from functools import partial
+from math import floor
 from os.path import dirname, join
 from sys import argv
+from typing import Callable
 
 from jasmine.sql.ast_nodes import (
     ASTNode,
@@ -62,32 +73,48 @@ def parse_tree_node(
     return result
 
 
-def with_constrained_column_values(
+def passthrough_transformation(
     node: ASTNode,
-    select_column_criteria: dict[int, str],
+    transform_func: Callable,
 ) -> ASTNode:
     match node:
         case SqlProgram():
             return replace(
                 node,
                 queries=[
-                    with_constrained_column_values(query, select_column_criteria)
+                    transform_func(query)
                     for query in node.queries
                 ],
             )
+
         case UnionNode():
             return replace(
                 node,
                 subqueries=[
-                    with_constrained_column_values(subquery, select_column_criteria)
+                    transform_func(subquery)
                     for subquery in node.subqueries
                 ],
             )
+
         case CTEOrderLimitNode():
             return replace(
                 node,
-                subquery=with_constrained_column_values(node.subquery, select_column_criteria)
+                subquery=transform_func(node.subquery)
             )
+
+        case QuerySpecNode():
+            return node
+
+        case _:
+            raise ValueError(f"Unknown node type: {type(node).__name__}")
+
+
+def with_constrained_column_values(
+    node: ASTNode,
+    select_column_criteria: dict[int, str],
+) -> ASTNode:
+
+    match node:
         case QuerySpecNode():
             assert all(
                 isinstance(node.select_exprs[select_column_index], SelectExpr)
@@ -111,7 +138,37 @@ def with_constrained_column_values(
             )
 
         case _:
-            raise ValueError(f"Unknown node type: {type(node).__name__}")
+            return passthrough_transformation(
+                node,
+                partial(with_constrained_column_values, select_column_criteria=select_column_criteria),
+            )
+
+
+def with_constrained_updated_ts(
+    node: ASTNode,
+    updated_ts_column: str,
+    min_timestamp: int,
+) -> ASTNode:
+    match node:
+        case QuerySpecNode():
+
+            return replace(
+                node,
+                where_clauses=(
+                    (node.where_clauses or []) + [
+                        parse_tree_node(
+                            f"{updated_ts_column} > {min_timestamp}",
+                            parse_node_type_str="expr",
+                        )
+                    ]
+                ),
+            )
+
+        case _:
+            return passthrough_transformation(
+                node,
+                partial(with_constrained_updated_ts, updated_ts_column=updated_ts_column, min_timestamp=min_timestamp),
+            )
 
 
 def display_transformed_query():
@@ -135,6 +192,16 @@ def display_transformed_query():
         },
     )
 
-    print("After transformation:")
+    print("After constrained_column transformation:")
+    print(pretty_printed_sql_ast(transformed_query))
+    print()
+
+    transformed_query = with_constrained_updated_ts(
+        query,
+        updated_ts_column="my_table.updated_ts",
+        min_timestamp=floor((datetime.now() - timedelta(hours=6)).timestamp()),
+    )
+
+    print("After constrained_column transformation:")
     print(pretty_printed_sql_ast(transformed_query))
     print()

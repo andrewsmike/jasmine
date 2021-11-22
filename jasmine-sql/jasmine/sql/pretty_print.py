@@ -108,7 +108,7 @@ SELECT organization.name AS Organization,
 """
 from contextlib import contextmanager
 from dataclasses import dataclass
-from functools import partial, singledispatchmethod
+from functools import partial, singledispatch, singledispatchmethod
 from hashlib import sha256
 from itertools import zip_longest
 from os.path import dirname, join
@@ -156,6 +156,26 @@ comment_token_types = {
 }
 
 
+def previous_visible_token(token_stream, token_index):
+    hidden_tokens_to_left = token_stream.getHiddenTokensToLeft(token_index) or []
+
+    previous_visible_token_index = token_index - 1 - len(hidden_tokens_to_left)
+    if previous_visible_token_index >= 0:
+        return token_stream.tokens[previous_visible_token_index]
+    else:
+        return None
+
+
+def next_visible_token(token_stream, token_index):
+    hidden_tokens_to_right = token_stream.getHiddenTokensToRight(token_index) or []
+
+    next_visible_token_index = token_index + len(hidden_tokens_to_right) + 1
+    if next_visible_token_index < len(token_stream.tokens) - 2:  # Eliminate EOF.
+        return token_stream.tokens[next_visible_token_index]
+    else:
+        return None
+
+
 def token_comments_str(tokens):
     return "".join(
         hidden_token.text or ""
@@ -182,10 +202,13 @@ class SQLCommentInjector(SQLParserVisitor):
         token_stream = node.getParent().parser._input
         token_index = node.symbol.tokenIndex
 
-        first_token = token_index == 0
+        prev_real_token = previous_visible_token(token_stream, token_index)
+        next_real_token = next_visible_token(token_stream, token_index)
+
         is_semicolon = node.symbol.type == SQLLexer.SEMICOLON_SYMBOL
         follows_semicolon = (
-            token_stream.tokens[token_index - 1].type == SQLParser.SEMICOLON_SYMBOL
+            prev_real_token is not None
+            and prev_real_token.type == SQLParser.SEMICOLON_SYMBOL
         )
 
         # Comments are attached to the tokens immediately to their left, except
@@ -193,15 +216,16 @@ class SQLCommentInjector(SQLParserVisitor):
 
         # Exceptional case.
         node.before_comments_str = (
-            token_comments_str(token_stream.getHiddenTokensToLeft(token_index))
-            if first_token or follows_semicolon
+            token_comments_str(token_stream.getHiddenTokensToLeft(token_index) or [])
+            if (prev_real_token is None) or follows_semicolon
             else ""
         )
 
         # Typical case.
         node.after_comments_str = (
-            token_comments_str(token_stream.getHiddenTokensToRight(token_index))
-            if not is_semicolon
+            token_comments_str(token_stream.getHiddenTokensToRight(token_index) or [])
+            # Comments at end of text are retained.
+            if (not is_semicolon) or (next_real_token is None)
             else ""
         )
 
@@ -332,7 +356,73 @@ def first_token(prefix: str) -> str:
     return (" " * lpadding_width) + prefix.lstrip().split(" ")[0].split("_")[0]
 
 
+@singledispatch
+def keyword_indent(node: ASTNode) -> int:
+    """
+    What is the keyword indent of the given node?
+
+    When pretty-printing a SQL query along multiple lines, we tend to do something like:
+      SELECT *
+        FROM a
+    STRAIGHT_JOIN b
+       ORDER BY a.foo;
+
+    As you can see, we right-align the first keyword across the entire query.
+    This information needs to propagate up _and_ down the AST during pretty printing.
+    This method extracts the prefix directly, avoiding string manipulation issues (like comments)
+    or having to actually render, check the prefix, then rerender with the appropriate subquery indent.
+    (Indenting by replacing newlines doesn't work, because we want subqueries to _ignore_ that indent in
+    most cases.)
+
+    Only TableJoin and UNION produce a longer keyword prefix than "SELECT"; queries, CTEOrderLimitNodes,
+    etc just propagate it up.
+    """
+    return len("SELECT")
+
+
+@keyword_indent.register
+def table_join_keyword_indent(node: TableJoin) -> int:
+    return len(first_token(table_join_type_str(node)))
+
+
+@keyword_indent.register
+def join_spec_keyword_indent(node: JoinSpec) -> int:
+    return max(
+        max(
+            (
+                table_join_keyword_indent(table_join)
+                for table_join in node.table_joins[1:]
+            ),
+            default=len("FROM"),
+        ),
+        len("SELECT"),
+    )
+
+
+@keyword_indent.register
+def query_spec_keyword_indent(node: QuerySpecNode) -> int:
+    """
+    Only the from_clause can have a keyword that's longer than "SELECT" (they are "NATURAL" and "STRAIGHT").
+    """
+    return max(
+        len("SELECT"),
+        (
+            join_spec_keyword_indent(node.from_clause)
+            if node.from_clause is not None
+            else 0
+        ),
+    )
+
+
+@keyword_indent.register
+def cte_order_limit_node_keyword_indent(node: CTEOrderLimitNode) -> int:
+    return max(keyword_indent(node.subquery), len("SELECT"))
+
+
 def prefix_padded(prefix, max_prefix_width):
+    """
+    Right-pad the string first keyword in a string.
+    """
     prefix_first_token = first_token(prefix)
     prefix_width = len(prefix_first_token)
 
@@ -360,13 +450,6 @@ class PrettyPrintVisitor:
         These aren't yet separated by inline/multiline.
         Singledispatch'd from self.pretty_print_raw_parse_tree_node by context type.
 
-    TODOs:
-    - TableRef
-    - SelectExpr
-    - OrderExpr
-    - UnionNode
-    - CTESubqueryNode
-    - CTEOrderLimitNode
     """
 
     indent: IndentContext
@@ -535,6 +618,7 @@ class PrettyPrintVisitor:
         use_commas: bool = True,
     ):
         """
+        TODO: What happened to this docstring?!
 
         Disable commas and give "AND" as a separator for this case.
 
@@ -650,15 +734,6 @@ class PrettyPrintVisitor:
             right_comment = f"  {right_comment}"
 
         return f"{left_comment}{token_text}{right_comment}"
-
-    @pretty_print_raw_parse_tree_node.register
-    def pretty_print_raw_sql_program_node(
-        self, node: SQLParser.SqlProgramContext, children: list[ASTNode]
-    ) -> str:
-        statements = matching_nodes(children, {SQLParser.StatementContext})
-        return (
-            ";\n".join(self.pretty_print(statement) for statement in statements) + ";"
-        )
 
     @pretty_print_raw_parse_tree_node.register(SQLParser.SubqueryContext)
     def pretty_print_raw_subquery(self, node, children: list[ASTNode]) -> str:
@@ -815,21 +890,33 @@ class PrettyPrintVisitor:
             use_commas=True,
         )
 
+    # Multiple SELECT statements per line looks wrong, even when short.
     @pretty_print_inline.register
-    def pretty_print_table_sql_program_inline(
-        self,
-        node: SqlProgram,
-    ) -> str:
-        return (
-            "; ".join(self.pretty_print_inline(query) for query in node.queries) + ";"
-        )
-
     @pretty_print_multiline.register
     def pretty_print_table_sql_program_multiline(
         self,
         node: SqlProgram,
     ) -> str:
-        return ";\n".join(self.pretty_print(query) for query in node.queries) + ";"
+        query_strs = [self.pretty_print(query) for query in node.queries]
+
+        result = ""
+        for query_str, next_query_str in zip_longest(query_strs, query_strs[1:]):
+
+            result += query_str
+
+            is_last_query = next_query_str is None
+            if not is_last_query:
+                if is_multiline(query_str, self.indent) or is_multiline(
+                    next_query_str, self.indent
+                ):
+                    result += ";\n\n"
+                else:
+                    result += ";\n"
+
+            else:
+                result += ";"
+
+        return result
 
     @pretty_print_inline.register
     @pretty_print_multiline.register
@@ -875,10 +962,8 @@ class PrettyPrintVisitor:
         return self.pretty_print_inline(node.expr) + " " + node.direction
 
     @pretty_print_inline.register
-    @pretty_print_multiline.register
     def pretty_print_union_node_inline(
-        self,
-        node: UnionNode,
+        self, node: UnionNode, max_prefix_width: int = 6  # len("SELECT"). Unused.
     ) -> str:
         def is_prefixed_with_union_all(index: int) -> bool:
             """
@@ -914,11 +999,73 @@ class PrettyPrintVisitor:
 
         return line
 
+    @pretty_print_multiline.register
+    def pretty_print_union_node_multiline(
+        self,
+        node: UnionNode,
+        max_prefix_width: int = 6,  # len("SELECT"). Currently unused, but forced to 6 for niceness.
+    ) -> str:
+        """
+        After going over the following examples, I've determined that any UNION large enough to
+        require multiple lines should have parentheses in the following syntax:
+
+        (
+          SELECT 2
+            FROM my_table
+           GROUP BY blah
+        )
+         UNION
+        (
+            SELECT blah
+              FROM my_table
+          STRAIGHT_JOIN bleh
+             GROUP BY 1
+        )
+         ORDER BY 1 ASC
+         LIMIT 1;
+
+        Everything else is just too dense and unreadable.
+        Render each subquery with indent, put newline-parens around each one.
+        """
+
+        def is_prefixed_with_union_all(index: int) -> bool:
+            """
+            When iterating over QUERIES, is the previous UNION a UNION ALL?
+            Example: For one unfiltered_subquery:
+                [[QUERY@0: False], [QUERY@1: False], [QUERY-ALL@2: True]]
+            """
+            return len(node.subqueries) - node.unfiltered_subqueries <= index
+
+        newline_indent = self.indent.newline_indent()
+
+        result = ""
+        for query_index, query in enumerate(node.subqueries):
+            is_first_query = query_index == 0
+
+            if is_first_query:
+                prefix = "("
+            else:
+                if is_prefixed_with_union_all(query_index):
+                    keyword = "UNION ALL"
+                else:
+                    keyword = "UNION"
+
+                rjust_keyword = prefix_padded(keyword, max_prefix_width)
+
+                prefix = f"{newline_indent}{rjust_keyword}{newline_indent}("
+
+            with self.indent.indent_subquery():
+                result += prefix + self.indent.newline_indent()
+                result += self.pretty_print(query)
+            result += newline_indent + ")"
+
+        return result
+
     @pretty_print_inline.register
     def pretty_print_cte_subquery_node_inline(
         self,
         node: CTESubqueryNode,
-        with_clause_indent: int = 6,  # len("SELECT")
+        max_prefix_width: int = 6,  # len("SELECT")
     ) -> str:
         line = node.name
 
@@ -938,31 +1085,38 @@ class PrettyPrintVisitor:
     def pretty_print_cte_subquery_node_multiline(
         self,
         node: CTESubqueryNode,
-        with_clause_indent: int = 6,  # len("SELECT")
+        max_prefix_width: int = 6,  # len("SELECT")
     ) -> str:
-        line = node.name
+        """
+        Selected syntax:
+          WITH RECURSIVE blah (a, b, c, d) AS (
+              SELECT 1
+                FROM my_table
+               GROUP BY 1
+            ),
+               bleh (...) AS (
+              SELECT 1
+            )
+        SELECT 1
+        """
+
+        result = node.name
 
         if node.column_names is not None:
-            line += " (" + ", ".join(node.column_names) + ")"
+            result += " (" + ", ".join(node.column_names) + ")"
+        result += " AS ("
 
-        line += " AS "
+        with self.indent.indent_subquery(
+            indent_width=6
+        ):  # Visually necessary due to compact format.
+            result += self.indent.newline_indent()
+            result += self.pretty_print_multiline(node.query)
 
-        line += "("
-        with self.indent.shrink_width(len(line)):
-            inline_query_str = self.pretty_print_inline(node.query)
+        result += self.indent.newline_indent() + ")".rjust(
+            max_prefix_width - 1
+        )  # Leave room for the comma.
 
-        if is_multiline(inline_query_str, self.indent):
-            line += "\n"
-            with self.indent.indent_subquery():
-                line += self.pretty_print_multiline(node.query)
-
-            # Close parens are pushed into the indent / not treated like keywords.
-            # See examples to understand this.
-            close_paren_prefix = " " * (with_clause_indent - 1)
-
-            line += self.indent.newline_indent() + close_paren_prefix + ")"
-
-        return line
+        return result
 
     @pretty_print_inline.register
     def pretty_print_cte_order_limit_node_inline(
@@ -1017,53 +1171,89 @@ class PrettyPrintVisitor:
         self,
         node: CTEOrderLimitNode,
     ) -> str:
-        # TODO: Refactor this using the list processing tools?
-        # TODO: Handle max prefix keyword length
+        """
+          WITH blah AS (
+              SELECT 1
+            )
+        SELECT *
+          FROM my_table
+         ORDER BY bar
+         LIMIT 1
 
-        line = ""
+
+          WITH blah AS (
+              SELECT 1
+            )
+        (
+          SELECT *
+            FROM my_table
+           ORDER BY foo
+           LIMIT 10
+        )
+         ORDER BY bar
+         LIMIT 1
+        """
+        max_prefix_width = keyword_indent(node)
+        padded = partial(prefix_padded, max_prefix_width=max_prefix_width)
+
+        result = ""
         if node.cte_subqueries is not None:
             if any(subquery.allow_recursion for subquery in node.cte_subqueries):
-                line += "WITH RECURSIVE "
+                result += padded("WITH RECURSIVE ")
             else:
-                line += "WITH "
+                result += padded("WITH ")
 
             for cte_subquery_index, cte_subquery in enumerate(node.cte_subqueries):
                 if cte_subquery_index != 0:
-                    line += ", "
+                    result += "," + self.indent.newline_indent()
+                    result += padded("") + " "
 
-                with self.indent.shrink_width(len(line)):
-                    line += self.pretty_print_inline(cte_subquery)
-            line += " "
+                result += self.pretty_print(
+                    cte_subquery, max_prefix_width=max_prefix_width
+                )
+
+            result += self.indent.newline_indent()
 
         needs_parens = not isinstance(node.subquery, (QuerySpecNode, UnionNode))
-        if needs_parens:
-            line += "("
-
-        # This will need keyword-width extraction.
-        with self.indent.shrink_width(len(line)):
-            line += self.pretty_print_multiline(node.subquery)
 
         if needs_parens:
-            line += ")"
+            with self.indent.indent_subquery():
+                result += "(" + self.indent.newline_indent()
+                result += self.pretty_print_multiline(node.subquery)
+            result += self.indent.newline_indent() + ")"
+        else:
+            result += self.pretty_print_multiline(node.subquery)
 
-        # This will need multiline-breakout.
+        # TODO: Real handling here, handle inline-to-multiline-breakout.
         if node.order_by_clauses is not None:
-            line += " ORDER BY "
+            result += self.indent.newline_indent()
+            result += self.expr_list_str(
+                prefix=padded("ORDER BY "),
+                elements=node.order_by_clauses,
+                sep=" ",
+                use_commas=True,
+            )
+
+        # TODO: Drop this segment when I'm sure it won't be useful.
+        """
+        if node.order_by_clauses is not None:
+            result += padded("ORDER BY ")
             for order_by_clause_index, order_by_clause in enumerate(
                 node.order_by_clauses
             ):
                 if order_by_clause_index != 0:
-                    line += ", "
+                    result += ", "
 
                 with self.indent.shrink_width(len(line)):
-                    line += self.pretty_print_inline(order_by_clause)
+                    result += self.pretty_print_inline(order_by_clause)
+        """
 
         if node.limit_options is not None:
-            line += " LIMIT "
-            with self.indent.shrink_width(len(line)):
-                line += self.pretty_print_inline(node.limit_options)
+            result += self.indent.newline_indent() + padded("LIMIT ")
+            with self.indent.shrink_width(len(padded("LIMIT "))):
+                result += self.pretty_print_inline(node.limit_options)
 
-        return line
+        return result
 
     @pretty_print_inline.register
     def pretty_print_table_join_inline(
@@ -1073,7 +1263,6 @@ class PrettyPrintVisitor:
         max_prefix_width: int = 6,  # len("SELECT")
     ) -> str:
         join_type_str = table_join_type_str(node, first_table)
-        join_type_prefix_length = len(join_type_str.split(" ")[0].split("_")[0])
 
         table_str = self.pretty_print(node.table_factor)
 
@@ -1113,7 +1302,6 @@ class PrettyPrintVisitor:
     ) -> str:
         join_type_str = table_join_type_str(node, first_table)
 
-        # max_prefix_width = max(len(first_token(join_type_str)), len("SELECT"))
         padded = partial(prefix_padded, max_prefix_width=max_prefix_width)
 
         table_str = self.pretty_print(node.table_factor)
@@ -1146,17 +1334,7 @@ class PrettyPrintVisitor:
 
     @pretty_print_multiline.register
     def pretty_print_join_spec_multiline(self, node: JoinSpec) -> str:
-        max_prefix_width = max(
-            max(
-                len(
-                    first_token(
-                        table_join_type_str(table_join, first=table_join_index == 0)
-                    )
-                )
-                for table_join_index, table_join in enumerate(node.table_joins)
-            ),
-            len("SELECT"),
-        )
+        max_prefix_width = keyword_indent(node)
 
         return self.indent.newline_indent().join(
             self.pretty_print(
@@ -1280,16 +1458,12 @@ class PrettyPrintVisitor:
           HAVING
            UNION
         """
-        # FROM clause contains all keywords that are longer than "SELECT".
-        # Calculate its multiline string first, extract the prefix, then use
-        # that for all future padding.
+        max_prefix_width = keyword_indent(node)
+
         if node.from_clause is not None:
             from_clause_str = self.pretty_print(node.from_clause, force_multiline=True)
-            from_clause_indent = len("FROM") + len(from_clause_str.split("FROM")[0])
         else:
-            from_clause_str, from_clause_indent = "", 0
-
-        max_prefix_width = max(len("SELECT"), from_clause_indent)
+            from_clause_str = ""
 
         padded = partial(prefix_padded, max_prefix_width=max_prefix_width)
 
