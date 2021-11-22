@@ -14,8 +14,8 @@ Setting up
 - Run `jasmine_initialize_schema` to initialize your database.
 - Copy `config/dev/example_jasmine_webserver.cfg` to `config/dev/jasmine_webserver.cfg`, optionally adding missing credentials.
 - Add the database at `mysql://jasmine_web_su:password@127.0.0.1:3305/jasmine_web` to your favorite SQL client.
-- Install your distro's redis package and use `redis-cli` to access the redis instance.
-- Manually add an initial company, user, backend, and default project for testing.
+- Install your distro's redis package and use `redis-cli` to access the docker redis instance for testing.
+- Dump `config/dev/dev_database_dump.sql` for default company/user/backend/views/etc dev testing data, or set up manually.
 
 Navigate to http://localhost:8000/, and the app should be visible.
 
@@ -34,7 +34,8 @@ Maintenance
 ===========
 Database Migrations
 -------------------
-While we use `$ jasmine_initialize_schema` to initialize a new schema, we use [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html) to handle upgrades.
+While we use `$ jasmine_initialize_schema` or `config/dev/dev_database_dump.sql` to initialize a new schema, we use [alembic](https://alembic.sqlalchemy.org/en/latest/tutorial.html) to handle upgrades.
+
 Upgrading typically looks like this:
 ```bash
 $ cd jasmine-webserver
@@ -42,6 +43,8 @@ jasmine-models/ $ alembic revision --autogenerate -m "Add my fancy new column."
 jasmine-models/ $ less migrations/versions/generated_migration_file_name.py  # Review and make any necessary edits.
 jasmine-models/ $ alembic upgrade head
 ```
+
+Please refresh the MySQL dump when you upgrade the schema.
 
 
 Architecture
