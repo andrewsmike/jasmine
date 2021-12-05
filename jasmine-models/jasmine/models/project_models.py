@@ -74,7 +74,7 @@ class View:
 
     view_id = Column(BigInteger, nullable=False)
 
-    view_type = Column(Enum("query"), nullable=False)
+    view_type = Column(Enum("query", "history_table"), nullable=False)
 
     spec = Column(JSON, nullable=False)
 
@@ -89,29 +89,6 @@ class View:
     )
 
     project = relationship("Project", backref="views")
-
-
-"""
-MaterializationType = Enum("view")
-
-@orm_registry.mapped
-class Materialization:
-    __tablename__ = "materializations"
-
-    query_id = Column(BigInteger, nullable=False)
-    materialization_type = Column(MaterializationType, nullable=False)
-    status =  Column(String, nullable=False)
-
-    config = Column(Text, nullable=False)
-
-    __table_args__ = (
-        PrimaryKeyConstraint("query_id", "materialization_type"),
-        ForeignKeyConstraint(["project_id"], ["projects.project_id"]),
-    )
-
-    project = relationship("Project", backref="queries")
-
-"""
 
 
 @orm_registry.mapped
@@ -140,15 +117,21 @@ class BackendEvent:
         ForeignKeyConstraint(
             ["project_id"],
             ["projects.project_id"],
-            "project_event_view",
+            "backend_event_project",
         ),
         ForeignKeyConstraint(
             ["view_id"],
             ["views.view_id"],
             "backend_event_view",
         ),
+        ForeignKeyConstraint(
+            ["materialization_id"],
+            ["materializations.materialization_id"],
+            "backend_event_materialization",
+        ),
     )
 
     backend = relationship("Backend", backref="backend_events")
     project = relationship("Project", backref="backend_events")
     view = relationship("View", backref="backend_events")
+    materialization = relationship("Materialization", backref="backend_events")

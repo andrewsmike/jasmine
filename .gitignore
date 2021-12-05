@@ -12,3 +12,5 @@ node_modules
 build
 .pytest_cache
 jasmine-etl/celerybeat-schedule
+Digraph.*
+*.png
