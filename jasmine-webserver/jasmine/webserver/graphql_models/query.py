@@ -34,6 +34,7 @@ type Query {
     project(id: ID!): Project!
 
     view(id: ID!): View!
+    materialization(id: ID!): Materialization!
 
     "Defaults to the current organization."
     view_from_path(
@@ -42,8 +43,8 @@ type Query {
         organization_id: ID
     ): View
 
-"Get an autoformatted version of the given SQL query."
-formatted_query_text(query_text: String!): String!
+    "Get an autoformatted version of the given SQL query."
+    formatted_query_text(query_text: String!): String!
 }
 """
 query_obj = ObjectType("Query")

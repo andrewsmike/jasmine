@@ -38,7 +38,7 @@ While we use `$ jasmine_initialize_schema` or `config/dev/dev_database_dump.sql`
 
 Upgrading typically looks like this:
 ```bash
-$ cd jasmine-webserver
+$ cd jasmine-models
 jasmine-models/ $ alembic revision --autogenerate -m "Add my fancy new column."
 jasmine-models/ $ less migrations/versions/generated_migration_file_name.py  # Review and make any necessary edits.
 jasmine-models/ $ alembic upgrade head
@@ -60,3 +60,58 @@ Jasmine is split into a few components:
 - Jasmine-ETL: RabbitMQ-based celery worker pool for running ETL and management jobs. Includes celery beat cron-like scheduler.
 - jasmine-models: Shared package holding the ORM models.
 - jasmine-sql: Utility package for SQL manipulation.
+
+
+How do I add an ETL / materialization?
+======================================
+
+ETL patterns, or materializations, have multiple components:
+- `jasmine-sql/jasmine/sql/transforms/{etl}.py`: SQL manipulations and analyses used by the ETL.
+- `jasmine-etl/jasmine/etl/materializations/{etl}.py`: ETL backend database interaction logic, event handling, and scheduling.
+- `jasmine-models/jasmine/models/materializations/{etl}.py`: Database model and state-machine logical description.
+
+Between these files, the statefullness and correctness properties, scheduling semantics, available events, backend interactions, SQL analysis, and SQL generation logic are handled for every ETL pattern.y
+The borders can be a bit fuzzy; the exact setup here may evolve.
+
+To add a materialization, you'll also have to add the materialization (and possibly view) type to the appropriate schemas, and add appropriate references to the new objects through the __init__ hierarchy above as necessary.
+
+
+How do I run a celery task manually?
+====================================
+Open up the [celery task monitor](http://localhost:5555/tasks) (at http://localhost:5555/tasks) to see tasks as they are processed.
+Find your backend docker container's name using `docker ps` (here jasmnie-backend-1) and use the following syntax to call your function:
+```sh
+$ docker exec jasmine-backend-1 celery -A jasmine.etl.app call jasmine.etl.worker_tasks.view_result_preview --args '[[28]]' --kwargs '{}'
+```
+This translates to `view_result_preview([28], **{})`.
+
+The command will return a task ID, such as `dbd04d00-cb0d-4eef-954b-75577f152e74`, which you can use to fetch the status and result:
+```sh
+$ docker exec jasmine-backend-1 celery -A jasmine.etl.app result dbd04d00-cb0d-4eef-954b-75577f152e74
+[{'Organization': 'My Company', 'Project': '[dev]', ...}, ...]
+```
+
+You may find these aliases useful:
+```sh
+function container_name {
+    docker ps --format 'table {{.Names}}' | grep "$1"
+}
+
+function jasmine_celery_run {
+    TASK_ID=$(docker exec $(container_name jasmine-backend) celery -A jasmine.etl.app call jasmine.etl.worker_tasks.$1 --args "$2" --kwargs "$3")
+    echo "Running with task ID $TASK_ID."
+    docker exec $(container_name jasmine-backend) celery -A jasmine.etl.app result $TASK_ID
+}
+```
+This will call the function and print out the result, and can be ran as `jasmine_celery_run view_result_preview '[[28]]' '{}'`.
+
+After creating, say, a view materialization, you can walk it through its various stages like this:
+```sh
+$ jasmine_celery_run execute_materialization_event '[[<MATERIALIZATION_ID>], "verify"]' '{}' 
+Running with task ID 1595f9a6-7772-44db-94b9-f26ce105b828.
+
+$ jasmine_celery_run execute_materialization_event '[[<MATERIALIZATION_ID>], "create"]' '{}'
+Running with task ID a4f7b010-dd84-47ab-bca4-d2a287edf9e2.
+
+$ # Done. Check materializations.
+```

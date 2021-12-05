@@ -32,13 +32,20 @@ type Project {
 
 enum ViewType {
     query
+    history_table
 }
 
 type QuerySpec {
     query_text: String!
 }
 
-union ViewSpec = QuerySpec
+type HistoryTableSpec {
+    source_table: String!
+    min_history_seconds: Int!
+    trim_frequency_seconds: Int!
+}
+
+union ViewSpec = QuerySpec | HistoryTableSpec
 
 type View {
     view_id: ID!
@@ -46,6 +53,30 @@ type View {
     project: Project!
     path: String!
     spec: ViewSpec!
+    materializations: [Materialization]!
+    backend_events: [BackendEvent]!
+}
+
+enum MaterializationType {
+    view
+    history_table
+}
+
+
+type HistoryTableMaterializationSpec {
+    source_table: String!
+    min_history_seconds: Int!
+    trim_frequency_seconds: Int!
+}
+
+union MaterializationSpec = HistoryTableMaterializationSpec
+
+type Materialization {
+    materialization_id: ID!
+    materialization_type: MaterializationType!
+    state: String!
+    view: View!
+    config: MaterializationSpec
     backend_events: [BackendEvent]!
 }
 """

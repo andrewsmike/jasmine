@@ -3,8 +3,8 @@ from typing import Optional
 
 from ariadne import ObjectType
 
-from jasmine.etl.worker_tasks import view_result_preview
-from jasmine.models import Project, User, View
+from jasmine.etl.worker_tasks import execute_materialization_event, view_result_preview
+from jasmine.models import Materialization, Project, User, View, new_materialization
 from jasmine.webserver.graphql_models.query import with_sqla_session
 from jasmine.webserver.random_phrase import random_hex, random_phrase
 
@@ -14,6 +14,10 @@ interface OperationResult {
     error: String
 }
 
+type LaunchOperationResult implements OperationResult {
+    success: Boolean!
+    error: String
+}
 type DeleteResult implements OperationResult {
     success: Boolean!
     error: String
@@ -48,6 +52,11 @@ type ViewResult implements OperationResult {
     success: Boolean!
     error: String
     result: View
+}
+type MaterializationResult implements OperationResult {
+    success: Boolean!
+    error: String
+    result: Materialization
 }
 
 type DataResult implements OperationResult {
@@ -88,6 +97,9 @@ type Mutation {
     delete_view(id: ID!): DeleteResult!
 
     preview_view_result(id: ID!): DataResult!
+
+    create_materialization(view_id: ID!, materialization_type: MaterializationType, config: JSON): MaterializationResult!
+    terminate_materialization(materialization_id: ID!): LaunchOperationResult!
 }
 """
 mutation_obj = ObjectType("Mutation")
@@ -233,3 +245,58 @@ def preview_view_result(
 ):
     task = view_result_preview.delay(id)
     return task.get(timeout=10)
+
+
+@mutation_obj.field("create_materialization")
+@as_wrapped_graphql_payload
+@with_sqla_session
+def create_materialization(
+    session,
+    obj,
+    info,
+    view_id: int,
+    materialization_type: str,
+    config=None,
+) -> Materialization:
+    view = session.query(View).where(View.view_id == view_id).one()
+
+    preexisting_mats = (
+        session.query(Materialization)
+        .where(Materialization.view_id == view_id)
+        .where(Materialization.materialization_type == materialization_type)
+        .all()
+    )
+    if preexisting_mats:
+        (preexisting_mat,) = preexisting_mats
+        assert (
+            preexisting_mat.state in preexisting_mat.state_machine_type.terminal_states
+        ), f"{materialization_type} materialization already exists!"
+    else:
+        preexisting_mat = None
+
+    mat = new_materialization(
+        view=view,
+        mat_type_name=materialization_type,
+        config=config or {},
+        preexisting_mat=preexisting_mat,
+    )
+
+    session.add(mat)
+
+    return mat
+
+
+@mutation_obj.field("terminate_materialization")
+@as_wrapped_graphql_payload
+@with_sqla_session
+def terminate_materialization(
+    session,
+    obj,
+    info,
+    materialization_id: int,
+) -> Materialization:
+
+    # TODO: Locking logic.
+    execute_materialization_event.delay(materialization_id, "terminate")
+
+    return None

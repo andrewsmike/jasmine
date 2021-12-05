@@ -5,10 +5,18 @@ from sqlalchemy import inspect
 from jasmine.etl.app import celery_app
 from jasmine.etl.app_base import app_db_engine_session, timed_lock
 from jasmine.etl.backends import new_backend_conn
-from jasmine.models import View, orm_registry
+from jasmine.etl.materializations import materialization_event_funcs
+from jasmine.models import Materialization, View, orm_registry
+
+MINUTES = 60
+HOURS = 60 * MINUTES
 
 
 def with_sqla_session(func):
+    """
+    Inject a SQLAlchemy session object as the first argument to the function.
+    """
+
     @wraps(func)
     def wrapped(*args, **kwargs):
         engine, session = app_db_engine_session(orm_registry)
@@ -25,6 +33,14 @@ def with_sqla_session(func):
 
 
 def with_sqla_first_arg(sqla_class):
+    """
+    For functions structured as `handle_sqla_object(session, object_pk_id, ...)`,
+    replace object_pk_id with a loaded SQLAlchemy object.
+
+    Primary key tuples may or may not be supported; check SQLAlchemy's session.get
+    arguments.
+    """
+
     def decorator(func):
         @wraps(func)
         def wrapped_func(session, ident, *args, **kwargs):
@@ -37,8 +53,19 @@ def with_sqla_first_arg(sqla_class):
     return decorator
 
 
-def sqla_timed_lock(task_timeout, lock_suffix=None):
+def sqla_timed_lock(
+    soft_timeout=4 * MINUTES,
+    hard_timeout=5 * MINUTES,
+    lock_suffix=None,
+):
     def decorator(func):
+        celery_app.control.time_limit(
+            f"{func.__module__}.{func.__name__}",
+            soft=soft_timeout,
+            hard=hard_timeout,
+            reply=True,
+        )
+
         @wraps(func)
         def wrapped(session, sqla_object, *args, **kwargs):
             if lock_suffix:
@@ -51,7 +78,7 @@ def sqla_timed_lock(task_timeout, lock_suffix=None):
                 str(inspect(sqla_object).identity),
             ] + key_suffix
 
-            with timed_lock(*key, task_timeout=task_timeout) as lock:
+            with timed_lock(key, task_timeout=hard_timeout + 30) as lock:
                 return func(session, sqla_object, *args, timed_lock=lock, **kwargs)
 
         return wrapped
@@ -77,29 +104,42 @@ def log_backend_event(title: str):
 """
 
 
-@celery_app.task
-def foo(a, b):
-    print(a, b)
-    return a + b
-
-
-MINUTES = 60
-HOURS = 60 * MINUTES
-
-
+# TODO: These locking semantics are dreadfully wrong. Restart from scratch.
 @celery_app.task
 @with_sqla_session
 @with_sqla_first_arg(View)
-@sqla_timed_lock(task_timeout=5 * MINUTES, lock_suffix="result_preview")
-def view_result_preview(session, view, timed_lock=None):
-    with new_backend_conn(view.project.backend) as conn:
-        conn.execute(view.spec["query_text"])
-        return conn.fetchall()
+# @sqla_timed_lock(
+#     soft_timeout=4 * MINUTES,
+#     hard_timeout=5 * MINUTES,
+#     lock_suffix="result_preview",
+# )
+def view_result_preview(session, view):  # timed_lock=None
+    with new_backend_conn(view.project.backend, readonly=True) as ro_conn:
+        ro_conn.execute(view.spec["query_text"])
+        return ro_conn.fetchall()
 
 
-celery_app.control.time_limit(
-    "jasmine.etl.worker_tasks.view_result_preview",
-    soft=4 * MINUTES,
-    hard=5 * MINUTES,
-    reply=True,
-)
+# TODO: These locking semantics are dreadfully wrong. Restart from scratch.
+@celery_app.task
+@with_sqla_session
+@with_sqla_first_arg(Materialization)
+# @sqla_timed_lock(
+#     soft_timeout=4 * MINUTES,
+#     hard_timeout=5 * MINUTES,
+#     lock_suffix="run_event",
+# )
+def execute_materialization_event(
+    session, materialization, event_name  # , timed_lock=None
+):
+    assert event_name in materialization.state_machine_type.state_events.get(
+        materialization.state, set()
+    ), f"Cannot '{event_name}' a[n] '{materialization.state}' {type(materialization).__name__}."
+
+    event_func = materialization_event_funcs[materialization.materialization_name][
+        event_name
+    ]
+
+    next_state = event_func(materialization, session)
+
+    materialization.state = next_state
+    session.add(materialization)
