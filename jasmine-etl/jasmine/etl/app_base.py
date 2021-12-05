@@ -1,5 +1,5 @@
 """
-Initialize flask, config, database connections, auth, graphql, etc.
+Initialize celery, config, database connections, auth, redis, etc.
 """
 from configparser import ConfigParser
 from contextlib import contextmanager
@@ -10,6 +10,7 @@ from typing import Any, Optional
 
 from celery import Celery
 from pottery import Redlock
+from pottery.exceptions import ReleaseUnlockedLock
 from redis import Redis
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
@@ -45,38 +46,42 @@ def celery_handle():
 
 def sqla_uri_from_config_section(config_section) -> str:
     """
-    >>> from jasmine.webserver.app_base import sqla_uri_from_config_section
+    >>> from jasmine.etl.app_base import sqla_uri_from_config_section
     >>> sqla_uri_from_config_section({
     ...     "uri": "mysq://blah:blah@blah/{username}={user}, {password}={pass}, {database}={db}",
     ...     "username": "username",
     ...     "password": "password",
     ...     "host": "localhost",
-    ...     "db": "db",
+    ...     "database": "database",
     ... })
-    'mysq://blah:blah@blah/username=username, password=password, db=db'
+    'mysq://blah:blah@blah/username=username, password=password, database=database'
     >>> sqla_uri_from_config_section({
     ...     "username": "my_app_prod_ro",
     ...     "password": "my_ap_prod_ro_pass",
     ...     "host": "db_endpoint",
-    ...     "db": "database",
+    ...     "database": "database",
     ... })
-    'mysql+pymysql://my_app_prod_ro:my_ap_prod_ro_pass@db_endpoint/database'
+    'mysql+pymysql://my_app_prod_ro:my_ap_prod_ro_pass@db_endpoint:3306/database'
     """
-    uri = config_section.get("uri", "mysql+pymysql://{username}:{password}@{host}/{db}")
+    uri = config_section.get(
+        "uri", "mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+    )
     username = config_section.get("username", "")
     password = config_section.get("password", "")
     host = config_section.get("host", "")
-    db = config_section.get("db", "")
+    port = config_section.get("port", "3306")
+    database = config_section.get("database", "")
 
     return uri.format(
         **{
             "username": username,
-            "password": password,
-            "database": db,
             "user": username,
+            "password": password,
             "pass": password,
             "host": host,
-            "db": db,
+            "port": port,
+            "database": database,
+            "db": database,
         }
     )
 
@@ -137,15 +142,18 @@ def redislock(
 
 @contextmanager
 def timed_lock(
-    *key_parts_strs: str,
+    key_parts_strs: list[str],
     task_timeout: int,
     acquire_timeout: Optional[float] = None,
 ):
     key_str = ":".join(key_parts_strs)
     lock = redislock(key_str, task_timeout, acquire_timeout=acquire_timeout)
 
-    with lock:
-        yield lock
+    try:
+        with lock:
+            yield lock
+    except ReleaseUnlockedLock as e:
+        raise RuntimeError(f"Error while trying to lock/unlock redis to run task: {e}")
 
 
 def lock_free(

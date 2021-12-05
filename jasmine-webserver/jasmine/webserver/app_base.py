@@ -37,32 +37,36 @@ def sqla_uri_from_config_section(config_section) -> str:
     ...     "username": "username",
     ...     "password": "password",
     ...     "host": "localhost",
-    ...     "db": "db",
+    ...     "database": "db",
     ... })
     'mysq://blah:blah@blah/username=username, password=password, db=db'
     >>> sqla_uri_from_config_section({
     ...     "username": "my_app_prod_ro",
     ...     "password": "my_ap_prod_ro_pass",
     ...     "host": "db_endpoint",
-    ...     "db": "database",
+    ...     "database": "database",
     ... })
-    'mysql+pymysql://my_app_prod_ro:my_ap_prod_ro_pass@db_endpoint/database'
+    'mysql+pymysql://my_app_prod_ro:my_ap_prod_ro_pass@db_endpoint:3306/database'
     """
-    uri = config_section.get("uri", "mysql+pymysql://{username}:{password}@{host}/{db}")
+    uri = config_section.get(
+        "uri", "mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
+    )
     username = config_section.get("username", "")
     password = config_section.get("password", "")
     host = config_section.get("host", "")
-    db = config_section.get("db", "")
+    port = config_section.get("port", "3306")
+    database = config_section.get("database", "")
 
     return uri.format(
         **{
             "username": username,
-            "password": password,
-            "database": db,
             "user": username,
+            "password": password,
             "pass": password,
             "host": host,
-            "db": db,
+            "port": port,
+            "database": database,
+            "db": database,
         }
     )
 
