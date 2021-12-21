@@ -12,6 +12,7 @@ Setting up
 - Run `for PROJECT in webserver models sql etl; do pushd jasmine-$PROJECT && pip install -e '.[dev]' && popd`.
 - Run `docker-compose up` to start the services (and build them if necessary).
 - Run `jasmine_initialize_schema` to initialize your database.
+    - Grant all jasmine_web_su all permissions on `jasmine_web.*` and `jasmine_test.*`.
 - Copy `config/dev/example_jasmine_webserver.cfg` to `config/dev/jasmine_webserver.cfg`, optionally adding missing credentials.
 - Add the database at `mysql://jasmine_web_su:password@127.0.0.1:3305/jasmine_web` to your favorite SQL client.
 - Install your distro's redis package and use `redis-cli` to access the docker redis instance for testing.
@@ -44,7 +45,9 @@ jasmine-models/ $ less migrations/versions/generated_migration_file_name.py  # R
 jasmine-models/ $ alembic upgrade head
 ```
 
-Please refresh the MySQL dump when you upgrade the schema.
+Please refresh the MySQL dump, along with the derived MySQL testing database dump, using the `tools/update_sql_dumps.sh` command.
+See its documentation for details.
+This script assumes jasmine is located in `~/src/jasmine` and requires `mysqldump` to be installed.
 
 
 Architecture
