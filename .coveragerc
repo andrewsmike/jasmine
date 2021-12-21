@@ -1,0 +1,25 @@
+[run]
+omit =
+    jasmine-sql/jasmine/sql/parser/autogen/*
+    jasmine-sql/jasmine/sql/parser/SQLLexer.py
+    jasmine-sql/jasmine/sql/parser/SQLParser.py
+    jasmine-sql/jasmine/sql/parser/SQLBaseLexer.py
+    jasmine-sql/jasmine/sql/parser/SQLBaseParser.py
+    jasmine-sql/jasmine/sql/parser/SQLParserListener.py
+    jasmine-sql/jasmine/sql/parser/SQLParserVisitor.py
+    jasmine-etl/jasmine/etl/materializations/tests/*
+    **/test*.py
+
+
+[report]
+exclude_lines =
+    # Have to re-enable the standard pragma
+    pragma: no cover
+
+    # Don't complain if tests don't hit defensive assertion code:
+    raise ValueError
+    raise AssertionError
+    raise NotImplementedError
+
+    # Don't complain if non-runnable code isn't run:
+    if __name__ == .__main__.:
