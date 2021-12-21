@@ -60,6 +60,7 @@ from sqlalchemy import (
     String,
     UniqueConstraint,
 )
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 
 from jasmine.models.model_registry import orm_registry
@@ -89,9 +90,9 @@ class StateMachine(Generic[State, Event]):
     event_progressive_verb: dict[Event, str]
     event_outcomes: dict[Event, set[State]]
 
-    automatic_events: set[Event]
-    user_events: set[Event]
-    scheduled_events: set[Event]
+    state_automatic_event: dict[State, Event]
+    user_events: dict[State, set[Event]]
+    scheduled_events: dict[State, set[Event]]
 
 
 @orm_registry.mapped
@@ -107,7 +108,9 @@ class Materialization:
 
     state = Column(String(64), nullable=False)
 
-    config = Column(JSON, nullable=False)
+    # Static configuration determined on creation.
+    config = Column(MutableDict.as_mutable(JSON), nullable=False)
+    context = Column(MutableDict.as_mutable(JSON), nullable=False)
 
     view_id = Column(BigInteger, nullable=False)
 
@@ -133,3 +136,6 @@ class Materialization:
     @property
     def table_name(self) -> str:
         return f"{self.view.path}_{self.materialization_name}"
+
+    def update_context(self):
+        self.context = dict(self.context)

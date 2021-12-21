@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from sqlalchemy import (
     JSON,
     BigInteger,
@@ -11,6 +13,7 @@ from sqlalchemy import (
     Text,
     UniqueConstraint,
 )
+from sqlalchemy.ext.mutable import MutableDict
 from sqlalchemy.orm import relationship
 
 from jasmine.models.model_registry import orm_registry
@@ -24,7 +27,7 @@ class Backend:
     name = Column(String(length=64), nullable=False)
 
     backend_type = Column(Enum("mysql"), nullable=False)
-    spec = Column(JSON, nullable=False)
+    spec = Column(MutableDict.as_mutable(JSON), nullable=False)
 
     organization_id = Column(BigInteger, nullable=False)
 
@@ -76,7 +79,7 @@ class View:
 
     view_type = Column(Enum("query", "history_table"), nullable=False)
 
-    spec = Column(JSON, nullable=False)
+    spec = Column(MutableDict.as_mutable(JSON), nullable=False)
 
     # Everything starts as '[proj]/scratch/baby_avocado'
     path = Column(String(256), nullable=False)
@@ -99,7 +102,7 @@ class BackendEvent:
     title = Column(String(length=256), nullable=False)
     description = Column(Text, nullable=True)
 
-    created_time = Column(DateTime, nullable=False)
+    created_time = Column(DateTime, nullable=False, default=datetime.now)
 
     materialization_id = Column(BigInteger, nullable=True)
     view_id = Column(BigInteger, nullable=True)

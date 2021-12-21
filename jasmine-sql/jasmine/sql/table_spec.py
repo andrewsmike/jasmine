@@ -4,19 +4,26 @@ Extract and represent table schema, generate CREATE TABLE logic.
 Does _not_currently handle auto_increment, as not all backends provide that data.
 
 May simplify/muddle key names due to dialect weirdness, does not currently preserve coalation / charset / etc.
-
 TODO:
 - Coalation, charset
 - Preserve auto_inc if available
 - Rigorously test to identify missing / weak points
 - Handle SQLite keys
+        # mysql_collate="utf8mb4_0900_ai_ci",
+        # mysql_default_charset="utf8mb4",
+        # mysql_engine="InnoDB",
 """
 from dataclasses import dataclass, replace
 from random import choices
 from string import ascii_letters, digits
 from typing import Any
 
-from jasmine.sql.transforms.escaping import escaped, escaped_column_list, unescaped
+from jasmine.sql.transforms.escaping import (
+    escaped,
+    escaped_column_list,
+    escaped_db_table,
+    unescaped,
+)
 
 
 def column_type_decl(
@@ -413,3 +420,14 @@ def create_staging_table_statement(
         base_table_spec.without_constraints(keep_unique_keys=True),
         temporary=True,
     )
+
+
+def idempotent_drop_table_statement(
+    db_name: str,
+    table_name: str,
+) -> str:
+    """
+    >>> print(idempotent_drop_table_statement("main", 'users " '))
+    DROP TABLE IF EXISTS `main`.`users " `;
+    """
+    return f"DROP TABLE IF EXISTS {escaped_db_table(db_name, table_name)};"

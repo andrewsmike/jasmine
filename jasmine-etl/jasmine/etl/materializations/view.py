@@ -1,40 +1,77 @@
-from jasmine.etl.backends import new_backend_conn
+from jasmine.etl.backends import backend_conn, view_exists
+from jasmine.etl.ddl_tools import (
+    ResourceNames,
+    assert_names_available,
+    assert_names_successfully_taken,
+)
+from jasmine.etl.materializations.etl_tools import (
+    edit_resources,
+    set_state_on_exception,
+)
 from jasmine.sql.analysis import is_readonly_query
 from jasmine.sql.transforms.view import create_view_statement, drop_view_statement
 
 
-def verify_view(self, session):
-    view_sql = self.view.spec["query_text"]
+def view_resource_names(self):
+    """
+    Set of table, view, and trigger names used by this materialization.
+    Used in verifying CREATE / TERMINATE operations.
+    """
+    return ResourceNames(
+        views={(self.db_name, self.table_name)},
+    )
 
-    try:
-        assert is_readonly_query(view_sql)
-    except (SyntaxError, AssertionError, ValueError):
-        return "bad_spec"
+
+@set_state_on_exception("bad_spec", (SyntaxError, AssertionError, ValueError))
+def verify_view(self, session):
+
+    # Leave asserting to creation.
+    # assert_names_available(self.view.project.backend, view_resource_names(self))
+
+    view_sql = self.view.spec["query_text"]
+    assert is_readonly_query(view_sql)
 
     return "accepted"
 
 
+@set_state_on_exception("could_not_create", (Exception,))
 def create_view(self, session):
-    create_view_sql = create_view_statement(
-        self.db_name, self.table_name, self.view.spec["query_text"]
-    )
+    backend = self.view.project.backend
 
-    try:
-        with new_backend_conn(self.view.project.backend, readonly=False) as conn:
+    assert_names_available(backend, view_resource_names(self))
+
+    view_path = (self.db_name, self.table_name)
+    create_view_sql = create_view_statement(*view_path, self.view.spec["query_text"])
+
+    with backend_conn(backend, readonly=False) as conn:
+        with edit_resources(self) as resources:
             conn.execute(create_view_sql)
-    except Exception as e:
-        print(e)
-        return "could_not_create"
+            resources.views.add(view_path)
+
+    assert_names_successfully_taken(backend, view_resource_names(self))
 
     return "active"
 
 
+@set_state_on_exception("could_not_terminate", (Exception,))
 def terminate_view(self, session):
+    backend = self.view.project.backend
+
+    view_path = (self.db_name, self.table_name)
+    dirty_resources = ResourceNames.from_materialization(self)
+
     # TODO: Verify nobody renamed the views on us.
     drop_view_sql = drop_view_statement(self.db_name, self.table_name)
 
-    with new_backend_conn(self.view.project.backend, readonly=False) as conn:
-        conn.execute(drop_view_sql)
+    with backend_conn(backend, readonly=False) as conn:
+        with edit_resources(self) as resources:
+            if (view_path in resources.views) and view_exists(backend, *view_path):
+                conn.execute(drop_view_sql)
+            resources.views.discard(view_path)
+
+            assert resources.empty()
+
+    assert_names_available(backend, dirty_resources)
 
     return "terminated"
 

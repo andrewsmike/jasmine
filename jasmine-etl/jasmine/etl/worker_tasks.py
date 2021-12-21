@@ -3,8 +3,8 @@ from functools import wraps
 from sqlalchemy import inspect
 
 from jasmine.etl.app import celery_app
-from jasmine.etl.app_base import app_db_engine_session, timed_lock
-from jasmine.etl.backends import new_backend_conn
+from jasmine.etl.app_base import app_db_session, timed_lock
+from jasmine.etl.backends import backend_conn
 from jasmine.etl.materializations import materialization_event_funcs
 from jasmine.models import Materialization, View, orm_registry
 
@@ -19,15 +19,8 @@ def with_sqla_session(func):
 
     @wraps(func)
     def wrapped(*args, **kwargs):
-        engine, session = app_db_engine_session(orm_registry)
-
-        try:
-            result = func(session, *args, **kwargs)
-            session.commit()
-            return result
-        except Exception as e:
-            session.rollback()
-            raise e
+        with app_db_session(orm_registry) as session:
+            return func(session, *args, **kwargs)
 
     return wrapped
 
@@ -114,7 +107,7 @@ def log_backend_event(title: str):
 #     lock_suffix="result_preview",
 # )
 def view_result_preview(session, view):  # timed_lock=None
-    with new_backend_conn(view.project.backend, readonly=True) as ro_conn:
+    with backend_conn(view.project.backend, readonly=True) as ro_conn:
         ro_conn.execute(view.spec["query_text"])
         return ro_conn.fetchall()
 
@@ -142,4 +135,3 @@ def execute_materialization_event(
     next_state = event_func(materialization, session)
 
     materialization.state = next_state
-    session.add(materialization)

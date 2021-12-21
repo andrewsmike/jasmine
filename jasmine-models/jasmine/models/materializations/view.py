@@ -18,6 +18,7 @@ ViewState = Literal[
     "rejected",
     "accepted",
     "could_not_create",
+    "could_not_terminate",
     "active",
     "terminated",
 ]
@@ -34,7 +35,7 @@ class ViewStateMachine(StateMachine[ViewState, ViewEvent]):
     nice_name: str = "Database View"
 
     # Hack so we can typecheck state values, but still have them available here.
-    states: set[ViewState] = set(ViewState.__args__)
+    states: set[ViewState] = set(ViewState.__args__)  # type: ignore
 
     state_desc: dict[State, str] = {
         "proposed": "Received request, need to verify.",
@@ -42,6 +43,7 @@ class ViewStateMachine(StateMachine[ViewState, ViewEvent]):
         "accepted": "Materialization verified; need to create.",
         "could_not_create": "Failed to create materialization; aborted. See logs for details.",
         "active": "Successfully created materialization; active.",
+        "could_not_terminate": "Failed to clean up materialization; retrying. See logs for details.",
         "terminated": "Materialization terminated by user.",
     }
 
@@ -49,17 +51,18 @@ class ViewStateMachine(StateMachine[ViewState, ViewEvent]):
 
     terminal_states: set[State] = {
         "rejected",
-        "could_not_create",
         "terminated",
     }
 
     # Hack so we can typecheck event values, but still have them available here.
-    events: set[ViewEvent] = set(ViewEvent.__args__)
+    events: set[ViewEvent] = set(ViewEvent.__args__)  # type: ignore
 
     state_events: dict[State, set[Event]] = {
         "proposed": {"verify", "terminate"},
         "accepted": {"create", "terminate"},
+        "could_not_create": {"terminate"},
         "active": {"terminate"},
+        "could_not_terminate": {"terminate"},
     }
 
     event_progressive_verb: dict[Event, str] = {
@@ -70,14 +73,19 @@ class ViewStateMachine(StateMachine[ViewState, ViewEvent]):
     event_outcomes: dict[Event, set[State]] = {
         "verify": {"rejected", "accepted"},
         "create": {"could_not_create", "active"},
-        "terminate": {"terminated"},
+        "terminate": {"could_not_terminate", "terminated"},
     }
 
-    automatic_events: set[Event] = {"verify", "create"}
+    state_automatic_event: dict[State, Event] = {
+        "proposed": "verify",
+        "accepted": "create",
+        "could_not_create": "terminate",
+        "could_not_terminate": "terminate",  # TODO: Move to slow rescheduled / backoff
+    }
     user_events: set[Event] = {
         "terminate",
     }
-    scheduled_events: set[Event] = {}
+    scheduled_events: set[Event] = set()
 
 
 @orm_registry.mapped

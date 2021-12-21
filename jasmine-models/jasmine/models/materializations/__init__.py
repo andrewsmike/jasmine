@@ -40,6 +40,7 @@ def new_materialization(
         # without deleting / reinserting across two commits.
         preexisting_mat.config = config
         preexisting_mat.state = start_state
+        preexisting_mat.context = {"claimed_resources": {}}
 
         return preexisting_mat
     else:
@@ -47,5 +48,6 @@ def new_materialization(
             materialization_type=mat_type_name,
             state=mat_class.state_machine_type.start_state,
             config=config,
+            context={"claimed_resources": {}},
             view_id=view.view_id,
         )
