@@ -20,9 +20,9 @@ from sqlalchemy.orm import Session, scoped_session, sessionmaker
 @cache
 def app_config() -> ConfigParser:
     possible_config_file_paths = [
-        getenv("JASMINE_WORKER_CONFIG", None),
         "~/.jasmine_worker.cfg",
         "jasmine_worker.cfg",
+        getenv("JASMINE_WORKER_CONFIG", None),
     ]
     config_file_paths: list[str] = [
         expanduser(path) for path in possible_config_file_paths if path
@@ -66,11 +66,11 @@ def sqla_uri_from_config_section(config_section) -> str:
     uri = config_section.get(
         "uri", "mysql+pymysql://{username}:{password}@{host}:{port}/{database}"
     )
-    username = config_section.get("username", "")
-    password = config_section.get("password", "")
+    username = config_section.get("username", config_section.get("user", ""))
+    password = config_section.get("password", config_section.get("pass", ""))
     host = config_section.get("host", "")
     port = config_section.get("port", "3306")
-    database = config_section.get("database", "")
+    database = config_section.get("database", config_section.get("db", ""))
 
     return uri.format(
         **{
@@ -92,7 +92,7 @@ def app_db_engine_session_maker(orm_registry) -> tuple[Engine, Any]:
     assert "database" in config, "No backend [database] configured. Add to config file."
     sqla_uri = sqla_uri_from_config_section(config["database"])
 
-    engine = create_engine(sqla_uri, echo=False)
+    engine = create_engine(sqla_uri, echo=False, pool_pre_ping=True)
 
     orm_registry.metadata.bind = engine
 
@@ -108,9 +108,17 @@ def app_db_engine_session_maker(orm_registry) -> tuple[Engine, Any]:
     )
 
 
-def app_db_engine_session(orm_registry) -> tuple[Engine, Session]:
-    engine, session_maker = app_db_engine_session_maker(orm_registry)
-    return (engine, session_maker())
+def app_db_engine(orm_registry) -> Engine:
+    engine, _ = app_db_engine_session_maker(orm_registry)
+    return engine
+
+
+@contextmanager
+def app_db_session(orm_registry) -> Session:
+    _, session_maker = app_db_engine_session_maker(orm_registry)
+    session = session_maker()
+    yield session
+    session.commit()
 
 
 @cache

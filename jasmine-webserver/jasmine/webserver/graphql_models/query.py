@@ -15,7 +15,7 @@ from jasmine.models import (
     orm_registry,
 )
 from jasmine.sql.pretty_print import sql_pretty_printed
-from jasmine.webserver.app_base import app_db_engine_session
+from jasmine.webserver.app_base import app_db_session
 
 query_type_defs = """
 scalar JSON
@@ -66,15 +66,14 @@ json.JSONEncoder.default = json_datetime_encoder  # type: ignore
 def with_sqla_session(func):
     @wraps(func)
     def wrapped(obj, info, *args, **kwargs):
-        engine, session = app_db_engine_session(orm_registry)
-
-        try:
-            result = func(session, obj, info, *args, **kwargs)
-            session.commit()
-            return result
-        except Exception as e:
-            session.rollback()
-            raise e
+        with app_db_session(orm_registry) as session:
+            try:
+                return func(session, obj, info, *args, **kwargs)
+            except Exception as e:
+                session.rollback()
+                raise
+            finally:
+                session.commit()
 
     return wrapped
 
