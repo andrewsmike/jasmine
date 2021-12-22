@@ -1,7 +1,9 @@
 from collections.abc import Generator
 from contextlib import contextmanager
 from functools import cache
+from os import getpid
 from os.path import exists, join
+from socket import gethostname
 from tempfile import TemporaryDirectory
 
 from pymysql import connect
@@ -15,7 +17,22 @@ from jasmine.sql.table_spec import TableSpec
 from jasmine.sql.transforms.escaping import escaped, unescaped
 
 
-class ReadOnlyDictCursor(DictCursor):
+class DebuggingDictCursor(DictCursor):
+    def __init__(self, *args, backend=None, **kwargs):
+        self.backend = backend
+        super().__init__(*args, **kwargs)
+
+    def execute(self, query, args=None):
+        org_name = self.backend.organization.name
+        backend_name = (
+            f"{org_name}.{self.backend.name}(backend_id={self.backend.backend_id})"
+        )
+        context_str = f"/* Jasmine@{gethostname()}(pid={getpid()}): {self.backend.backend_id} */\n"
+
+        return super().execute(context_str + query, args=args)
+
+
+class ReadOnlyDictCursor(DebuggingDictCursor):
     def execute(self, query, args=None):
         assert is_readonly_query(
             query
