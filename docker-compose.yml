@@ -18,7 +18,7 @@ services:
       MYSQL_USER: "jasmine_web_su"
       MYSQL_PASSWORD: "password"
       MYSQL_ROOT_PASSWORD: "root"
-      TZ=America/New_York
+      TZ: "America/New_York"
 
     ports:
       - "3305:3306"
