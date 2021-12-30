@@ -139,3 +139,6 @@ class Materialization:
 
     def update_context(self):
         self.context = dict(self.context)
+
+    def terminal(self):
+        return self.state in self.state_machine_type.terminal_states

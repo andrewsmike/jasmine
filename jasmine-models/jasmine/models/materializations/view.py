@@ -30,7 +30,19 @@ ViewEvent = Literal[
 
 
 class ViewStateMachine(StateMachine[ViewState, ViewEvent]):
-    """ """
+    """
+    Potential mutating actions:
+    - Move
+    - Change spec
+
+    Other materializations:
+    - ALTERs (rename / reorder columns, change indices, etc)
+    - Complete data changes
+    - Backfills
+
+    So the kill-respawn strategy is gonna have to be the one for now, then.
+    We can then move into hot-swapping, then specific operations can get granular.
+    """
 
     nice_name: str = "Database View"
 

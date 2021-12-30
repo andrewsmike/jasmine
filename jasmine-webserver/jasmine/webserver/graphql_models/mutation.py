@@ -269,7 +269,7 @@ def create_materialization(
     if preexisting_mats:
         (preexisting_mat,) = preexisting_mats
         assert (
-            preexisting_mat.state in preexisting_mat.state_machine_type.terminal_states
+            preexisting_mat.terminal()
         ), f"{materialization_type} materialization already exists!"
     else:
         preexisting_mat = None

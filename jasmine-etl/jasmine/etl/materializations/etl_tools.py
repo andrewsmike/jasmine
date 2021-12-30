@@ -57,6 +57,9 @@ def set_state_on_exception(failure_state: str, error_types: tuple[Exception]):
     def wrapper(func):
         @wraps(func)
         def wrapped(materialization, session, *args, **kwargs):
+            assert (
+                failure_state in materialization.state_machine_type.states
+            ), f"Failure state {failure_state} not valid for materialization type {type(materialization).__name__}"
             # TODO: Testing
             try:
                 return func(materialization, session, *args, **kwargs)

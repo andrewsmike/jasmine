@@ -22,7 +22,7 @@ def view_resource_names(self):
     )
 
 
-@set_state_on_exception("bad_spec", (SyntaxError, AssertionError, ValueError))
+@set_state_on_exception("rejected", (SyntaxError, AssertionError, ValueError))
 def verify_view(self, session):
 
     # Leave asserting to creation.
@@ -69,7 +69,7 @@ def terminate_view(self, session):
                 conn.execute(drop_view_sql)
             resources.views.discard(view_path)
 
-            assert resources.empty()
+            assert resources.empty(), str(resources)
 
     assert_names_available(backend, dirty_resources)
 
