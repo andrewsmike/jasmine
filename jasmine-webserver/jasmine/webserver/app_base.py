@@ -6,7 +6,7 @@ from contextlib import contextmanager
 from functools import cache
 from os import getenv
 from os.path import expanduser
-from typing import Any
+from typing import Any, Iterator
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
@@ -100,8 +100,13 @@ def app_db_engine(orm_registry) -> Engine:
 
 
 @contextmanager
-def app_db_session(orm_registry) -> tuple[Engine, Session]:
+def app_db_session(orm_registry) -> Iterator[tuple[Engine, Session]]:
     _, session_maker = app_db_engine_session_maker(orm_registry)
     session = session_maker()
-    yield session
+    try:
+        yield session
+    except Exception as e:
+        session.rollback()
+        raise
+
     session.commit()

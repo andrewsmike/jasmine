@@ -117,7 +117,12 @@ def app_db_engine(orm_registry) -> Engine:
 def app_db_session(orm_registry) -> Session:
     _, session_maker = app_db_engine_session_maker(orm_registry)
     session = session_maker()
-    yield session
+    try:
+        yield session
+    except Exception as e:
+        session.rollback()
+        raise
+
     session.commit()
 
 

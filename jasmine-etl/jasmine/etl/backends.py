@@ -1,6 +1,6 @@
 from collections.abc import Generator
 from contextlib import contextmanager
-from functools import cache
+from functools import cache, partial
 from os import getpid
 from os.path import exists, join
 from socket import gethostname
@@ -18,16 +18,20 @@ from jasmine.sql.transforms.escaping import escaped, unescaped
 
 
 class DebuggingDictCursor(DictCursor):
-    def __init__(self, *args, backend=None, **kwargs):
+    def __init__(self, *args, backend=None, debug=False, **kwargs):
         self.backend = backend
+        self.debug = debug
         super().__init__(*args, **kwargs)
 
     def execute(self, query, args=None):
-        org_name = self.backend.organization.name
-        backend_name = (
-            f"{org_name}.{self.backend.name}(backend_id={self.backend.backend_id})"
-        )
-        context_str = f"/* Jasmine@{gethostname()}(pid={getpid()}): {self.backend.backend_id} */\n"
+        if self.debug:
+            org_name = self.backend.organization.name
+            backend_name = (
+                f"{org_name}.{self.backend.name}(backend_id={self.backend.backend_id})"
+            )
+            context_str = f"/* Jasmine@{gethostname()}(pid={getpid()}): {self.backend.backend_id} */\n"
+        else:
+            context_str = ""
 
         return super().execute(context_str + query, args=args)
 
@@ -47,7 +51,11 @@ def backend_conn(backend: Backend, readonly: bool = False):
         backend.backend_type == "mysql"
     ), "Only MySQL backends are currently supported."
 
-    cursor = ReadOnlyDictCursor if readonly else DictCursor
+    cursor = partial(
+        ReadOnlyDictCursor if readonly else DebuggingDictCursor,
+        backend=backend,
+        debug=False,
+    )
 
     # MyPy override: pymysql type stubs are incomplete - they don't capture the contextmanager API
     # specifically documented in the examples: https://pymysql.readthedocs.io/en/latest/user/examples.html
