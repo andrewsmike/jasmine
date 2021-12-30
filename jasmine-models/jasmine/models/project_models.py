@@ -14,9 +14,11 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from jasmine.models.model_registry import orm_registry
+
+cascade_deletes = "save-update, merge, delete, delete-orphan"
 
 
 @orm_registry.mapped
@@ -41,7 +43,10 @@ class Backend:
         ),
     )
 
-    organization = relationship("Organization", backref="backends")
+    organization = relationship(
+        "Organization",
+        backref=backref("backends", cascade=cascade_deletes),
+    )
 
 
 @orm_registry.mapped
@@ -68,7 +73,11 @@ class Project:
     )
 
     organization = relationship("Organization", backref="projects")
-    backend = relationship("Backend", backref="projects")
+    backend = relationship(
+        "Backend",
+        lazy="joined",
+        backref=backref("projects", cascade=cascade_deletes),
+    )
 
 
 @orm_registry.mapped
@@ -91,7 +100,11 @@ class View:
         ForeignKeyConstraint(["project_id"], ["projects.project_id"], "view_project"),
     )
 
-    project = relationship("Project", backref="views")
+    project = relationship(
+        "Project",
+        lazy="joined",
+        backref=backref("views", cascade=cascade_deletes),
+    )
 
 
 @orm_registry.mapped

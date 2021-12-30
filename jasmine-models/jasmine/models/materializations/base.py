@@ -61,7 +61,7 @@ from sqlalchemy import (
     UniqueConstraint,
 )
 from sqlalchemy.ext.mutable import MutableDict
-from sqlalchemy.orm import relationship
+from sqlalchemy.orm import backref, relationship
 
 from jasmine.models.model_registry import orm_registry
 
@@ -120,7 +120,13 @@ class Materialization:
         ForeignKeyConstraint(["view_id"], ["views.view_id"]),
     )
 
-    view = relationship("View", backref="materializations")
+    view = relationship(
+        "View",
+        lazy="joined",
+        backref=backref(
+            "materializations", cascade="save-update, merge, delete, delete-orphan"
+        ),
+    )
 
     __mapper_args__ = {
         # Note: You can't instantiate base materializations.
