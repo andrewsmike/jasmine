@@ -1,9 +1,14 @@
 from functools import wraps
+from logging import exception
 from typing import Optional
 
 from ariadne import ObjectType
 
-from jasmine.etl.worker_tasks import execute_materialization_event, view_result_preview
+from jasmine.etl.worker_tasks import (
+    execute_materialization_event,
+    execute_materialization_events,
+    view_result_preview,
+)
 from jasmine.models import Materialization, Project, User, View, new_materialization
 from jasmine.webserver.graphql_models.query import with_sqla_session
 from jasmine.webserver.random_phrase import random_hex, random_phrase
@@ -130,6 +135,7 @@ def as_wrapped_graphql_payload(func):
                 "result": func(*args, **kwargs),
             }
         except Exception as e:
+            exception(str(e))
             return {
                 "success": False,
                 "error": str(e),
@@ -137,6 +143,67 @@ def as_wrapped_graphql_payload(func):
             }
 
     return wrapper
+
+
+def active_materializations(view):
+    return [mat for mat in view.materializations if not mat.terminal()]
+
+
+def create_query_view_materialization(session, query):
+
+    preexisting_mats = [
+        mat for mat in query.materializations if mat.materialization_type == "view"
+    ]
+
+    assert (
+        len(preexisting_mats) <= 1
+    ), "Multiple view materializations per view is not currently supported."
+    preexisting_mat = (preexisting_mats + [None])[0]
+
+    mat = new_materialization(
+        view=query,
+        mat_type_name="view",
+        config={},
+        preexisting_mat=preexisting_mat,
+    )
+    session.add(mat)
+
+    session.commit()
+
+    result = execute_materialization_events(
+        mat.materialization_id,
+        ["proposed", "accepted"],
+        ["verify", "create"],
+        sync=True,
+    )
+
+    # The RPC has made our transaction state stale. Refresh by rolling back.
+    session.rollback()
+
+
+def terminate_query_view_materialization(session, query):
+    preexisting_mats = [
+        mat
+        for mat in query.materializations
+        if mat.materialization_type == "view"
+        if not mat.terminal()
+    ]
+
+    if not preexisting_mats:
+        return
+
+    assert (
+        len(preexisting_mats) == 1
+    ), "Multiple view materializations per view is not currently supported."
+    (preexisting_mat,) = preexisting_mats
+
+    execute_materialization_event.delay(
+        preexisting_mat.materialization_id, "terminate"
+    ).get()
+
+    # The RPC has made our transaction state stale. Refresh by rolling back.
+    session.rollback()
+    session.expire_all()
 
 
 @mutation_obj.field("create_query")
@@ -174,6 +241,12 @@ def create_query(
     )
 
     session.add(query)
+    session.commit()
+
+    try:
+        create_query_view_materialization(session, query)
+    except Exception as e:
+        pass
 
     return query
 
@@ -192,9 +265,20 @@ def update_query_text(
     assert view.view_type == "query"
     query = view
 
+    terminate_query_view_materialization(session, query)
+
+    assert (
+        len(active_materializations(query)) == 0
+    ), "Cannot update a view with active materializations."
+
     new_spec = dict(query.spec)
     new_spec["query_text"] = query_text
     query.spec = new_spec
+
+    try:
+        create_query_view_materialization(session, query)
+    except Exception as e:
+        pass
 
     return query
 
@@ -208,7 +292,16 @@ def delete_view(
     info,
     id: int = None,
 ):
-    session.delete(session.query(View).where(View.view_id == id).one())
+    view = session.query(View).where(View.view_id == id).one()
+
+    if view.view_type == "query":
+        terminate_query_view_materialization(session, view)
+
+    assert (
+        len(active_materializations(view)) == 0
+    ), "Cannot delete a view with active materializations."
+
+    session.delete(view)
 
 
 @mutation_obj.field("move_view")
@@ -224,12 +317,25 @@ def move_view(
 ) -> View:
     view = session.query(View).where(View.view_id == id).one()
 
+    if view.view_type == "query":
+        terminate_query_view_materialization(session, view)
+
+    assert (
+        len(active_materializations(view)) == 0
+    ), "Cannot move a view with active materializations."
+
     if project_name is not None:
-        project = session.query(Project).where(Project.name == project_name).one()
-        view.project = project
+        new_project = session.query(Project).where(Project.name == project_name).one()
+        view.project = new_project
 
     if view_path is not None:
         view.path = view_path
+
+    if view.view_type == "query":
+        try:
+            create_query_view_materialization(session, view)
+        except Exception as e:
+            pass
 
     return view
 

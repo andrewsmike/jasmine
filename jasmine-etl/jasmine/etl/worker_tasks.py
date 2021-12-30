@@ -1,4 +1,5 @@
 from functools import wraps
+from logging import exception
 
 from sqlalchemy import inspect
 
@@ -135,3 +136,55 @@ def execute_materialization_event(
     next_state = event_func(materialization, session)
 
     materialization.state = next_state
+
+
+@celery_app.task
+@with_sqla_session
+@with_sqla_first_arg(Materialization)
+def execute_materialization_event_or_cleanup(
+    session,
+    mat,
+    expected_start_state: str,
+    event: str,
+    cleanup_action_event: str | None = "terminate",
+):
+
+    if mat.state == expected_start_state:
+        try:
+            execute_materialization_event(mat.materialization_id, event)
+            return
+        except Exception as e:
+            initial_error = e
+    else:
+        initial_error = AssertionError(
+            f"Materialization state was {mat.state}, expected {expected_start_state}."
+        )
+
+    if not mat.terminal() and cleanup_action_event is not None:
+        try:
+            execute_materialization_event(mat.materialization_id, cleanup_action_event)
+        except Exception as cleanup_exception:
+            exception(cleanup_exception)
+
+    raise initial_error
+
+
+def execute_materialization_events(
+    materialization_id: int,
+    expected_state_names: list[str],
+    event_names: list[str],
+    onfail_action_event: str | None = "terminate",
+    sync: bool = True,
+):
+    promise = execute_materialization_event_or_cleanup.starmap(
+        [
+            (materialization_id, expected_state_name, event_name, onfail_action_event)
+            for expected_state_name, event_name in zip(
+                expected_state_names, event_names
+            )
+        ]
+    )
+    if sync:
+        promise.delay().get()
+    else:
+        promise.apply_async()
