@@ -1,7 +1,7 @@
 # Note: You may need to set your mysql client's default timezone.
 
 INTERVAL="30 MINUTE"
-DB="test"
+DB="web"
 
 
 echo "SELECT * FROM jasmine_${DB}.backend_events WHERE created_time > DATE_SUB(NOW(), INTERVAL $INTERVAL)\G" | \

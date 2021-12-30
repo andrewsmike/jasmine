@@ -110,7 +110,7 @@ This will call the function and print out the result, and can be ran as `jasmine
 
 After creating, say, a view materialization, you can walk it through its various stages like this:
 ```sh
-$ jasmine_celery_run execute_materialization_event '[[<MATERIALIZATION_ID>], "verify"]' '{}' 
+$ jasmine_celery_run execute_materialization_event '[[<MATERIALIZATION_ID>], "verify"]' '{}'
 Running with task ID 1595f9a6-7772-44db-94b9-f26ce105b828.
 
 $ jasmine_celery_run execute_materialization_event '[[<MATERIALIZATION_ID>], "create"]' '{}'
@@ -118,3 +118,20 @@ Running with task ID a4f7b010-dd84-47ab-bca4-d2a287edf9e2.
 
 $ # Done. Check materializations.
 ```
+
+Tools
+=====
+Additional debugging and project management tools are available in the `tools/` directory.
+Some of these are critical and will work by default, others require extra setup.
+Consult their header comments (or README.md files) for details.
+
+Debugging:
+
+- `backend_events.sh`: Display all backend events for the last 30m.
+- `mysql_trace.py`: Visualize concurrent transactions in MySQL.
+- `update_sql_dumps.sh`: Update jasmine\_web database dump and jasmine\_test database dumps.
+
+Project management:
+
+- `cloc.sh`: Summarize jasmine lines of code.
+- `jasmine_tracker/update_backlog.py`: Update the jasmine google sheets issue tracker. See `jasmine_tracker/README.md` for details.

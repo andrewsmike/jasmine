@@ -134,6 +134,7 @@ from jasmine.sql.ast_nodes import (
     UnionNode,
     matching_nodes,
     sql_ast,
+    sql_ast_repr,
 )
 from jasmine.sql.parser.sql import (
     SQLLexer,
@@ -1574,6 +1575,10 @@ def display_example_query():
     start_time = time()
     print(pretty_printed_parse_tree(sql_tree))
     printed_time = time() - start_time
+
+    with open(sql_source_path) as f:
+        source_text = f.read()
+    print(sql_ast_repr(source_text))
 
     print("Rendering graph...")
     display_parse_tree(sql_tree)
