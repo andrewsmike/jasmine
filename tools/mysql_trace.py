@@ -19,18 +19,19 @@ Setup:
 Examples: See mysql_trace_example.png.
 """
 from codecs import decode
-from collections import Counter
 from dataclasses import dataclass
 from functools import cache
 from json import loads
-from pprint import pprint
 from subprocess import run
 from sys import argv
 
 from dateutil.parser import parse
 from graphviz import Digraph
 
-sql_statement = bytearray(f"SELECT event_time, user_host, thread_id, command_type, argument FROM mysql.general_log ORDER BY event_time DESC LIMIT {argv[1] if len(argv) > 1 else 40}", "utf-8")
+sql_statement = bytearray(
+    f"SELECT event_time, user_host, thread_id, command_type, argument FROM mysql.general_log ORDER BY event_time DESC LIMIT {argv[1] if len(argv) > 1 else 40}",
+    "utf-8",
+)
 
 database_config = {
     "username": "root",
@@ -40,11 +41,13 @@ database_config = {
     "database": "jasmine_web",
 }
 
+
 def dehexed(part):
     if part.startswith("0x"):
         return decode(part, "hex").decode("utf-8")
     else:
         return part
+
 
 column_names = [
     "time",
@@ -54,6 +57,7 @@ column_names = [
     "argument",
 ]
 column_name_length = max(len(column_name) for column_name in column_names)
+
 
 @dataclass
 class Entry:
@@ -70,6 +74,7 @@ def display_rows(rows):
             print(f"{column_name.rjust(column_name_length)}: {column_value}")
         print()
 
+
 def snake_case(value: str) -> str:
     return value.replace(" ", "_").lower()
 
@@ -78,14 +83,18 @@ def snake_case(value: str) -> str:
 def ip_hostnames():
     container_id_strs = [
         container_id
-        for container_id in run("docker ps --format {{.ID}}".split(" "), capture_output=True).stdout.decode("utf-8").split("\n")
+        for container_id in run(
+            "docker ps --format {{.ID}}".split(" "), capture_output=True
+        )
+        .stdout.decode("utf-8")
+        .split("\n")
         if container_id
     ]
 
     container_infos = loads(
         run(
             f"docker container inspect {' '.join(container_id_strs)}".split(" "),
-            capture_output=True
+            capture_output=True,
         ).stdout
     )
     ip_hostname = {}
@@ -97,6 +106,7 @@ def ip_hostnames():
 
     return ip_hostname
 
+
 def cleaned_up_hostname(host_ip_str):
     host_ip = (
         [
@@ -104,9 +114,11 @@ def cleaned_up_hostname(host_ip_str):
             for part in host_ip_str.split()
             if part.startswith("[") and part.endswith("]")
             if len(part.split(".")) == 4
-        ] + [host_ip_str]
+        ]
+        + [host_ip_str]
     )[0]
     return ip_hostnames().get(host_ip, host_ip)
+
 
 def display_graph(
     entries,
@@ -116,7 +128,9 @@ def display_graph(
     title = "MySQL Interactions"
     graph = Digraph(name=snake_case(title), comment=title, format="png", engine="neato")
 
-    sequence_idents = {(cleaned_up_hostname(entry.host), entry.thread_id) for entry in entries}
+    sequence_idents = {
+        (cleaned_up_hostname(entry.host), entry.thread_id) for entry in entries
+    }
     sequence_first_event_time = {}
     for entry in entries:
         sequence_ident = (cleaned_up_hostname(entry.host), entry.thread_id)
@@ -124,23 +138,31 @@ def display_graph(
         if sequence_ident not in sequence_first_event_time:
             sequence_first_event_time[sequence_ident] = entry_time
         else:
-            sequence_first_event_time[sequence_ident] = min(entry_time, sequence_first_event_time[sequence_ident])
-
+            sequence_first_event_time[sequence_ident] = min(
+                entry_time, sequence_first_event_time[sequence_ident]
+            )
 
     for column_index, (hostname, thread_id) in enumerate(
-            sorted(sequence_idents, key=lambda s_id: sequence_first_event_time[s_id])
+        sorted(sequence_idents, key=lambda s_id: sequence_first_event_time[s_id])
     ):
         elements = [
             (entry_index, entry)
             for entry_index, entry in enumerate(entries)
-            if (cleaned_up_hostname(entry.host), entry.thread_id) == (hostname, thread_id)
+            if (cleaned_up_hostname(entry.host), entry.thread_id)
+            == (hostname, thread_id)
         ]
 
         sequence_name = f"{hostname}@{thread_id}"
 
         for in_sequence_index, (element_index, element) in enumerate(elements):
             if in_sequence_index == 0:
-                graph.node(sequence_name, sequence_name, pos=f"{column_index*3},-{element_index + 0.5}!", root="true", shape="box")
+                graph.node(
+                    sequence_name,
+                    sequence_name,
+                    pos=f"{column_index*3},-{element_index + 0.5}!",
+                    root="true",
+                    shape="box",
+                )
 
             if element.command_type != "Query":
                 label = element.command_type
@@ -149,12 +171,18 @@ def display_graph(
                 if len(label) > 75:
                     label = label[:40] + "..." + label[-35:]
 
-            graph.node(str(element_index), label, pos=f"{column_index*3},-{element_index + 1}!", pin="true")
+            graph.node(
+                str(element_index),
+                label,
+                pos=f"{column_index*3},-{element_index + 1}!",
+                pin="true",
+            )
 
         for (current_index, _), (next_index, _) in zip(elements, elements[1:]):
             graph.edge(str(current_index), str(next_index))
 
     graph.render(filename=render_path, cleanup=True, view=show)
+
 
 def main():
     command_parts = [
@@ -174,7 +202,11 @@ def main():
     )
     result = run_proc.stdout.decode("utf-8")
 
-    rows = [[dehexed(part) for part in line.split('\t')] for line in reversed(result.split("\n")[1:]) if line]
+    rows = [
+        [dehexed(part) for part in line.split("\t")]
+        for line in reversed(result.split("\n")[1:])
+        if line
+    ]
     display_rows(rows)
 
     display_graph([Entry(*row) for row in rows], show=True)
