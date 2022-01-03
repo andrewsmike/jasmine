@@ -18,6 +18,8 @@ from random import choices
 from string import ascii_letters, digits
 from typing import Any
 
+from dataclasses_json import dataclass_json
+
 from jasmine.sql.transforms.escaping import (
     escaped,
     escaped_column_list,
@@ -80,6 +82,8 @@ class ForeignKey:
         )
 
 
+# Recursive to_json, from_json methods.
+@dataclass_json
 @dataclass
 class TableSpec:
     """
@@ -90,7 +94,29 @@ class TableSpec:
     - Comments
     - Anything you don't see in the below list.
 
-    Tests can be found in in the `jasmine.etl.backends` module.
+    More tests can be found in in the `jasmine.etl.backends` module.
+
+    Serialization:
+    >>> from json import loads
+    >>> from pprint import pprint
+
+    >>> pprint(loads(example_table_spec.to_json()))
+    {'column_names': ['user_id', 'name', 'parent_user_id'],
+     'column_type_decls': {'name': 'VARCHAR(96) NOT NULL',
+                           'parent_user_id': 'BIGINT',
+                           'user_id': 'INTEGER NOT NULL'},
+     'foreign_keys': [{'dest_columns': ['user_id'],
+                       'dest_db_name': 'main',
+                       'dest_table_name': 'users " ',
+                       'name': None,
+                       'source_columns': ['parent_user_id']}],
+     'indices': {'org_name': ['parent_user_id', 'name']},
+     'primary_key': ['user_id'],
+     'unique_indices': {'unique_key_0': ['name'],
+                        'unique_key_1': ['parent_user_id']}}
+
+    >>> example_table_spec == TableSpec.from_json(example_table_spec.to_json())
+    True
     """
 
     column_names: list[str]
