@@ -714,14 +714,26 @@ class PrettyPrintVisitor:
         if node.symbol.type == SQLParser.EOF:
             return ""
 
+        is_symbol = node.symbol.type not in (
+            SQLParser.SINGLE_QUOTED_TEXT,
+            SQLParser.DOUBLE_QUOTED_TEXT,
+            SQLParser.BACK_TICK_QUOTED_ID,
+        )
+
         left_comment = getattr(node, "before_comments_str", "").strip()
         token_text = node.getText().strip()
         right_comment = getattr(node, "after_comments_str", "").strip()
 
+        if is_symbol:
+            token_text = token_text.upper()
+
         if left_comment:
             left_comment = left_comment + self.indent.newline_indent()
         if right_comment:
-            right_comment = f"  {right_comment}"
+            if "--" in right_comment:
+                right_comment = f"  {right_comment}" + self.indent.newline_indent()
+            else:
+                right_comment = f"  {right_comment}"
 
         return f"{left_comment}{token_text}{right_comment}"
 
