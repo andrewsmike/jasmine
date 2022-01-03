@@ -7,3 +7,6 @@ SELECT /* bleeeeh */ GROUP_CONCAT(DISTINCT a, b, c * 4 ORDER BY blah ASC, blih A
 /* UDF stuff: */
 SELECT MY_FUNC(a, b); /* blah */ /* bleh */
  /* bcdefghihuteaouhteoanuhaoeuhetoanunaeohsueaohtnuhaeotnhu */
+
+SELECT -- hello
+    my_fav;
