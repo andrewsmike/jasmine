@@ -39,21 +39,10 @@ from jasmine.sql.ast_nodes import (
     SqlProgram,
     UnionNode,
     sql_ast,
+    sql_subexpr_ast,
 )
-from jasmine.sql.parser.sql import sql_parser_from_str, sql_tree_from_file
+from jasmine.sql.parser.sql import sql_tree_from_file
 from jasmine.sql.pretty_print import pretty_printed_sql_ast
-
-
-def sql_subexpr_ast(sql_subexpr: str, expr_type_str: str):
-    parser = sql_parser_from_str(sql_subexpr)
-
-    # Prepare to parse a particular grammatical rule.
-    # TODO: This didn't throw an error when it should have.
-    parse_func = getattr(parser, expr_type_str)
-
-    parse_tree = parse_func()
-
-    return sql_ast(parse_tree)
 
 
 def parse_tree_node(
@@ -81,26 +70,17 @@ def passthrough_transformation(
         case SqlProgram():
             return replace(
                 node,
-                queries=[
-                    transform_func(query)
-                    for query in node.queries
-                ],
+                queries=[transform_func(query) for query in node.queries],
             )
 
         case UnionNode():
             return replace(
                 node,
-                subqueries=[
-                    transform_func(subquery)
-                    for subquery in node.subqueries
-                ],
+                subqueries=[transform_func(subquery) for subquery in node.subqueries],
             )
 
         case CTEOrderLimitNode():
-            return replace(
-                node,
-                subquery=transform_func(node.subquery)
-            )
+            return replace(node, subquery=transform_func(node.subquery))
 
         case QuerySpecNode():
             return node
@@ -130,7 +110,9 @@ def with_constrained_column_values(
                         parse_tree_node(
                             f"{{select_column}} = {column_value_str}",
                             parse_node_type_str="expr",
-                            select_column=node.select_exprs[select_column_index].expr,  # TODO: Assert no stars
+                            select_column=node.select_exprs[
+                                select_column_index
+                            ].expr,  # TODO: Assert no stars
                         )
                         for select_column_index, column_value_str in select_column_criteria.items()
                     ]
@@ -140,7 +122,10 @@ def with_constrained_column_values(
         case _:
             return passthrough_transformation(
                 node,
-                partial(with_constrained_column_values, select_column_criteria=select_column_criteria),
+                partial(
+                    with_constrained_column_values,
+                    select_column_criteria=select_column_criteria,
+                ),
             )
 
 
@@ -155,7 +140,8 @@ def with_constrained_updated_ts(
             return replace(
                 node,
                 where_clauses=(
-                    (node.where_clauses or []) + [
+                    (node.where_clauses or [])
+                    + [
                         parse_tree_node(
                             f"{updated_ts_column} > {min_timestamp}",
                             parse_node_type_str="expr",
@@ -167,7 +153,11 @@ def with_constrained_updated_ts(
         case _:
             return passthrough_transformation(
                 node,
-                partial(with_constrained_updated_ts, updated_ts_column=updated_ts_column, min_timestamp=min_timestamp),
+                partial(
+                    with_constrained_updated_ts,
+                    updated_ts_column=updated_ts_column,
+                    min_timestamp=min_timestamp,
+                ),
             )
 
 

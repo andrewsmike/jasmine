@@ -122,6 +122,7 @@ from jasmine.sql.ast_nodes import (
     ASTNode,
     CTEOrderLimitNode,
     CTESubqueryNode,
+    Identifier,
     JoinSpec,
     MockNode,
     OrderExpr,
@@ -132,6 +133,7 @@ from jasmine.sql.ast_nodes import (
     TableJoin,
     TableRef,
     UnionNode,
+    escaped_identifier,
     matching_nodes,
     sql_ast,
     sql_ast_repr,
@@ -887,6 +889,14 @@ class PrettyPrintVisitor:
             use_commas=True,
         )
 
+    @pretty_print_inline.register
+    @pretty_print_multiline.register
+    def pretty_print_identifier_multiline(
+        self,
+        node: Identifier,
+    ) -> str:
+        return escaped_identifier(node.text)
+
     # Multiple SELECT statements per line looks wrong, even when short.
     @pretty_print_inline.register
     @pretty_print_multiline.register
@@ -921,7 +931,11 @@ class PrettyPrintVisitor:
         self,
         node: TableRef,
     ) -> str:
-        return node.ref
+        return ".".join(
+            escaped_identifier(part)
+            for part in [node.db_name, node.table_name]
+            if part is not None
+        )
 
     @pretty_print_inline.register
     @pretty_print_multiline.register
@@ -933,7 +947,7 @@ class PrettyPrintVisitor:
             return self.pretty_print_inline(node.star_table) + ".*"
         elif node.select_expr_type == "expr":
             suffix = (
-                f" AS {self.pretty_print(node.expr_alias)}"
+                f" AS {escaped_identifier(node.expr_alias)}"
                 if node.expr_alias is not None
                 else ""
             )
@@ -1067,7 +1081,13 @@ class PrettyPrintVisitor:
         line = node.name
 
         if node.column_names is not None:
-            line += " (" + ", ".join(node.column_names) + ")"
+            line += (
+                " ("
+                + ", ".join(
+                    escaped_identifier(column_name) for column_name in node.column_names
+                )
+                + ")"
+            )
 
         line += " AS "
 

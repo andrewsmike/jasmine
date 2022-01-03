@@ -7,6 +7,7 @@ from typing import Callable, Iterable, List, Optional, Tuple
 from antlr4.CommonTokenStream import CommonTokenStream
 from antlr4.FileStream import FileStream
 from antlr4.InputStream import InputStream
+from antlr4.Token import Token
 from antlr4.error.ErrorListener import ErrorListener
 from antlr4.tree.Tree import ParseTree
 from antlr4.tree.Trees import Trees
@@ -57,6 +58,11 @@ def sql_parser_from_str(expr: str) -> SQLParser:
     parser.addErrorListener(AbortSyntaxErrorListener())
 
     return parser
+
+
+def sql_raw_token_from_str(expr: str) -> Token:
+    lexer = SQLLexer(InputStream(expr))
+    return lexer.nextToken()
 
 
 def sql_tree_from_stream(input_stream: InputStream) -> ParseTree:

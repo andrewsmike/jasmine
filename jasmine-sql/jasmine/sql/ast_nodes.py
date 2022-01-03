@@ -12,7 +12,7 @@ representations (sql_parse_tree_node_type) and singledispatch'd sql_ast submetho
 from dataclasses import dataclass, fields
 from functools import singledispatch
 from pprint import pformat
-from typing import Iterator, Literal, Optional, Type
+from typing import Iterator, Literal, Optional, Type, TypeAlias, cast
 
 from antlr4.ParserRuleContext import ParserRuleContext
 from antlr4.tree.Tree import TerminalNodeImpl
@@ -21,6 +21,7 @@ from jasmine.sql.parser.sql import (
     ParseTree,
     SQLParser,
     children_contexts,
+    sql_parser_from_str,
     sql_tree_from_file,
     sql_tree_from_str,
 )
@@ -68,7 +69,7 @@ class ParseTreeNode(ASTNode):
 
 
 ParserSymbol = int
-ASTNodePattern = Type[ASTNode] | Type[ParserRuleContext] | ParserSymbol
+ASTNodePattern: TypeAlias = ParserSymbol | Type[ASTNode | ParserRuleContext]
 
 
 def node_matches(node: ASTNode, node_pattern: ASTNodePattern) -> bool:
@@ -117,15 +118,80 @@ class SqlProgram(ASTNode):
 
 
 @dataclass
+class Identifier(ASTNode):
+    """
+    Identifier of any type.
+
+    Please use `sql_ast(ident_node).text` to extract (unescaped) identifier text.
+    All other methods will _not_ correctly unescape the text.
+    """
+
+    text: str
+
+    def __post_init__(self):
+        assert (
+            "`" not in self.text
+        ), f"Cannot handle symbols with backticks in them: `{self.text}`"
+
+
+def ident_text(identifier: SQLParser.IdentifierContext) -> str:
+    ident = sql_ast(identifier)
+    assert isinstance(ident, Identifier)
+    return ident.text
+
+
+def escaped_identifier(text: str):
+    if identifier_needs_escaping(text):
+        return "`" + text + "`"
+    else:
+        return text
+
+
+_ident_needs_escaping_cache = {}
+
+
+def identifier_needs_escaping(text):
+    """
+    Slightly slow, but absolutely correct determination if a given symbol _must_ be escaped.
+    Necessary when you might be generating column names that could be a reserved keyword.
+
+    >>> identifier_needs_escaping("my_column")
+    False
+    >>> identifier_needs_escaping("my_column3424")
+    False
+
+    >>> identifier_needs_escaping("my column with spaces")
+    True
+    >>> identifier_needs_escaping("mycolumn;")
+    True
+    >>> identifier_needs_escaping("SELECT")
+    True
+    >>> identifier_needs_escaping("my_column.blah")
+    True
+    >>> identifier_needs_escaping("UPDATE")
+    True
+    """
+    # TODO: Replace with custom caching decorator?
+    global _ident_needs_escaping_cache
+
+    if text not in _ident_needs_escaping_cache:
+        try:
+            sql_subexpr_ast(text, "identifier")
+            _ident_needs_escaping_cache[text] = False
+        except Exception as e:
+            _ident_needs_escaping_cache[text] = True
+
+    return _ident_needs_escaping_cache[text]
+
+
+@dataclass
 class TableRef(ASTNode):
     """
-    Doesn't currently resolve anything / unquote escaped identifiers / etc.
-    See SelectExpr for tests / examples.
-
-    TODO: Smarter format.
+    Reference to a table.
     """
 
-    ref: str
+    db_name: str | None
+    table_name: str
 
 
 @dataclass
@@ -145,7 +211,7 @@ class SelectExpr(ASTNode):
 
     >>> print(sql_ast_repr("SELECT my_table.*"))
     {'queries': [{'select_exprs': [{'select_expr_type': 'table_star',
-                                    'star_table': {'ref': 'my_table',
+                                    'star_table': {'table_name': 'my_table',
                                                    'type': 'TableRef'},
                                     'type': 'SelectExpr'}],
                   'type': 'QuerySpecNode'}],
@@ -153,7 +219,7 @@ class SelectExpr(ASTNode):
 
     >>> print(sql_ast_repr("SELECT `my_table`.*"))
     {'queries': [{'select_exprs': [{'select_expr_type': 'table_star',
-                                    'star_table': {'ref': '`my_table`',
+                                    'star_table': {'table_name': 'my_table',
                                                    'type': 'TableRef'},
                                     'type': 'SelectExpr'}],
                   'type': 'QuerySpecNode'}],
@@ -556,11 +622,18 @@ class CTEOrderLimitNode(ASTNode):
 
 
 @singledispatch
-def sql_ast(parse_tree: None) -> ASTNode:
+def sql_ast(parse_tree, **kwargs) -> ASTNode:
     """
     The AST corresponding to the given parse tree.
     """
-    return None
+    raise NotImplementedError()
+
+
+def nullable_sql_ast(parse_tree, **kwargs) -> ASTNode | None:
+    if parse_tree is None:
+        return parse_tree
+    else:
+        return sql_ast(parse_tree, **kwargs)
 
 
 @sql_ast.register
@@ -612,25 +685,33 @@ def query_expression_sql_ast(parse_tree: SQLParser.QueryExpressionContext) -> AS
         parse_tree.procedureAnalyseClause() is None
     ), "PROCEDURE ANALYZE is not supported."
 
-    cte_subqueries = None
+    cte_subqueries: list[CTESubqueryNode] | None = None
     if parse_tree.withClause():
         with_recursive = parse_tree.withClause().RECURSIVE_SYMBOL() is not None
 
-        cte_subqueries = [
-            sql_ast(common_table_expr, allow_recursion=with_recursive)
-            for common_table_expr in children_contexts(
-                parse_tree.withClause().commonTableExpression
-            )
-        ]
+        # For MyPy.
+        cte_subqueries = cast(
+            list[CTESubqueryNode] | None,
+            [
+                sql_ast(common_table_expr, allow_recursion=with_recursive)
+                for common_table_expr in children_contexts(
+                    parse_tree.withClause().commonTableExpression
+                )
+            ],
+        )
 
     order_by_clauses = None
     if parse_tree.orderClause() is not None:
-        order_by_clauses = [
-            sql_ast(child)
-            for child in children_contexts(
-                parse_tree.orderClause().orderList().orderExpression
-            )
-        ]
+        # For MyPy.
+        order_by_clauses = cast(
+            list[OrderExpr] | None,
+            [
+                sql_ast(child)
+                for child in children_contexts(
+                    parse_tree.orderClause().orderList().orderExpression
+                )
+            ],
+        )
 
     limit_options = None
     if parse_tree.limitClause() is not None:
@@ -658,12 +739,12 @@ def common_table_expr_sql_ast(
     parse_tree: SQLParser.CommonTableExpressionContext,
     allow_recursion: bool = False,
 ) -> ASTNode:
-    name = parse_tree.identifier().getText()
+    name = ident_text(parse_tree.identifier())
 
     column_names = None
     if parse_tree.columnInternalRefList() is not None:
         column_names = [
-            column_ref.getText()
+            ident_text(column_ref.identifier())
             for column_ref in children_contexts(
                 parse_tree.columnInternalRefList().columnInternalRef
             )
@@ -698,14 +779,56 @@ def query_expression_parens_sql_ast(
 
 
 @sql_ast.register
+def identifier_sql_ast(parse_tree: SQLParser.IdentifierContext) -> ASTNode:
+    if parse_tree.pureIdentifier() is not None:
+        pure_ident = parse_tree.pureIdentifier()
+        if pure_ident.DOUBLE_QUOTED_TEXT() is not None:
+            raise NotImplementedError("Cannot parse double quoted text identifiers.")
+        elif pure_ident.IDENTIFIER() is not None:
+            text = pure_ident.IDENTIFIER().getText()
+            escaped = False
+        elif pure_ident.BACK_TICK_QUOTED_ID() is not None:
+            text = pure_ident.BACK_TICK_QUOTED_ID().getText()
+            assert text.startswith("`") and text.endswith("`")
+            text = text[1:-1]
+            escaped = True
+        else:
+            raise ValueError(f"Unknown pure identifier type: {pure_ident}")
+
+    elif parse_tree.identifierKeyword() is not None:
+        text = parse_tree.identifierKeyword().getText()
+        assert (not text.startswith('"')) and (
+            not text.startswith("`")
+        ), "Keyword identifier had unexpected backticks/quotation marks."
+        escaped = False
+
+    else:
+        raise ValueError(f"Unknown identifier type: {parse_tree}")
+
+    # If the parser says this doesn't need to be escaped, don't complain.
+    # Add it to the cache so we don't have to perform the expensive check later.
+    if not escaped:
+        _ident_needs_escaping_cache[text] = False
+
+    return Identifier(text=text)
+
+
+@sql_ast.register
 def table_wild_sql_ast(parse_tree: SQLParser.TableWildContext) -> ASTNode:
 
-    name = ".".join(
-        ref_path_part.getText()
-        for ref_path_part in children_contexts(parse_tree.identifier)
-    )
+    path_parts = [
+        ident_text(path_part_identifier)
+        for path_part_identifier in children_contexts(parse_tree.identifier)
+    ]
+    if len(path_parts) == 2:
+        db_name, table_name = path_parts
+    elif len(path_parts) == 1:
+        (table_name,) = path_parts
+        db_name = None
+    else:
+        raise ValueError("Parsing error: TableWildContext somehow had two identifiers.")
 
-    return TableRef(ref=name)
+    return TableRef(db_name=db_name, table_name=table_name)
 
 
 def sql_ast_identifiers_from_list(
@@ -717,7 +840,7 @@ def sql_ast_identifiers_from_list(
     ]
 
 
-JoinTreeNodeContext = (
+JoinTreeNodeContext: TypeAlias = (
     SQLParser.TableReferenceListContext
     | SQLParser.TableReferenceContext
     | SQLParser.JoinedTableContext
@@ -970,7 +1093,7 @@ def query_spec_sql_ast(parse_tree: SQLParser.QuerySpecificationContext) -> ASTNo
     assert parse_tree.selectItemList() is not None
     node_select_exprs = select_exprs(parse_tree.selectItemList())
 
-    from_clause = sql_ast(parse_tree.fromClause())
+    from_clause = nullable_sql_ast(parse_tree.fromClause())
 
     where_clauses = []
     if parse_tree.whereClause() is not None:
@@ -984,7 +1107,7 @@ def query_spec_sql_ast(parse_tree: SQLParser.QuerySpecificationContext) -> ASTNo
         # The grammar hackily reuses the orderList construct for group-bys.
         # This function asserts they don't have directions.
         group_by_exprs = sql_ast_exprs_from_orderless_list(group_by_clause.orderList())
-        olap_options = sql_ast(group_by_clause.olapOption())
+        olap_options = nullable_sql_ast(group_by_clause.olapOption())
 
     having_clauses = []
     if parse_tree.havingClause() is not None:
@@ -993,13 +1116,13 @@ def query_spec_sql_ast(parse_tree: SQLParser.QuerySpecificationContext) -> ASTNo
     return QuerySpecNode(
         select_options=select_options,
         select_exprs=node_select_exprs,
-        into_clause=sql_ast(parse_tree.intoClause()),
+        into_clause=nullable_sql_ast(parse_tree.intoClause()),
         from_clause=from_clause,
         where_clauses=where_clauses,
         group_by_exprs=group_by_exprs,
         olap_options=olap_options,
         having_clauses=having_clauses,
-        window_clause=sql_ast(parse_tree.windowClause()),
+        window_clause=nullable_sql_ast(parse_tree.windowClause()),
     )
 
 
@@ -1097,7 +1220,7 @@ def select_item_sql_ast(parse_tree: SQLParser.SelectItemContext) -> ASTNode:
         return SelectExpr(
             select_expr_type="expr",
             expr=sql_ast(parse_tree.expr()),
-            expr_alias=sql_ast(alias),
+            expr_alias=ident_text(alias) if alias is not None else None,
         )
 
 
@@ -1170,6 +1293,34 @@ def sql_ast_from_file(query_path: str) -> ASTNode:
 
 def sql_ast_from_str(query: str) -> ASTNode:
     return sql_ast(sql_tree_from_str(query))
+
+
+def sql_subexpr_ast(sql_subexpr: str, expr_type_str: str):
+    """
+    Parse out an ASTNode of the given expression type from an input string.
+    This is useful for constructing raw ParseTree arguments when manipulating ASTs,
+    (esp. in dealing with expressions.)
+
+    It may be on the slower side, as it is invoking the parser under the hood.
+    """
+    parser = sql_parser_from_str(sql_subexpr)
+
+    # Prepare to parse a particular grammatical rule.
+    # TODO: This didn't throw an error when it should have.
+    parse_func = getattr(parser, expr_type_str)
+
+    parse_tree = parse_func()
+
+    tokens = parser._input.tokens
+    assert tokens[-1].type == SQLParser.EOF, "Failed to parse entire subexpression."
+    tokens = tokens[:-1]
+
+    last_parsed_token = tokens.index(parse_tree.stop)
+    assert not any(
+        token.channel == 0 for token in tokens[last_parsed_token + 1 :]
+    ), "Failed to parse entire subexpression."
+
+    return sql_ast(parse_tree)
 
 
 # TODO:
