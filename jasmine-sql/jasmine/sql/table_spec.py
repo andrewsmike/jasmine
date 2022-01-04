@@ -448,12 +448,17 @@ def create_staging_table_statement(
     )
 
 
-def idempotent_drop_table_statement(
+def drop_table_statement(
     db_name: str,
     table_name: str,
+    idempotent: bool = True,
 ) -> str:
     """
-    >>> print(idempotent_drop_table_statement("main", 'users " '))
+    >>> print(drop_table_statement("main", 'users " '))
     DROP TABLE IF EXISTS `main`.`users " `;
+
+    >>> print(drop_table_statement("main", 'users " ', idempotent=False))
+    DROP TABLE `main`.`users " `;
     """
-    return f"DROP TABLE IF EXISTS {escaped_db_table(db_name, table_name)};"
+    idempotent_str = "IF EXISTS " if idempotent else ""
+    return f"DROP TABLE {idempotent_str}{escaped_db_table(db_name, table_name)};"

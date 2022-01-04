@@ -22,6 +22,7 @@ Initial tests:
 - Breaking out a recursive query into multiple CTEs
 - Combining a view tree into a single CTE-based expr
 - Renaming columns
+- Add denormalization, normalization (add JOIN, change SELECT.)
 """
 from dataclasses import replace
 from datetime import datetime, timedelta
