@@ -25,9 +25,7 @@ Initial tests:
 - Add denormalization, normalization (add JOIN, change SELECT.)
 """
 from dataclasses import replace
-from datetime import datetime, timedelta
 from functools import partial
-from math import floor
 from os.path import dirname, join
 from sys import argv
 from typing import Callable
@@ -46,27 +44,26 @@ from jasmine.sql.parser.sql import sql_tree_from_file
 from jasmine.sql.pretty_print import pretty_printed_sql_ast
 
 
-def parse_tree_node(
-    template_str: str,
-    parse_node_type_str: str,
-    **keyword_format_args,
-):
-    rendered_sql_subexpr = template_str.format(
-        **{
-            keyword: pretty_printed_sql_ast(format_arg)
-            for keyword, format_arg in keyword_format_args.items()
-        }
-    )
-
-    result = sql_subexpr_ast(rendered_sql_subexpr, parse_node_type_str)
-
-    return result
-
-
 def passthrough_transformation(
     node: ASTNode,
     transform_func: Callable,
 ) -> ASTNode:
+    """
+    When writing transformations, we typically want to recurse down the top-level structure of a query.
+    These may or may not block, manipulate, or be the end-point for a given transformation.
+
+    To handle this, have transformations 'inherit' from this base passthrough transformation using matching.
+
+    IE, if your transformation only cares about QuerySpecNodes, and passes through UNIONs / etc, do the following:
+    ```
+    def my_transform(node, ...):
+        match node:
+            case QuerySpecNode(...):
+                ...
+            case _:
+                return passthrough_transformation(node, partial(my_transformation, ...))
+    ```
+    """
     match node:
         case SqlProgram():
             return replace(
@@ -93,8 +90,31 @@ def passthrough_transformation(
 def with_constrained_column_values(
     node: ASTNode,
     select_column_criteria: dict[int, str],
+    constraint_template: str = "{select_column} = {criteria_expr}",
 ) -> ASTNode:
+    """
+    Add 'WHERE <col> = <expr>' clauses to a set of output columns, identified by their zero-indexed position.
 
+    Expressions are unquoted; you can put anything in there. Be careful to escape things properly.
+
+    You can specify other constraints (`>=`, `!=`, `IFNULL(..., ) = `, etc) by passing in a constraint_template.
+    This setup is a bit limited, and should be genericized in the future.
+
+    >>> from jasmine.sql.ast_nodes import sql_ast_from_str
+    >>> from jasmine.sql.pretty_print import pretty_printed_sql_ast
+
+    >>> query = sql_ast_from_str("SELECT a.id, a.value + b.value FROM a JOIN b WHERE a.id > 0")
+    >>> constrained_query = with_constrained_column_values(
+    ...     query,
+    ...     select_column_criteria={1: "1"},
+    ...     constraint_template="{select_column} >= {criteria_expr}",
+    ... )
+    >>> print(pretty_printed_sql_ast(constrained_query))
+    SELECT a.id, a.value + b.value
+      FROM a
+     INNER JOIN b
+     WHERE a.id > 0 AND (a.value + b.value) >= 1;
+    """
     match node:
         case QuerySpecNode():
             assert all(
@@ -108,14 +128,18 @@ def with_constrained_column_values(
                 where_clauses=(
                     (node.where_clauses or [])
                     + [
-                        parse_tree_node(
-                            f"{{select_column}} = {column_value_str}",
-                            parse_node_type_str="expr",
-                            select_column=node.select_exprs[
-                                select_column_index
-                            ].expr,  # TODO: Assert no stars
+                        sql_subexpr_ast(
+                            constraint_template.format(
+                                select_column="("
+                                + pretty_printed_sql_ast(
+                                    node.select_exprs[select_column_index].expr
+                                )
+                                + ")",
+                                criteria_expr=criteria_expr_str,
+                            ),
+                            "expr",
                         )
-                        for select_column_index, column_value_str in select_column_criteria.items()
+                        for select_column_index, criteria_expr_str in select_column_criteria.items()
                     ]
                 ),
             )
@@ -126,38 +150,7 @@ def with_constrained_column_values(
                 partial(
                     with_constrained_column_values,
                     select_column_criteria=select_column_criteria,
-                ),
-            )
-
-
-def with_constrained_updated_ts(
-    node: ASTNode,
-    updated_ts_column: str,
-    min_timestamp: int,
-) -> ASTNode:
-    match node:
-        case QuerySpecNode():
-
-            return replace(
-                node,
-                where_clauses=(
-                    (node.where_clauses or [])
-                    + [
-                        parse_tree_node(
-                            f"{updated_ts_column} > {min_timestamp}",
-                            parse_node_type_str="expr",
-                        )
-                    ]
-                ),
-            )
-
-        case _:
-            return passthrough_transformation(
-                node,
-                partial(
-                    with_constrained_updated_ts,
-                    updated_ts_column=updated_ts_column,
-                    min_timestamp=min_timestamp,
+                    constraint_template=constraint_template,
                 ),
             )
 
@@ -181,16 +174,6 @@ def display_transformed_query():
             1: '"My company"',
             2: '"dev"',
         },
-    )
-
-    print("After constrained_column transformation:")
-    print(pretty_printed_sql_ast(transformed_query))
-    print()
-
-    transformed_query = with_constrained_updated_ts(
-        query,
-        updated_ts_column="my_table.updated_ts",
-        min_timestamp=floor((datetime.now() - timedelta(hours=6)).timestamp()),
     )
 
     print("After constrained_column transformation:")
