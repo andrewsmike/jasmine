@@ -13,7 +13,7 @@ TODO:
         # mysql_default_charset="utf8mb4",
         # mysql_engine="InnoDB",
 """
-from dataclasses import dataclass, replace
+from dataclasses import dataclass, field, replace
 from random import choices
 from string import ascii_letters, digits
 from typing import Any
@@ -56,6 +56,11 @@ class ForeignKey:
 
     source_columns: list[str]
     dest_columns: list[str]
+
+    def __post_init__(self):
+        assert len(self.source_columns) == len(
+            self.dest_columns
+        ), "Foreign keys must have the same number of source and target columns."
 
     @classmethod
     def from_info(cls, foreign_key_info):
@@ -119,14 +124,73 @@ class TableSpec:
     True
     """
 
-    column_names: list[str]
-    column_type_decls: dict[str, str]
+    column_names: list[str] = field(default_factory=list)
+    column_type_decls: dict[str, str] = field(default_factory=dict)
 
-    primary_key: list[str]
-    indices: dict[str, list[str]]
-    unique_indices: dict[str, list[str]]
+    primary_key: list[str] = field(default_factory=list)
+    indices: dict[str, list[str]] = field(default_factory=dict)
+    unique_indices: dict[str, list[str]] = field(default_factory=dict)
 
-    foreign_keys: list[ForeignKey]
+    foreign_keys: list[ForeignKey] = field(default_factory=list)
+
+    def __post_init__(self):
+        """
+        Validate everything.
+
+        Note: Does not validate everything, IE name length > accepted by database.
+
+        >>> from pprint import pprint
+
+        Example correct usage:
+        >>> pprint(TableSpec(column_names=["a", "b"], column_type_decls={"a": "int", "b": "int"}, primary_key=["a"]))
+        TableSpec(column_names=['a', 'b'],
+                  column_type_decls={'a': 'int', 'b': 'int'},
+                  primary_key=['a'],
+                  indices={},
+                  unique_indices={},
+                  foreign_keys=[])
+
+        Various errors:
+        >>> TableSpec(column_names=[])
+        Traceback (most recent call last):
+          ...
+        AssertionError: Table spec must have at least one column...
+
+        You must remember to type your columns:
+        >>> TableSpec(column_names=["a"])
+        Traceback (most recent call last):
+          ...
+        AssertionError: Column(s) not provided with a type declaration: {'a'}...
+
+
+        >>> TableSpec(column_names=["a"], column_type_decls={"a": "int"}, primary_key=["b"])
+        Traceback (most recent call last):
+          ...
+        AssertionError: Key ['b'] asking for unknown column(s) {'b'}...
+
+        >>> TableSpec(column_names=["a"], column_type_decls={"a": "int"}, unique_indices={"blah": ["a", "b"]})
+        Traceback (most recent call last):
+          ...
+        AssertionError: Key ['a', 'b'] asking for unknown column(s) {'b'}...
+        """
+        assert len(self.column_names) >= 1, "Table spec must have at least one column."
+
+        untyped_columns = set(self.column_names) - set(self.column_type_decls.keys())
+        assert (
+            not untyped_columns
+        ), f"Column(s) not provided with a type declaration: {untyped_columns}"
+
+        keys = (
+            [self.primary_key]
+            + list(self.unique_indices.values())
+            + list(self.indices.values())
+            + list(foreign_key.source_columns for foreign_key in self.foreign_keys)
+        )
+        for key in keys:
+            unknown_columns = set(key) - set(self.column_names)
+            assert (
+                not unknown_columns
+            ), f"Key {key} asking for unknown column(s) {unknown_columns}"
 
     @classmethod
     def from_sqla_inspector(cls, inspector, db_name: str, table_name: str):
