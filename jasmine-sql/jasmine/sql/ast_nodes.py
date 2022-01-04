@@ -6,8 +6,7 @@ These are representations of various SQL expressions (SELECT queries, UNIONs, or
 ASTs discard irrelevant grammatical constructs / separations and convert everything
 to more standard python types.
 
-The sql_ast() function visits ParseTrees and encodes them as AST nodes using the list of available
-representations (sql_parse_tree_node_type) and singledispatch'd sql_ast submethods.
+The sql_ast() function visits ParseTrees and encodes them as AST nodes using the  singledispatch'd sql_ast submethods.
 """
 from dataclasses import dataclass, fields
 from functools import singledispatch
