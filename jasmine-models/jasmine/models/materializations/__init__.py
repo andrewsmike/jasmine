@@ -4,6 +4,7 @@ from jasmine.models.materializations.base import (
     materialization_types,
 )
 from jasmine.models.materializations.history_table import HistoryTableMaterialization
+from jasmine.models.materializations.upsert import UpsertMaterialization
 from jasmine.models.materializations.view import ViewMaterialization
 from jasmine.models.project_models import View
 
@@ -16,8 +17,9 @@ __all__ = [
 ]
 
 materialization_type = {
-    "view": ViewMaterialization,
     "history_table": HistoryTableMaterialization,
+    "view": ViewMaterialization,
+    "upsert": UpsertMaterialization,
 }
 
 
