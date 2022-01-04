@@ -7,6 +7,10 @@ Jasmine Web: Putting the 'T' in 'ETL'.
 Jasmine Web is a web-app and backend service that automatically translates your SQL queries into optimized ETL patterns.
 Jasmine is uses a variety of ETL strategies, along with a SQL manipulation library, to make your analyses easy, near-realtime, and performant.
 
+Screenshots
+===========
+![Jasmine Web UI](https://github.com/andrewsmike/jasmine/blob/main/screenshots/main_edit_view.png?raw=true)
+
 Setting up
 ==========
 - Run `for PROJECT in webserver models sql etl; do pushd jasmine-$PROJECT && pip install -e '.[dev]' && popd`.
@@ -69,14 +73,19 @@ How do I add an ETL / materialization?
 ======================================
 
 ETL patterns, or materializations, have multiple components:
-- `jasmine-sql/jasmine/sql/transforms/{etl}.py`: SQL manipulations and analyses used by the ETL.
+- `jasmine-sql/jasmine/sql/transforms/{etl}.py`: SQL manipulations and yanalyses used by the ETL.
 - `jasmine-etl/jasmine/etl/materializations/{etl}.py`: ETL backend database interaction logic, event handling, and scheduling.
 - `jasmine-models/jasmine/models/materializations/{etl}.py`: Database model and state-machine logical description.
+- `jasmine-models/jasmine/models/materializations/__init__.py`: Registration for database model and state machine logical description.
 
-Between these files, the statefullness and correctness properties, scheduling semantics, available events, backend interactions, SQL analysis, and SQL generation logic are handled for every ETL pattern.y
+Between these files, the statefullness and correctness properties, scheduling semantics, available events, backend interactions, SQL analysis, and SQL generation logic are handled for every ETL pattern.
 The borders can be a bit fuzzy; the exact setup here may evolve.
 
 To add a materialization, you'll also have to add the materialization (and possibly view) type to the appropriate schemas, and add appropriate references to the new objects through the __init__ hierarchy above as necessary.
+
+There are a variety of helpful utility modules throughout jasmine-sql and jasmine-etl.
+I recommend you read over existing ETLs and investigate any used modules to get a sense for what tools are available.
+Examples include `jasmine.etl.ddl_tools`, `jasmine.etl.backends`, `jasmine.sql.table_spec`, `jasmine.sql.analysis`, and more.
 
 
 How do I run a celery task manually?
