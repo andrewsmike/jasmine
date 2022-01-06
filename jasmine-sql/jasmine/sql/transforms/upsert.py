@@ -29,8 +29,8 @@ def upsert_into_statement(db_name, table_name, query_text, column_names=None):
     ... ))
     INSERT INTO `my_db`.`my_table ' uea$3}` (`1 + 4`, `a`)
     SELECT 1 + 4, my_other_table.a FROM my_other_table WHERE 4
-    ON DUPLICATE KEY UPDATE `1 + 4` = VALUES(`1 + 4`),
-                            `a` = VALUES(`a`);
+        ON DUPLICATE KEY UPDATE `1 + 4` = VALUES(`1 + 4`),
+                                `a` = VALUES(`a`);
     """
     if column_names is None:
         column_names = query_column_names(sql_ast_from_str(query_text))
@@ -40,8 +40,8 @@ def upsert_into_statement(db_name, table_name, query_text, column_names=None):
             [
                 f"INSERT INTO {escaped_db_table(db_name, table_name)} ({escaped_column_list(column_names)})",
                 query_text,
-                "ON DUPLICATE KEY UPDATE "
-                + ",\n                        ".join(
+                "    ON DUPLICATE KEY UPDATE "
+                + ",\n                            ".join(
                     f"{escaped(column_name)} = VALUES({escaped(column_name)})"
                     for column_name in column_names
                 ),
@@ -88,13 +88,14 @@ def update_upsert_statement(db_name, table_name, query_text, timestamp_column_na
       FROM a
      INNER JOIN b
         ON a.b_id = b.id
-     WHERE a.id != 3 AND (a.updated_ts) = {last_updated_ts_expr}
+     WHERE a.id != 3
+       AND (a.updated_ts) >= {last_updated_ts_expr}
      ORDER BY a.id ASC
-    ON DUPLICATE KEY UPDATE `id` = VALUES(`id`),
-                            `project` = VALUES(`project`),
-                            `'{{problematic_string}}'` = VALUES(`'{{problematic_string}}'`),
-                            `combined_count` = VALUES(`combined_count`),
-                            `timestamp` = VALUES(`timestamp`);
+        ON DUPLICATE KEY UPDATE `id` = VALUES(`id`),
+                                `project` = VALUES(`project`),
+                                `'{{problematic_string}}'` = VALUES(`'{{problematic_string}}'`),
+                                `combined_count` = VALUES(`combined_count`),
+                                `timestamp` = VALUES(`timestamp`);
     """
     query = sql_ast_from_str(query_text)
     if isinstance(query, SqlProgram):
@@ -104,7 +105,7 @@ def update_upsert_statement(db_name, table_name, query_text, timestamp_column_na
     column_names = query_column_names(query)
 
     # Use placeholder expression, instead of the formatting argument, to sneak by grammatical correctness.
-    timestamp_value_placeholder = "'temporary_placeholder_pattern'"
+    timestamp_value_placeholder = "'temporary_placeholder_pattern_534324352'"
     if timestamp_value_placeholder in query_text:
         raise RuntimeError()
 
@@ -112,6 +113,7 @@ def update_upsert_statement(db_name, table_name, query_text, timestamp_column_na
     constrained_query = with_constrained_column_values(
         query,
         {timestamp_column_index: timestamp_value_placeholder},
+        constraint_template="{select_column} >= {criteria_expr}",
     )
     pretty_indented_select_query = pretty_printed_sql_ast(constrained_query)
 

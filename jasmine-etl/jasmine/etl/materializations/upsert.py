@@ -30,6 +30,7 @@ TODO:
 - How are ORDER BYs retained?
 - Alllll the JOIN issues
 """
+from datetime import datetime
 from math import floor
 from time import time
 
@@ -44,10 +45,13 @@ from jasmine.etl.materializations.etl_tools import (
     set_state_on_exception,
 )
 from jasmine.sql.analysis import is_readonly_query, query_column_names
-from jasmine.sql.table_spec import TableSpec, create_table_statement, drop_table_statement
-from jasmine.sql.transforms.upsert import (
-    update_upsert_statement,
+from jasmine.sql.ast_nodes import sql_ast_from_str
+from jasmine.sql.table_spec import (
+    TableSpec,
+    create_table_statement,
+    drop_table_statement,
 )
+from jasmine.sql.transforms.upsert import update_upsert_statement
 
 
 def upsert_resource_names(self):
@@ -69,24 +73,26 @@ def verify_upsert(self, session):
     view_sql = self.view.spec["query_text"]
     assert is_readonly_query(view_sql)
 
-    column_names = query_column_names(view_sql)
+    column_names = query_column_names(sql_ast_from_str(view_sql))
 
-    assert updated_ts_column_name in column_names
+    assert self.config["updated_ts_column_name"] in column_names
+    assert "jsmn_auto_id" not in column_names, "Cannot SELECT column with name auto_id."
 
+    start_timestamp = self.config.get("start_timestamp")
     if start_timestamp is None:
         start_timestamp = floor(time())
     assert isinstance(start_timestamp, int)
 
     table_spec = TableSpec(
-        column_names=["auto_id"] + column_names,
+        column_names=["jsmn_auto_id"] + column_names,
         column_type_decls={
-            **{"auto_id": "BIGINT NOT NULL AUTO_INCREMENT"},
-            **self.config["column_type_decls"]
+            **{"jsmn_auto_id": "BIGINT NOT NULL AUTO_INCREMENT"},
+            **self.config["column_type_decls"],
         },
-        primary_key="auto_id",
-        unique_indices=self.config["unique_keys"],
-        keys=self.config["keys"],
-    )
+        primary_key=["jsmn_auto_id"],
+        unique_indices=self.config.get("unique_keys", []),
+        indices=self.config.get("keys", []),
+    ).with_deduped_indices()
 
     self.context = {
         "high_water_mark": start_timestamp,
@@ -105,7 +111,7 @@ def create_upsert(self, session):
     create_upsert_sql = create_table_statement(
         db_name=self.db_name,
         table_name=self.table_name,
-        table_spec=TableSpec.from_json(self.context["table_spec"]),
+        table_spec=TableSpec.from_dict(self.context["table_spec"]),
         temporary=False,
         if_not_exists=False,
     )
@@ -155,14 +161,17 @@ def update_upsert(self, session):
 
     updated_ts_column_name = self.config["updated_ts_column_name"]
     update_upsert_sql = update_upsert_statement(
-        self.db_name, self.table_name, self.view.spec["query_text"], updated_ts_column_name,
+        self.db_name,
+        self.table_name,
+        self.view.spec["query_text"],
+        updated_ts_column_name,
     )
 
-    last_updated_ts = self.config["high_water_mark"]
+    last_updated_ts = self.context["high_water_mark"]
 
-    table_spec = TableSpec.from_json(self.context["table_spec"])
+    table_spec = TableSpec.from_dict(self.context["table_spec"])
 
-    timestamp_decl_str = table_spec["column_type_decls"][last_updated_ts_column_name].upper()
+    timestamp_decl_str = table_spec.column_type_decls[updated_ts_column_name].upper()
     if "INT" in timestamp_decl_str or "DECIMAL" in timestamp_decl_str:
         last_updated_ts_expr = last_updated_ts
     else:
@@ -171,15 +180,20 @@ def update_upsert(self, session):
             "postgres": f"TO_TIMESTAMP({last_updated_ts})",
         }[self.view.project.backend.backend_type]
 
+    update_upsert_materialization_sql = update_upsert_sql.format(
+        last_updated_ts_expr=last_updated_ts_expr,
+    )
+
+    end_timestamp = datetime.now().timestamp()
     with backend_conn(backend, readonly=False) as conn:
-        conn.execute(update_upsert_sql.format(
-            last_updated_ts_expr=last_updated_ts_expr,
-        ))
+        conn.execute(update_upsert_materialization_sql)
+
+    self.context["high_water_mark"] = end_timestamp
 
     return "active"
 
 
-view_event_funcs = {
+upsert_event_funcs = {
     "verify": verify_upsert,
     "create": create_upsert,
     "terminate": terminate_upsert,
