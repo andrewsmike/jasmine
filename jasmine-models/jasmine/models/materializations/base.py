@@ -68,6 +68,7 @@ from jasmine.models.model_registry import orm_registry
 materialization_types = [
     "view",
     "history_table",
+    "upsert",
 ]
 
 # Each subclass needs to define their own State / Event types.
@@ -142,9 +143,6 @@ class Materialization:
     @property
     def table_name(self) -> str:
         return f"{self.view.path}_{self.materialization_name}"
-
-    def update_context(self):
-        self.context = dict(self.context)
 
     def terminal(self):
         return self.state in self.state_machine_type.terminal_states

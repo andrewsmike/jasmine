@@ -107,7 +107,7 @@ class UpsertStateMachine(StateMachine[UpsertState, UpsertEvent]):
 
 @orm_registry.mapped
 class UpsertMaterialization(Materialization):
-    acceptable_upsert_types = {"query"}
+    acceptable_view_types = {"query"}
     state_machine_type: Type[StateMachine] = UpsertStateMachine
     materialization_name: str = "upsert"
 
