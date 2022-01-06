@@ -148,6 +148,7 @@ def terminate_upsert(self, session):
 
 
 def update_upsert(self, session):
+
     backend = self.view.project.backend
 
     upsert_path = (self.db_name, self.table_name)

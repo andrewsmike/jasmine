@@ -12,6 +12,7 @@ TODO:
         # mysql_collate="utf8mb4_0900_ai_ci",
         # mysql_default_charset="utf8mb4",
         # mysql_engine="InnoDB",
+- Handle prefix-only indexing of TEXT blobs (IE, `KEY (my_text_column(255), ...)`)
 """
 from dataclasses import dataclass, field, replace
 from random import choices

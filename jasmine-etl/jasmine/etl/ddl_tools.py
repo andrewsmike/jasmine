@@ -39,7 +39,7 @@ class ResourceNames:
 
     @classmethod
     def from_materialization(cls, mat):
-        return cls.from_dict(mat.context["claimed_resources"])
+        return cls.from_dict(mat.context.get("claimed_resources", {}))
 
     def empty(self):
         return (len(self.tables) + len(self.views) + len(self.triggers)) == 0
