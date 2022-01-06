@@ -13,6 +13,10 @@ services:
   database:
     image: mysql:8.0.22
     command: --default-authentication-plugin=mysql_native_password
+    volumes:
+      - "./config/dev/dev_database_dump.sql:/docker-entrypoint-initdb.d/dev_database_dump.sql"
+      - "./config/dev/init_mysql_container_grants.sql:/docker-entrypoint-initdb.d/init_mysql_container_grants.sql"
+
     environment:
       MYSQL_DATABASE: "jasmine_web"
       MYSQL_USER: "jasmine_web_su"
