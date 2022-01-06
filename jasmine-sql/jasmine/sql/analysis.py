@@ -54,7 +54,10 @@ def is_readonly_query(query: str) -> bool:
     ...     "SELECT 1 UHTNEONUTHOEH UHONUTHN E",
     ... ]
     >>> for query in mutating_queries:
-    ...     print(f"'{query}': {is_readonly_query(query)}")
+    ...     try:
+    ...         print(f"'{query}': {is_readonly_query(query)}")
+    ...     except SyntaxError as e:
+    ...         print(f"'{query}': Failed to parse query: {e}")
     'INSERT INTO my_table (a) SELECT 1': False
     'REPLACE INTO my_table (a) SELECT 1': False
     'SELECT 1; INSERT INTO my_table (a) VALUES (10)': False
@@ -62,12 +65,9 @@ def is_readonly_query(query: str) -> bool:
     'SELECT 1; DROP TABLE blah; SELECT 1;': False
     'SELECT 1 INTO OUTFILE "/tmp/bleh.csv"': False
     'SELECT 1 FROM my_table INTO OUTFILE '/tmp/blah.csv'': False
-    'SELECT 1 UHTNEONUTHOEH UHONUTHN E': False
+    'SELECT 1 UHTNEONUTHOEH UHONUTHN E': Failed to parse query: At 1:23: mismatched input 'UHONUTHN' expecting {<EOF>, ';'}
     """
-    try:
-        sql_program = sql_tree_from_str(query)
-    except SyntaxError as syntax_error:
-        return False
+    sql_program = sql_tree_from_str(query)
 
     statements = children_contexts(sql_program.statement)
     if len(statements) != 1:
@@ -134,7 +134,7 @@ def query_column_names(node: ASTNode) -> list[str]:
     >>> query_column_names(sql_ast_from_str("SELECT 1; SELECT 4"))
     Traceback (most recent call last):
       ...
-    AssertionError: Attempted to find resulting column names of multiple queries instead of one.
+    AssertionError: Attempted to find resulting column names of multiple queries instead of one...
     """
     match node:
         case SqlProgram(queries=queries):

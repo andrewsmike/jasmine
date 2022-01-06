@@ -11,7 +11,7 @@ CREATE VIEW `my db;`.`my_table;;&` AS
 >>> print(create_view_statement("`my db;`", "my_table;;&", "WITH a (a, b, c) AS SELECT 1, 2, 3 FROM dual SELECT 1 FROM blaaaaah"))
 Traceback (most recent call last):
     ...
-AssertionError: Can only create views for read-only SELECT statements...
+SyntaxError: At 1:20: no viable alternative at input 'WITH a (a, b, c) AS SELECT'
 
 >>> print(create_view_statement("`my db;`", "my_table;;&", "DELETE FROM blah"))
 Traceback (most recent call last):
