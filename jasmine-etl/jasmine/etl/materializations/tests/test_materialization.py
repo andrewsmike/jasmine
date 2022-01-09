@@ -331,11 +331,11 @@ def walk_upsert_lifecycle(session, view_id: int):
     do("verify")
     do("create")
     assert mat.state == "could_not_create"
-    assert table_exists(backend, "jasmine_test", "incremental_demo_upsert")
+    assert view_exists(backend, "jasmine_test", "incremental_demo_upsert")
 
     do("terminate")
     assert mat.state == "terminated"
-    assert table_exists(backend, "jasmine_test", "incremental_demo_upsert")
+    assert view_exists(backend, "jasmine_test", "incremental_demo_upsert")
     session.execute(text("DROP VIEW `jasmine_test`.`incremental_demo_upsert`;"))
 
     # Verify table name collion handling.
