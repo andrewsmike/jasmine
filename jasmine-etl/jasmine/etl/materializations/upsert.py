@@ -44,7 +44,7 @@ from jasmine.etl.materializations.etl_tools import (
     edit_resources,
     set_state_on_exception,
 )
-from jasmine.sql.analysis import is_readonly_query, query_column_names
+from jasmine.sql.analysis import is_readonly_query, query_column_names, uses_subqueries
 from jasmine.sql.ast_nodes import sql_ast_from_str
 from jasmine.sql.table_spec import (
     TableSpec,
@@ -71,7 +71,23 @@ def verify_upsert(self, session):
     # assert_names_available(self.view.project.backend, upsert_resource_names(self))
 
     view_sql = self.view.spec["query_text"]
-    assert is_readonly_query(view_sql)
+    assert is_readonly_query(
+        view_sql
+    ), "Views must contain a single read-only query each."
+    assert not uses_subqueries(
+        view_sql
+    ), "The UPSERT materialization does not support subqueries."
+    assert self.config.get(
+        "unique_keys", []
+    ), "The UPSERT materialization requires at least one primary or unique key."
+    # query_ast = sql_ast_from_str(view_sql)
+    # No UNION DISTINCT
+    # No LIMITs _anywhere_
+    # No CTEs
+    # No subquery
+    # No DISTINCT, SUM(...) OVER (....), GROUP BY, etc
+    # assert not top_level_filters(query_ast), "The UPSERT materialization does not support (possibly changing) WHERE clauses."
+    # assert not top_level_aggregations(query_ast), "The UPSERT materialization does not support (possibly changing) WHERE clauses."
 
     column_names = query_column_names(sql_ast_from_str(view_sql))
 
@@ -135,7 +151,7 @@ def terminate_upsert(self, session):
 
     # TODO: Verify nobody renamed the upsert on us.
     drop_upsert_sql = drop_table_statement(
-        self.db_name, self.table_name, idempotent=False
+        self.db_name, self.table_name, idempotent=True
     )
 
     with backend_conn(backend, readonly=False) as conn:

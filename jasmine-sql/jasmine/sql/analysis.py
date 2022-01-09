@@ -87,6 +87,56 @@ def is_readonly_query(query: str) -> bool:
     )
 
 
+def uses_subqueries(query: ASTNode) -> bool:
+    """
+    Subqueries are used in a variety of places:
+    - CTEs
+    - FROM / JOIN clauses
+    - In expressions (SELECT, ON, WHERE, GROUP BY, HAVING, ...)
+
+    To detect them all, use xpaths on the original parse tree.
+
+    >>> subquery_queries = [
+    ...     "SELECT 1 FROM (SELECT 1 FROM dual) GROUP BY 3 LIMIT 10;",
+    ...     "SELECT (SELECT 1 FROM dual) FROM dual UNION SELECT 2",
+    ...     "SELECT 1 FROM dual WHERE (SELECT 1 FROM dual WHERE DATE(hello) = 3)",
+    ...     "SELECT 1 FROM dual GROUP BY id IN (SELECT id FROM my_table)",
+    ... ]
+    >>> for query in subquery_queries:
+    ...     print(f"'{query}': {uses_subqueries(query)}")
+    'SELECT 1 FROM (SELECT 1 FROM dual) GROUP BY 3 LIMIT 10;': True
+    'SELECT (SELECT 1 FROM dual) FROM dual UNION SELECT 2': True
+    'SELECT 1 FROM dual WHERE (SELECT 1 FROM dual WHERE DATE(hello) = 3)': True
+    'SELECT 1 FROM dual GROUP BY id IN (SELECT id FROM my_table)': True
+
+    >>> flat_queries = [
+    ...     'WITH blah AS (SELECT 1 FROM dual) SELECT 1 FROM a JOIN b JOIN c',
+    ...     'SELECT 1 FROM a JOIN b JOIN c',
+    ...     "SELECT 1 FROM my_table  GROUP BY abcd",
+    ...     "SELECT 1 FROM UHTNEONUTHOEH ",
+    ... ]
+    >>> for query in flat_queries:
+    ...     try:
+    ...         print(f"'{query}': {uses_subqueries(query)}")
+    ...     except SyntaxError as e:
+    ...         print(f"'{query}': Failed to parse query: {e}")
+    'WITH blah AS (SELECT 1 FROM dual) SELECT 1 FROM a JOIN b JOIN c': False
+    'SELECT 1 FROM a JOIN b JOIN c': False
+    'SELECT 1 FROM my_table  GROUP BY abcd': False
+    'SELECT 1 FROM UHTNEONUTHOEH ': False
+    """
+    sql_program = sql_tree_from_str(query)
+
+    statements = children_contexts(sql_program.statement)
+    assert len(statements) == 1, "Cannot analyze multiple queries at a time."
+    (statement,) = statements
+
+    subquery_clauses = XPath.findAll(
+        sql_program, "//!commonTableExpression/subquery", sql_program.parser
+    )
+    return len(subquery_clauses) > 0
+
+
 def query_column_names(node: ASTNode) -> list[str]:
     """
     Infer column names from an AST-represented SQL query.
