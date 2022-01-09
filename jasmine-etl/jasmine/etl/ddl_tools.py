@@ -5,14 +5,21 @@ This module has tools to:
 - Verify an ETL was correctly instantiated in a database.
 """
 from dataclasses import dataclass, field
+from pprint import pformat
+
+from sqlalchemy import text
 
 from jasmine.etl.backends import (
     Backend,
+    backend_engine,
+    backend_table_spec,
+    create_view_statement,
     table_exists,
     table_view_exists,
     trigger_exists_with_pattern,
     view_exists,
 )
+from jasmine.sql.table_spec import create_table_statement
 from jasmine.sql.transforms.escaping import escaped_db_table
 
 
@@ -119,3 +126,120 @@ def names_successfully_taken(backend: Backend, resource_names: ResourceNames) ->
     except AssertionError:
         return False
     return True
+
+
+def view_status_str(backend: Backend, db_name: str, view_name: str) -> str:
+    if table_exists(backend, db_name, view_name):
+        return (
+            f"Table {escaped_db_table(db_name, view_name)} exists; was expecting a view.\n"
+            + table_status_str(backend, db_name, view_name)
+        )
+
+    if not view_exists(backend, db_name, view_name):
+        return f"View {escaped_db_table(db_name, view_name)} does not exist."
+
+    view_statement = create_view_statement(backend, db_name, view_name)
+    try:
+        with backend_engine(backend).connect() as conn:
+            sample_rows = conn.execute(
+                text(f"SELECT * FROM {escaped_db_table(db_name, view_name)} LIMIT 5;")
+            ).fetchall()
+    except Exception as e:
+        sample_rows = None
+
+    return "\n".join(
+        [
+            view_statement,
+            "Sample rows:",
+            pformat(sample_rows),
+        ]
+    )
+
+
+def table_status_str(backend: Backend, db_name: str, table_name: str) -> str:
+    if view_exists(backend, db_name, table_name):
+        return (
+            f"View {escaped_db_table(db_name, table_name)} exists; was expecting a table.\n"
+            + view_status_str(backend, db_name, table_name)
+        )
+
+    if not table_exists(backend, db_name, table_name):
+        return f"Table {escaped_db_table(db_name, table_name)} does not exist."
+
+    table_spec = backend_table_spec(backend, db_name, table_name)
+    table_statement = create_table_statement(db_name, table_name, table_spec)
+    try:
+        with backend_engine(backend).connect() as conn:
+            sample_rows = conn.execute(
+                text(f"SELECT * FROM {escaped_db_table(db_name, table_name)} LIMIT 5;")
+            ).fetchall()
+    except Exception as e:
+        sample_rows = None
+
+    return "\n".join(
+        [
+            table_statement,
+            "Sample rows:",
+            pformat(sample_rows),
+        ]
+    )
+
+
+def trigger_status_str(backend: Backend, db_name: str, trigger_name: str) -> str:
+    if not trigger_exists_with_pattern(backend, db_name, trigger_name):
+        return f"Trigger {escaped_db_table(db_name, trigger_name)} does not exist."
+
+    with backend_engine(backend).connect() as conn:
+        (create_trigger_statement,) = conn.execute(
+            text(f"SHOW CREATE TRIGGER {escaped_db_table(db_name, trigger_name)};")
+        ).fetchone()
+        return create_trigger_statement
+
+
+def names_status_str(backend: Backend, resource_names: ResourceNames) -> str:
+    """
+    Summarize the status of a group of resource names.
+    Useful for debugging materialization / ETLs across multiple steps.
+
+    This shows whether each exist, prints out the CREATE TABLE / CREATE VIEW statements, and
+    shows sample data if available.
+
+    >>> from jasmine.etl.ddl_tools import ResourceNames, names_status_str
+    >>> from jasmine.etl.backends import example_create_sqlite_schema_statements, tmp_mock_sqla_backend
+    >>> from pprint import pprint
+
+    >>> resource_names = ResourceNames(
+    ...     tables=[("main", 'bleh " ')],
+    ...     views=[("main", 'users " ')],
+    ...     triggers=[],  # sqlite doesn't currently support triggers.
+    ... )
+    >>> create_view_statement = 'CREATE VIEW `bleh " ` AS SELECT 1;'
+    >>> with tmp_mock_sqla_backend(example_create_sqlite_schema_statements + [create_view_statement]) as backend:
+    ...     print(names_status_str(backend, resource_names))
+    Table `main`.`users " ` exists; was expecting a view.
+    CREATE TABLE `main`.`users " ` (
+        `user_id` INTEGER NOT NULL,
+        `name` VARCHAR(96) NOT NULL,
+        `parent_user_id` BIGINT,
+        PRIMARY KEY (`user_id`),
+        UNIQUE unique_key_0 (`name`),
+        UNIQUE unique_key_1 (`parent_user_id`),
+        KEY org_name (`parent_user_id`, `name`),
+        CONSTRAINT FOREIGN KEY (`parent_user_id`) REFERENCES `main`.`users \\" ` (`user_id`)
+    );
+    <BLANKLINE>
+    View `main`.`bleh " ` exists; was expecting a table.
+    CREATE VIEW `bleh " ` AS SELECT 1
+    """
+    status_parts = []
+
+    for db_name, view_name in resource_names.views:
+        status_parts.append(view_status_str(backend, db_name, view_name))
+
+    for db_name, table_name in resource_names.tables:
+        status_parts.append(table_status_str(backend, db_name, table_name))
+
+    for db_name, trigger_name in resource_names.triggers:
+        status_parts.append(trigger_status_str(backend, db_name, trigger_name))
+
+    return "\n\n".join(status_parts)
