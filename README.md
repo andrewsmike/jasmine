@@ -5,7 +5,7 @@ Jasmine Web: Putting the 'T' in 'ETL'.
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 
 Jasmine Web is a web-app and backend service that automatically translates your SQL queries into optimized ETL patterns.
-Jasmine is uses a variety of ETL strategies, along with a SQL manipulation library, to make your analyses easy, near-realtime, and performant.
+Jasmine uses a variety of ETL strategies, along with a SQL manipulation library, to make your analyses easy, near-realtime, and performant.
 
 Screenshots
 ===========
@@ -72,19 +72,52 @@ How do I add an ETL / materialization?
 ======================================
 
 ETL patterns, or materializations, have multiple components:
-- `jasmine-sql/jasmine/sql/transforms/{etl}.py`: SQL manipulations and yanalyses used by the ETL.
+- `jasmine-sql/jasmine/sql/transforms/{etl}.py`: SQL manipulations and analyses used by the ETL.
 - `jasmine-etl/jasmine/etl/materializations/{etl}.py`: ETL backend database interaction logic, event handling, and scheduling.
-- `jasmine-models/jasmine/models/materializations/{etl}.py`: Database model and state-machine logical description.
-- `jasmine-models/jasmine/models/materializations/__init__.py`: Registration for database model and state machine logical description.
+- `jasmine-models/jasmine/models/materializations/{etl}.py`: Database model and lifecycle state-machine logical description.
+
+The also need to be registered with the system in the relevant `__init__.py` files:
+- `jasmine-etl/jasmine/etl/materializations/__init__.py`: Registration for ETL backend event funcs and resource name func.
+- `jasmine-models/jasmine/models/materializations/__init__.py`: Registration for database model and lifecycle state machine logical description.
 
 Between these files, the statefullness and correctness properties, scheduling semantics, available events, backend interactions, SQL analysis, and SQL generation logic are handled for every ETL pattern.
 The borders can be a bit fuzzy; the exact setup here may evolve.
 
-To add a materialization, you'll also have to add the materialization (and possibly view) type to the appropriate schemas, and add appropriate references to the new objects through the __init__ hierarchy above as necessary.
+To add a materialization, you'll also have to add the materialization type (and any new view types) to the appropriate schemas and add appropriate references to the new objects through the `__init__` hierarchy above as necessary.
 
 There are a variety of helpful utility modules throughout jasmine-sql and jasmine-etl.
 I recommend you read over existing ETLs and investigate any used modules to get a sense for what tools are available.
 Examples include `jasmine.etl.ddl_tools`, `jasmine.etl.backends`, `jasmine.sql.table_spec`, `jasmine.sql.analysis`, and more.
+
+How do I debug an ETL?
+----------------------
+There are three good ways to debug an ETL:
+
+- Manually launch celery materialization events through celery, described below.
+- Write your lifecycle tests in `test_materializations.py` and debug step-by-step (using `pytest -k test_{materialization}_lifecycle`.)
+- Step through materialization states using the `jasmine_step_mat` command.
+
+The `jasmine_step_mat` command describes the materialization's and the backend's state thoroughly before and after every step.
+This includes every materialization field, what tables/views/triggers from the materialization exist in the backend, their CREATE statements, and sample data.
+
+This makes it particularly useful for identifying problems quickly, and it operates against the `jasmine_web` database directly, rather than the test database.
+This means it doesn't need to reload the database at every step, and can be used on production instances as well.
+
+In your docker container (`docker-compose exec backend /bin/bash`), the command is
+```sh
+docker-backend $ jasmine_step_mat <view_id> <materialization_type> <action1,action2,...> <config_json>?
+```
+
+Use the action 'init' to create new (or terminate, then create new) materializations.
+For complicated configurations, save them to a file, then use the following invocation:
+```sh
+docker-backend $ jasmine_step_mat 51 upsert init,verify,create,update "$(cat /opt/jasmine-etl/jasmine/etl/materializations/tests/upsert_example_conf.json)"
+```
+
+You also invoke it from outside docker using exec directly after remapping the config file path:
+```sh
+$ docker-compose exec backend jasmine_step_mat 51 upsert init,verify,create,update "$(cat jasmine-etl/jasmine/etl/materializations/tests/upsert_example_conf.json)"
+```
 
 
 How do I run a celery task manually?
