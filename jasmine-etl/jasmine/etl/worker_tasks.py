@@ -4,47 +4,14 @@ from logging import exception
 from sqlalchemy import inspect
 
 from jasmine.etl.app import celery_app
-from jasmine.etl.app_base import app_db_session, timed_lock
+from jasmine.etl.app_base import timed_lock
 from jasmine.etl.backends import backend_conn
 from jasmine.etl.materializations import materialization_event_funcs
-from jasmine.models import Materialization, View, orm_registry
+from jasmine.etl.sqla_tools import with_sqla_first_arg, with_sqla_session
+from jasmine.models import Materialization, View
 
 MINUTES = 60
 HOURS = 60 * MINUTES
-
-
-def with_sqla_session(func):
-    """
-    Inject a SQLAlchemy session object as the first argument to the function.
-    """
-
-    @wraps(func)
-    def wrapped(*args, **kwargs):
-        with app_db_session(orm_registry) as session:
-            return func(session, *args, **kwargs)
-
-    return wrapped
-
-
-def with_sqla_first_arg(sqla_class):
-    """
-    For functions structured as `handle_sqla_object(session, object_pk_id, ...)`,
-    replace object_pk_id with a loaded SQLAlchemy object.
-
-    Primary key tuples may or may not be supported; check SQLAlchemy's session.get
-    arguments.
-    """
-
-    def decorator(func):
-        @wraps(func)
-        def wrapped_func(session, ident, *args, **kwargs):
-            sqla_object = session.query(sqla_class).get(ident)
-
-            return func(session, sqla_object, *args, **kwargs)
-
-        return wrapped_func
-
-    return decorator
 
 
 def sqla_timed_lock(
