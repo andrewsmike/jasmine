@@ -227,9 +227,13 @@ def names_status_str(backend: Backend, resource_names: ResourceNames) -> str:
         KEY org_name (`parent_user_id`, `name`),
         CONSTRAINT FOREIGN KEY (`parent_user_id`) REFERENCES `main`.`users \\" ` (`user_id`)
     );
+    Sample rows:
+    []
     <BLANKLINE>
     View `main`.`bleh " ` exists; was expecting a table.
     CREATE VIEW `bleh " ` AS SELECT 1
+    Sample rows:
+    [(1,)]
     """
     status_parts = []
 
