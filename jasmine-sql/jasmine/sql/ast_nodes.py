@@ -9,7 +9,7 @@ to more standard python types.
 The sql_ast() function visits ParseTrees and encodes them as AST nodes using the  singledispatch'd sql_ast submethods.
 """
 from dataclasses import dataclass, fields
-from functools import singledispatch
+from functools import cache, singledispatch
 from pprint import pformat
 from typing import Iterator, Literal, Optional, Type, TypeAlias, cast
 
@@ -620,6 +620,7 @@ class CTEOrderLimitNode(ASTNode):
     limit_options: ASTNode | None  # TODO: Actually represent this.
 
 
+@cache
 @singledispatch
 def sql_ast(parse_tree, **kwargs) -> ASTNode:
     """

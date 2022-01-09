@@ -1,6 +1,7 @@
 """
 Tools for parsing and visualizing SQL statements using the ANTLR-based SQLParser.
 """
+from functools import cache
 from pprint import pformat
 from typing import Callable, Iterable, List, Optional, Tuple
 
@@ -81,6 +82,7 @@ def sql_tree_from_file(path: str) -> ParseTree:
     return sql_tree_from_stream(FileStream(path))
 
 
+@cache
 def sql_tree_from_str(query: str) -> ParseTree:
     return sql_tree_from_stream(InputStream(query))
 
