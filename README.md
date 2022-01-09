@@ -4,12 +4,31 @@ Jasmine Web: Putting the 'T' in 'ETL'.
 [![Code style: black](https://img.shields.io/badge/code%20style-black-000000.svg)](https://github.com/psf/black)
 [![Checked with mypy](http://www.mypy-lang.org/static/mypy_badge.svg)](http://mypy-lang.org/)
 
-Jasmine Web is a web-app and backend service that automatically translates your SQL queries into optimized ETL patterns.
+Jasmine Web is a web-app and backend service that automatically translates your SQL queries into optimized ETL patterns with managed lifecycles.
 Jasmine uses a variety of ETL strategies, along with a SQL manipulation library, to make your analyses easy, near-realtime, and performant.
+
+Warning: Jasmine has a solid foundation and does things no other library offers, but it is still in pre-alpha and we provide no guarantees of anything. Use at your own risk.
+I believe this data engineering strategy will eat the world, but I haven't had the free time to build a _complete_ product around it yet.
 
 Screenshots
 ===========
 ![Jasmine Web UI](https://github.com/andrewsmike/jasmine/blob/main/screenshots/main_edit_view.png?raw=true)
+
+How does it work?
+=================
+Almost all ETL technologies strive to do one thing: Keep the results of a SQL query around as new data arrives.
+How they do this varies drammatically depending on the liveliness, correctness, and performance constraints, as well as the underlying database technologies.
+
+Because every use case needs a different solution, data engineers spend their entire careers building scores of variants of each ETL pattern for each new SQL query they want to make available.
+This seriously hinders analysis response time (leading to solutions like ELT platforms) and is is a massive burden that can be automated with the right tools.
+
+Jasmine takes these SQL queries and automatically compiles them down into known ETL patterns with explicit latency guarantees that work on a variety of backend platforms.
+This means you can use the same query to run a daily batch job, maintain a low-latency streaming join with windows, and as a soft-realtime query with no join windows / historical correctness, all by selecting a few options.
+
+Data is entirely hosted and processed on your database; Jasmine just sends it the commands it needs to keep your analysis fresh and up to date.
+ETL pattern lifecycles are safely and fully managed by Jasmine; no more manually CREATE-ing / RENAME-ing / DROP-ing tables; just click a button.
+Each ETL pattern is carefully vetted to ensure safety and raise alerts when something looks wrong.
+
 
 Setting up
 ==========
