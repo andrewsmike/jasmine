@@ -47,6 +47,8 @@ class ReadOnlyDictCursor(DebuggingDictCursor):
 
 @contextmanager
 def backend_conn(backend: Backend, readonly: bool = False):
+    "Direct driver connection to a given backend."
+
     assert (
         backend.backend_type == "mysql"
     ), "Only MySQL backends are currently supported."
@@ -170,15 +172,18 @@ def table_exists(backend: Backend, db_name: str, table_name: str) -> bool:
     >>> from jasmine.etl.backends import example_create_sqlite_schema_statements, tmp_mock_sqla_backend
     >>> from pprint import pprint
 
-    >>> with tmp_mock_sqla_backend(example_create_sqlite_schema_statements) as backend:
+    >>> create_view_statement = 'CREATE VIEW `view " ` AS SELECT 1;'
+    >>> with tmp_mock_sqla_backend(example_create_sqlite_schema_statements + [create_view_statement]) as backend:
     ...     pprint(table_exists(backend, "main", '`users " `'))
     ...     pprint(table_exists(backend, "main", 'users'))
+    ...     pprint(table_exists(backend, "main", 'view " '))
     True
+    False
     False
     """
     return backend_inspector(backend).has_table(
         unescaped(table_name), schema=unescaped(db_name)
-    )
+    ) and not view_exists(backend, db_name, table_name)
 
 
 def view_exists(backend: Backend, db_name: str, view_name: str) -> bool:
@@ -198,6 +203,24 @@ def view_exists(backend: Backend, db_name: str, view_name: str) -> bool:
     )
 
 
+def create_view_statement(backend: Backend, db_name: str, view_name: str) -> str:
+    """
+    Note: Engines may "mangle", reformat, and restructure the original view queries.
+    Apparently SQLite is rather unimaginative and saves the raw string.
+
+    >>> from jasmine.etl.backends import example_create_sqlite_schema_statements, tmp_mock_sqla_backend
+    >>> from pprint import pprint
+
+    >>> create_view = 'CREATE VIEW `bleh " ` AS SELECT 1;'
+    >>> with tmp_mock_sqla_backend(example_create_sqlite_schema_statements + [create_view]) as backend:
+    ...     print(create_view_statement(backend, "main", '`bleh " `'))
+    CREATE VIEW `bleh " ` AS SELECT 1
+    """
+    return backend_inspector(backend).get_view_definition(
+        unescaped(view_name), schema=unescaped(db_name)
+    )
+
+
 def table_view_exists(*args, **kwargs) -> bool:
     return table_exists(*args, **kwargs) or view_exists(*args, **kwargs)
 
@@ -207,7 +230,9 @@ def trigger_exists_with_pattern(
 ) -> bool:
     assert isinstance(trigger_pattern, str)
 
-    with backend_conn(backend) as conn:
-        conn.execute(f"SHOW TRIGGERS IN {escaped(db_name)} LIKE %s;", trigger_pattern)
+    with backend_engine(backend).connect() as conn:
+        conn.execute(
+            text(f"SHOW TRIGGERS IN {escaped(db_name)} LIKE %s;", trigger_pattern)
+        )
 
         return conn.fetchone() is not None

@@ -210,9 +210,10 @@ class TableSpec:
         ]
 
         index_infos = inspector.get_indexes(table_name, schema=db_name)
-        assert not any(index_info["unique"] for index_info in index_infos)
         indices = {
-            index_info["name"]: index_info["column_names"] for index_info in index_infos
+            index_info["name"]: index_info["column_names"]
+            for index_info in index_infos
+            if not index_info["unique"]
         }
 
         unique_index_infos = inspector.get_unique_constraints(
