@@ -488,7 +488,10 @@ def create_staging_table_statement(
     >>> from random import seed
 
     >>> seed(1337)
-    >>> print(create_staging_table_statement("main", 'users " ', example_table_spec, suffix="new"))
+    >>> temp_table_name, create_temp_table = create_staging_table_statement("main", 'users " ', example_table_spec, suffix="new")
+    >>> temp_table_name
+    '_users " _new_MHwKkZ'
+    >>> print(create_temp_table)
     CREATE TEMPORARY TABLE `main`.`_users " _new_MHwKkZ` (
         `user_id` INTEGER NOT NULL,
         `name` VARCHAR(96) NOT NULL,
@@ -506,7 +509,7 @@ def create_staging_table_statement(
     random_suffix = "".join(choices(ascii_letters + digits, k=6))
     randomized_name = f"_{base_table_name}_{suffix}_{random_suffix}"
 
-    return create_table_statement(
+    return randomized_name, create_table_statement(
         base_db_name,
         randomized_name,
         base_table_spec.without_constraints(keep_unique_keys=True),
@@ -518,6 +521,7 @@ def drop_table_statement(
     db_name: str,
     table_name: str,
     idempotent: bool = True,
+    temporary: bool = False,
 ) -> str:
     """
     >>> print(drop_table_statement("main", 'users " '))
@@ -525,6 +529,15 @@ def drop_table_statement(
 
     >>> print(drop_table_statement("main", 'users " ', idempotent=False))
     DROP TABLE `main`.`users " `;
+
+    >>> print(drop_table_statement("main", 'users " ', idempotent=False))
+    DROP TABLE `main`.`users " `;
+
+    >>> print(drop_table_statement("main", 'users " ', idempotent=True, temporary=True))
+    DROP TEMPORARY TABLE IF EXISTS `main`.`users " `;
     """
     idempotent_str = "IF EXISTS " if idempotent else ""
-    return f"DROP TABLE {idempotent_str}{escaped_db_table(db_name, table_name)};"
+    temp_str = "TEMPORARY " if temporary else ""
+    return (
+        f"DROP {temp_str}TABLE {idempotent_str}{escaped_db_table(db_name, table_name)};"
+    )

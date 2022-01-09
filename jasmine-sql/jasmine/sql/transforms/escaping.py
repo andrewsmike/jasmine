@@ -1,6 +1,8 @@
 """
 Escaping tools.
 """
+from sqlalchemy import String
+from sqlalchemy.dialects.mysql import dialect
 
 __all__ = [
     "escaped",
@@ -21,6 +23,14 @@ def unescaped(name: str) -> str:
     return name[1:-1]
 
 
+def string_literal_expr(value: str) -> str:
+    """
+    >>> print(string_literal_expr("Hello '\\" world!;`"))
+    'Hello ''" world!;`'
+    """
+    return String("").literal_processor(dialect=dialect())(value=value)
+
+
 def escaped(name: str) -> str:
     if "`" in name:
         name = unescaped(name)
@@ -34,3 +44,9 @@ def escaped_db_table(db_name: str, table_name: str) -> str:
 
 def escaped_column_list(column_names: list[str]) -> str:
     return ", ".join(escaped(column_name) for column_name in column_names)
+
+
+def escaped_table_column_list(table_name: str, column_names: list[str]) -> str:
+    return ", ".join(
+        f"{escaped(table_name)}.{escaped(column_name)}" for column_name in column_names
+    )
