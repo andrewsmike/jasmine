@@ -69,6 +69,7 @@ materialization_types = [
     "view",
     "history_table",
     "upsert",
+    "reload",
 ]
 
 # Each subclass needs to define their own State / Event types.
