@@ -1,0 +1,21 @@
+{
+    "column_type_decls": {
+        "event_id": "BIGINT NOT NULL",
+        "path": "VARCHAR(256)",
+        "method": "VARCHAR(64)",
+        "state": "VARCHAR(64)",
+        "config": "TEXT",
+        "context": "TEXT",
+        "title": "VARCHAR(255)",
+        "description": "VARCHAR(255)",
+        "updated_ts": "DATETIME"
+    },
+    "unique_keys": {},
+    "primary_key": ["event_id"],
+    "keys": {
+        "path": ["path"],
+        "description": ["description"],
+        "title": ["title"],
+        "title2": ["title", "description"]
+    }
+}
