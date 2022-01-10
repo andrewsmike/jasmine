@@ -89,6 +89,7 @@ export default function LogSettings({ viewId }: { viewId: number }) {
             loading={loading}
             error={error}
             density="compact"
+            sortModel={[{ field: "eventCreatedTime", sort: "desc" }]}
             autoPageSize={true}
             rowsPerPageOptions={[5, 10, 20, 50]}
         />

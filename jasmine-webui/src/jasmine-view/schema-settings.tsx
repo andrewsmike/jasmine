@@ -45,11 +45,21 @@ export default function SchemaSettings({
         refetchQueries: ["orgViewDirectory", "ViewFromPath", "ViewFromId"],
         variables: { viewId },
         onCompleted: (data) => {
-            dispatch(
-                setNotification(`Deleted view at [${viewProject}]/${viewPath}.`)
-            );
-            dispatch(toggleSettings());
-            history.push("/console");
+            if (data.delete_view.success) {
+                dispatch(
+                    setNotification(
+                        `Deleted view at [${viewProject}]/${viewPath}.`
+                    )
+                );
+                dispatch(toggleSettings());
+                history.push("/console");
+            } else {
+                dispatch(
+                    setNotification(
+                        `Failed to deleted view: ` + data.delete_view.error
+                    )
+                );
+            }
         },
     });
 
