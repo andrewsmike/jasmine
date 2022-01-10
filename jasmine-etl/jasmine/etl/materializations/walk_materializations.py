@@ -63,8 +63,9 @@ def perform_action(session, view, mat_type, action, config):
 
 def print_mat_state(mat):
     print(
-        f"[view {mat.view.view_id}, {mat.materialization_type}] Materialization's state:"
+        f"[view {mat.view.view_id}, {mat.materialization_type}] {mat.state_machine_type.state_desc[mat.state]}"
     )
+    print("Materialization's state:")
     state = {
         "materialization_id": mat.materialization_id,
         "state": mat.state,
