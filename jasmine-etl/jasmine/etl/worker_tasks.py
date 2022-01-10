@@ -148,6 +148,7 @@ def execute_materialization_event(
     next_state = event_func(materialization, session)
 
     materialization.state = next_state
+    session.commit()
 
     unschedule_materialization(session, materialization)
 
