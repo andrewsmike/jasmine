@@ -60,6 +60,8 @@ type View {
 enum MaterializationType {
     view
     history_table
+    upsert
+    reload
 }
 
 
@@ -69,7 +71,23 @@ type HistoryTableMaterializationSpec {
     trim_frequency_seconds: Int!
 }
 
-union MaterializationSpec = HistoryTableMaterializationSpec
+
+type UpsertMaterializationSpec {
+    column_type_decls: JSON
+    updated_ts_column_name: String!
+    unique_keys: JSON
+    keys: JSON
+    start_timestamp: Int
+}
+
+type ReloadMaterializationSpec {
+    column_type_decls: JSON
+    primary_key: [String]!
+    unique_keys: JSON
+    keys: JSON
+}
+
+union MaterializationSpec = HistoryTableMaterializationSpec | UpsertMaterializationSpec | ReloadMaterializationSpec
 
 type Materialization {
     materialization_id: ID!

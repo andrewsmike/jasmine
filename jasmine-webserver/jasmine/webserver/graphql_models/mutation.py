@@ -7,6 +7,7 @@ from ariadne import ObjectType
 from jasmine.etl.worker_tasks import (
     execute_materialization_event,
     execute_materialization_events,
+    schedule_materialization,
     view_result_preview,
 )
 from jasmine.models import Materialization, Project, User, View, new_materialization
@@ -19,10 +20,6 @@ interface OperationResult {
     error: String
 }
 
-type LaunchOperationResult implements OperationResult {
-    success: Boolean!
-    error: String
-}
 type DeleteResult implements OperationResult {
     success: Boolean!
     error: String
@@ -104,7 +101,7 @@ type Mutation {
     preview_view_result(id: ID!): DataResult!
 
     create_materialization(view_id: ID!, materialization_type: MaterializationType, config: JSON): MaterializationResult!
-    terminate_materialization(materialization_id: ID!): LaunchOperationResult!
+    terminate_materialization(materialization_id: ID!): DeleteResult!
 }
 """
 mutation_obj = ObjectType("Mutation")
@@ -388,6 +385,9 @@ def create_materialization(
     )
 
     session.add(mat)
+
+    session.commit()
+    schedule_materialization(session, mat)
 
     return mat
 

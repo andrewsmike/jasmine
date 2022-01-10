@@ -75,9 +75,51 @@ def log_backend_event(title: str):
 #     lock_suffix="result_preview",
 # )
 def view_result_preview(session, view):  # timed_lock=None
+    assert view is not None, "Unknown view: Try reloading."
     with backend_conn(view.project.backend, readonly=True) as ro_conn:
         ro_conn.execute(view.spec["query_text"])
         return ro_conn.fetchall()
+
+
+@celery_app.on_after_finalize.connect
+def add_regular_scheduling_event(sender, **kwargs):
+    sender.add_periodic_task(
+        30.0, update_all_materializations.s(), name="Update materializations."
+    )
+
+
+@celery_app.task
+@with_sqla_session
+def update_all_materializations(session):
+    active_mats = (
+        session.query(Materialization)
+        .where(Materialization.state == "active")
+        .where(Materialization.materialization_type != "view")
+        .all()
+    )
+    for mat in active_mats:
+        execute_materialization_event.s(mat.materialization_id, "update").apply_async()
+
+
+def unschedule_materialization(session, materialization):
+    """
+    Currently no cleanup required; this will change when we add crontab-like scheduling.
+    """
+    pass
+
+
+def schedule_materialization(session, materialization):
+    state_machine = materialization.state_machine_type
+
+    if materialization.state in state_machine.state_automatic_event:
+        automatic_event = state_machine.state_automatic_event[materialization.state]
+        execute_materialization_event.s(
+            materialization.materialization_id, automatic_event
+        ).apply_async()
+
+    # Handled separately.
+    # elif materialization.state in state_machine.state_automatic_event:
+    #     pass
 
 
 # TODO: These locking semantics are dreadfully wrong. Restart from scratch.
@@ -90,7 +132,10 @@ def view_result_preview(session, view):  # timed_lock=None
 #     lock_suffix="run_event",
 # )
 def execute_materialization_event(
-    session, materialization, event_name  # , timed_lock=None
+    session,
+    materialization,
+    event_name,
+    schedule_next_event: bool = True,  # , timed_lock=None
 ):
     assert event_name in materialization.state_machine_type.state_events.get(
         materialization.state, set()
@@ -104,6 +149,11 @@ def execute_materialization_event(
 
     materialization.state = next_state
 
+    unschedule_materialization(session, materialization)
+
+    if schedule_next_event:
+        schedule_materialization(session, materialization)
+
 
 @celery_app.task
 @with_sqla_session
@@ -115,10 +165,18 @@ def execute_materialization_event_or_cleanup(
     event: str,
     cleanup_action_event: str | None = "terminate",
 ):
+    """
+    Used by execute_materialization_events to run a sequence of materialization steps synchronously,
+    aborting on failure, from the GraphQL API call directly.
+
+    Specifically, used to create / terminate views on materialization changes.
+    """
 
     if mat.state == expected_start_state:
         try:
-            execute_materialization_event(mat.materialization_id, event)
+            execute_materialization_event(
+                mat.materialization_id, event, schedule_next_event=False
+            )
             return
         except Exception as e:
             initial_error = e
@@ -143,6 +201,12 @@ def execute_materialization_events(
     onfail_action_event: str | None = "terminate",
     sync: bool = True,
 ):
+    """
+    Used by create_query_view_materialization to run a sequence of materialization steps synchronously,
+    aborting on failure, from the GraphQL API call directly.
+
+    Specifically, used to create / terminate views on materialization changes.
+    """
     promise = execute_materialization_event_or_cleanup.starmap(
         [
             (materialization_id, expected_state_name, event_name, onfail_action_event)

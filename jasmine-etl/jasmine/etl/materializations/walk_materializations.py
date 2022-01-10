@@ -9,7 +9,8 @@ from jasmine.etl.ddl_tools import names_status_str
 from jasmine.etl.materializations import materialization_resource_names_funcs
 from jasmine.etl.sqla_tools import with_sqla_first_arg, with_sqla_session
 from jasmine.models.materializations import materialization_type, new_materialization
-from jasmine.models.project_models import View
+from jasmine.models.project_models import Project, View
+from jasmine.models.user_models import Organization
 
 try:
     # This won't work if we're not in a properly configured environment (IE, not in the docker container.)
@@ -39,6 +40,7 @@ def perform_action(session, view, mat_type, action, config):
             execute_materialization_event(
                 mat.materialization_id,
                 "terminate",
+                schedule_next_event=False,
             )
             assert mat.state == "terminated"
 
@@ -57,6 +59,7 @@ def perform_action(session, view, mat_type, action, config):
         execute_materialization_event(
             mat.materialization_id,
             action,
+            schedule_next_event=False,
         )
         session.commit()
 
@@ -122,13 +125,41 @@ def display_backend_messages(session, start_time, view_id):
         print(f"{title}:\n{desc}\n")
 
 
+@with_sqla_session
+def resolved_view_id(session, view_id_str: str):
+    try:
+        return int(view_id_str)
+    except Exception as e:
+        pass
+
+    assert ":" in view_id_str, "Format: <view_id> | org_name:[project]/path/to/query"
+    org_name, project_view_path = view_id_str.split(":", maxsplit=1)
+    bracketed_project_name, view_path = project_view_path.split("/", maxsplit=1)
+    project_name = bracketed_project_name[1:-1]
+
+    return (
+        (
+            session.query(View)
+            .join(View.project)
+            .join(Project.organization)
+            .where(Organization.name == org_name)
+            .where(Project.name == project_name)
+            .where(View.path == view_path)
+        )
+        .one()
+        .view_id
+    )
+
+
 def step_materialization():
     assert len(argv) in (
         4,
         5,
-    ), f"Usage: {argv[0]} <view_id> <mat_type> <action1,action2,...> [config]?"
+    ), f"Usage: {argv[0]} (<view_id> | org_name:[project]/path/to/view) <mat_type> <action1,action2,...> [config]?"
     view_id, mat_type, actions, *rest = argv[1:]
-    view_id = int(view_id)
+
+    view_id = resolved_view_id(view_id)
+
     if rest:
         config = loads(rest[0])
     else:

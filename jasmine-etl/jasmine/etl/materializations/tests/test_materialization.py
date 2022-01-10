@@ -102,6 +102,7 @@ def walk_view_lifecycle(session, view_id: int):
         execute_materialization_event(
             mat.materialization_id,
             event,
+            schedule_next_event=False,
         )
 
     if mat is not None:
@@ -243,6 +244,7 @@ def walk_upsert_lifecycle(session, view_id: int):
         execute_materialization_event(
             mat.materialization_id,
             event,
+            schedule_next_event=False,
         )
 
     if mat is not None:
@@ -403,6 +405,7 @@ def walk_reload_lifecycle(session, view_id: int):
         execute_materialization_event(
             mat.materialization_id,
             event,
+            schedule_next_event=False,
         )
 
     if mat is not None:
