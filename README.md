@@ -94,6 +94,7 @@ ETL patterns, or materializations, have multiple components:
 - `jasmine-sql/jasmine/sql/transforms/{etl}.py`: SQL manipulations and analyses used by the ETL.
 - `jasmine-etl/jasmine/etl/materializations/{etl}.py`: ETL backend database interaction logic, event handling, and scheduling.
 - `jasmine-models/jasmine/models/materializations/{etl}.py`: Database model and lifecycle state-machine logical description.
+- `jasmine-models/jasmine/models/materializations/base.py`: List of materialization types used in database Enums.
 
 The also need to be registered with the system in the relevant `__init__.py` files:
 - `jasmine-etl/jasmine/etl/materializations/__init__.py`: Registration for ETL backend event funcs and resource name func.
@@ -137,7 +138,10 @@ You also invoke it from outside docker using exec directly after remapping the c
 ```sh
 $ docker-compose exec backend jasmine_step_mat 51 upsert init,verify,create,update "$(cat jasmine-etl/jasmine/etl/materializations/tests/upsert_example_conf.json)"
 ```
-
+You can run it using pdb with addition of `python -m pdb` and using a full path:
+```sh
+$ docker-compose exec backend python -m pdb /usr/local/bin/jasmine_step_mat 51 upsert init,verify,create,update "$(cat jasmine-etl/jasmine/etl/materializations/tests/upsert_example_conf.json)"
+```
 
 How do I run a celery task manually?
 ====================================
