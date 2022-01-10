@@ -418,15 +418,14 @@ def walk_reload_lifecycle(session, view_id: int):
     do("create")
     assert mat.state == "active"
     assert table_exists(backend, "jasmine_test", "incremental_demo_reload")
-    assert (
-        mat.context["last_updated"] == None
-    )
+    assert mat.context["last_updated"] is None
 
     direct_results = set(session.execute(text(view.spec["query_text"])).fetchall())
 
     # Adds rows to backend_events and changes state so do this a step later.
     do("update")
     assert mat.state == "active"
+    assert mat.context["last_updated"] is not None
     assert (
         mat.context["last_updated"]
         >= (datetime.now() - timedelta(seconds=10)).timestamp()
@@ -440,6 +439,22 @@ def walk_reload_lifecycle(session, view_id: int):
         ).fetchall()
     )
     assert direct_results == reload_results
+
+    second_direct_results = set(
+        session.execute(text(view.spec["query_text"])).fetchall()
+    )
+    do("update")
+    second_reload_results = set(
+        session.execute(
+            text(
+                f"SELECT {escaped_column_list(column_names)} FROM `jasmine_test`.`incremental_demo_reload`"
+            )
+        ).fetchall()
+    )
+    assert second_direct_results == second_reload_results
+
+    # Specific to backend_events.
+    assert len(reload_results) + 1 == len(second_reload_results)
 
     do("terminate")
     assert mat.state == "terminated"

@@ -9,8 +9,8 @@ Strategy:
 from jasmine.sql.analysis import query_column_names
 from jasmine.sql.ast_nodes import SqlProgram, sql_ast_from_str
 from jasmine.sql.pretty_print import pretty_printed_sql_ast
-from jasmine.sql.transforms.complex_base import with_constrained_column_values
 from jasmine.sql.transforms.basic_statements import upsert_into_statement
+from jasmine.sql.transforms.complex_base import with_constrained_column_values
 
 
 def update_upsert_statement(db_name, table_name, query_text, timestamp_column_name):
@@ -32,6 +32,13 @@ def update_upsert_statement(db_name, table_name, query_text, timestamp_column_na
     ...   JOIN b
     ...     ON a.b_id = b.id
     ...  WHERE a.id != 3
+    ...  UNION
+    ... SELECT 1 AS id,
+    ...        c.project,
+    ...        "meh",
+    ...        c.c_count AS combined_count,
+    ...        c.created_ts AS timestamp
+    ...   FROM c
     ...  ORDER BY a.id
     ... \"\"\"
 
@@ -42,16 +49,28 @@ def update_upsert_statement(db_name, table_name, query_text, timestamp_column_na
     ...     timestamp_column_name="timestamp",
     ... ))
     INSERT INTO `my_db`.`my_table ' uhaet` (`id`, `project`, `'{{problematic_string}}'`, `combined_count`, `timestamp`)
-    SELECT IFNULL(a.id, a.id2) AS id,
-           b.project,
-           '{{problematic_string}}',
-           a.a_count + b.b_count AS combined_count,
-           a.updated_ts AS timestamp
-      FROM a
-     INNER JOIN b
-        ON a.b_id = b.id
-     WHERE a.id != 3
-       AND (a.updated_ts) >= {last_updated_ts_expr}
+    (
+      SELECT IFNULL(a.id, a.id2) AS id,
+             b.project,
+             '{{problematic_string}}',
+             a.a_count + b.b_count AS combined_count,
+             a.updated_ts AS timestamp
+        FROM a
+       INNER JOIN b
+          ON a.b_id = b.id
+       WHERE a.id != 3
+         AND (a.updated_ts) >= {last_updated_ts_expr}
+    )
+     UNION
+    (
+      SELECT 1 AS id,
+             c.project,
+             "meh",
+             c.c_count AS combined_count,
+             c.created_ts AS timestamp
+        FROM c
+       WHERE (c.created_ts) >= {last_updated_ts_expr}
+    )
      ORDER BY a.id ASC
         ON DUPLICATE KEY UPDATE `id` = VALUES(`id`),
                                 `project` = VALUES(`project`),
