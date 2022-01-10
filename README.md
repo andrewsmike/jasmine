@@ -133,8 +133,9 @@ For complicated configurations, save them to a file, then use the following invo
 ```sh
 docker-backend $ jasmine_step_mat 51 upsert init,verify,create,update "$(cat /opt/jasmine-etl/jasmine/etl/materializations/tests/upsert_example_conf.json)"
 ```
+You may also substitude the view_id for `"Company Name:[dev]/path/to/view"`. Careful with quotation - single quotes will be unwrapped if invoked from outside of docker.
 
-You also invoke it from outside docker using exec directly after remapping the config file path:
+You can also invoke it from outside docker using exec directly after remapping the config file path:
 ```sh
 $ docker-compose exec backend jasmine_step_mat 51 upsert init,verify,create,update "$(cat jasmine-etl/jasmine/etl/materializations/tests/upsert_example_conf.json)"
 ```

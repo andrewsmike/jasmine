@@ -106,8 +106,13 @@ def verify_upsert(self, session):
             **self.config["column_type_decls"],
         },
         primary_key=["jsmn_auto_id"],
-        unique_indices=self.config.get("unique_keys", []),
-        indices=self.config.get("keys", []),
+        unique_indices=self.config.get("unique_keys", {}),
+        indices={
+            **self.config.get("keys", {}),
+            # Inject updated_ts key, which will be removed if redundant when deduping indices.
+            # Arbitrary key that won't be in the config:
+            **{"nonexistent_key" * 10: [self.config["updated_ts_column_name"]]},
+        },
     ).with_deduped_indices()
 
     self.context = {

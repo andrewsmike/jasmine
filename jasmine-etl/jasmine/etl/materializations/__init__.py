@@ -1,10 +1,10 @@
-from jasmine.etl.materializations.upsert import (
-    upsert_event_funcs,
-    upsert_resource_names,
-)
 from jasmine.etl.materializations.reload import (
     reload_event_funcs,
     reload_resource_names,
+)
+from jasmine.etl.materializations.upsert import (
+    upsert_event_funcs,
+    upsert_resource_names,
 )
 from jasmine.etl.materializations.view import view_event_funcs, view_resource_names
 

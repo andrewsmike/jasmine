@@ -33,8 +33,8 @@ from jasmine.sql.analysis import is_readonly_query, query_column_names
 from jasmine.sql.ast_nodes import sql_ast_from_str
 from jasmine.sql.table_spec import (
     TableSpec,
-    create_table_statement,
     create_staging_table_statement,
+    create_table_statement,
     drop_table_statement,
 )
 from jasmine.sql.transforms.basic_statements import insert_into_statement
@@ -67,8 +67,8 @@ def verify_reload(self, session):
         column_names=column_names,
         column_type_decls=self.config["column_type_decls"],
         primary_key=self.config.get("primary_key", column_names),
-        unique_indices=self.config.get("unique_keys", []),
-        indices=self.config.get("keys", []),
+        unique_indices=self.config.get("unique_keys", {}),
+        indices=self.config.get("keys", {}),
     ).with_deduped_indices()
 
     self.context = {
