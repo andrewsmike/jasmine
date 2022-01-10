@@ -42,6 +42,8 @@ SELECT 1 FROM a UNION SELECT 2 FROM a;
   SELECT 1
     FROM a
    WHERE a.bleh < 10
+     AND bleeeeeeeeeeeeeeeeeeeeeeeeeeeeeh = bliiiiiih
+     AND abcd = ijkl
    ORDER BY bleh DESC
    LIMIT 1
 )

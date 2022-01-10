@@ -586,7 +586,7 @@ class PrettyPrintVisitor:
                 "Expression separators and commas are mutually incompatible."
             )
             if sep.strip() != "":
-                sep = "\n" + f"{sep} ".rjust(len(prefix))
+                sep = "\n" + f"{sep} ".rjust(self.indent.indent_width())
             else:
                 sep = ("," if use_commas else "") + self.indent.newline_indent()
 
@@ -658,11 +658,16 @@ class PrettyPrintVisitor:
         else:
             inline_str = self.pretty_print_inline(node, **kwargs)
 
-        use_multiline = force_multiline or is_multiline(inline_str, self.indent)
+        if force_multiline:
+            use_multiline = True
+        else:
+            assert inline_str is not None
+            use_multiline = is_multiline(inline_str, self.indent)
 
         if use_multiline:
             return self.pretty_print_multiline(node, **kwargs)
         else:
+            assert inline_str is not None
             return inline_str
 
     @pretty_print_inline.register
