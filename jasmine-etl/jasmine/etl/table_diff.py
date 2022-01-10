@@ -16,12 +16,12 @@ def columns_equal_expr(
 ) -> str:
     """
     >>> print("    ON " + columns_equal_expr("left", "right", ["event_id", "title", "updated_ts"]))
-        ON left.`event_id` = right.`event_id`
-       AND left.`title` = right.`title`
-       AND left.`updated_ts` = right.`updated_ts`
+        ON left.`event_id` <=> right.`event_id`
+       AND left.`title` <=> right.`title`
+       AND left.`updated_ts` <=> right.`updated_ts`
     """
     return "\n   AND ".join(
-        f"{left_alias}.{escaped(column_name)} = {right_alias}.{escaped(column_name)}"
+        f"{left_alias}.{escaped(column_name)} <=> {right_alias}.{escaped(column_name)}"
         for column_name in column_names
     )
 
@@ -73,9 +73,9 @@ def delete_unchanged_rows_statement(
     DELETE prev, next
       FROM `main ' `.` uahtoeua' ` prev
       JOIN `main ' `.`next_table"` next
-        ON prev.`event_id` = next.`event_id`
-       AND prev.`title` = next.`title`
-       AND prev.`updated_ts` = next.`updated_ts`;
+        ON prev.`event_id` <=> next.`event_id`
+       AND prev.`title` <=> next.`title`
+       AND prev.`updated_ts` <=> next.`updated_ts`;
     """
     return delete_unchanged_rows_statement_template.format(
         prev_db_table=escaped_db_table(db_name, prev_temp_table),
@@ -96,7 +96,7 @@ def row_count(conn, db_name: str, table_name: str) -> int:
     conn.execute(row_count_statement(db_name, table_name))
     results = conn.fetchone()
     assert len(results) == 1
-    return results[0]
+    return list(results.values())[0]
 
 
 def patch_format_args(
@@ -126,11 +126,11 @@ def patch_format_args(
      'next_db_table': "`my_db ' `.`next_temp`",
      'next_pk_is_null_expr': 'next.`event_id` IS NULL\\n'
                              '   AND next.`org_id` IS NULL',
-     'prev_curr_pk_equal_expr': 'prev.`event_id` = curr.`event_id`\\n'
-                                '   AND prev.`org_id` = curr.`org_id`',
+     'prev_curr_pk_equal_expr': 'prev.`event_id` <=> curr.`event_id`\\n'
+                                '   AND prev.`org_id` <=> curr.`org_id`',
      'prev_db_table': "`my_db ' `.`prev_temp`",
-     'prev_next_pk_equal_expr': 'prev.`event_id` = next.`event_id`\\n'
-                                '   AND prev.`org_id` = next.`org_id`'}
+     'prev_next_pk_equal_expr': 'prev.`event_id` <=> next.`event_id`\\n'
+                                '   AND prev.`org_id` <=> next.`org_id`'}
     """
     return {
         "prev_db_table": escaped_db_table(db_name, prev_temp_table),
@@ -179,11 +179,11 @@ def patch_deleted_rows_statement(format_args: dict[str, str]) -> str:
     DELETE curr
       FROM `my_db ' `.`prev_temp` prev
       LEFT JOIN `my_db ' `.`next_temp` next  /* If this is NULL, delete. If not, don't delete. */
-        ON prev.`event_id` = next.`event_id`
-       AND prev.`org_id` = next.`org_id`
+        ON prev.`event_id` <=> next.`event_id`
+       AND prev.`org_id` <=> next.`org_id`
       JOIN `my_db ' `.`curr_table` curr
-        ON prev.`event_id` = curr.`event_id`
-       AND prev.`org_id` = curr.`org_id`
+        ON prev.`event_id` <=> curr.`event_id`
+       AND prev.`org_id` <=> curr.`org_id`
      WHERE next.`event_id` IS NULL
        AND next.`org_id` IS NULL;  /* If row is in `next`, don't delete. */
     """
@@ -244,9 +244,9 @@ def patch_mock_conn():
     def execute_mock(sql):
         mock.sql_queries.append(sql)
         for prefix, value in [
-            ("Delete unchanged", 50),
+            ("Delete unchanged", 100),
             ("Delete deleted", 15),
-            ("Insert / update", 15 + 35),
+            ("Insert / update", 15 + 35 * 2),
         ]:
             if sql.startswith(f"/* {prefix}"):
                 return value
@@ -254,7 +254,7 @@ def patch_mock_conn():
         return None
 
     def fetchone_mock():
-        return (100,)
+        return {"COUNT(*)": 100}
 
     mock.execute = execute_mock
     mock.fetchone = fetchone_mock
@@ -306,18 +306,18 @@ def apply_minimized_patch(
     DELETE prev, next
       FROM `my_db`.`prev temp` prev
       JOIN `my_db`.`next temp` next
-        ON prev.`event_id` = next.`event_id`
-       AND prev.`org_id` = next.`org_id`
-       AND prev.`updated_ts` = next.`updated_ts`;
+        ON prev.`event_id` <=> next.`event_id`
+       AND prev.`org_id` <=> next.`org_id`
+       AND prev.`updated_ts` <=> next.`updated_ts`;
     /* Delete deleted rows. */
     DELETE curr
       FROM `my_db`.`prev temp` prev
       LEFT JOIN `my_db`.`next temp` next  /* If this is NULL, delete. If not, don't delete. */
-        ON prev.`event_id` = next.`event_id`
-       AND prev.`org_id` = next.`org_id`
+        ON prev.`event_id` <=> next.`event_id`
+       AND prev.`org_id` <=> next.`org_id`
       JOIN `my_db`.`my_table " ` curr
-        ON prev.`event_id` = curr.`event_id`
-       AND prev.`org_id` = curr.`org_id`
+        ON prev.`event_id` <=> curr.`event_id`
+       AND prev.`org_id` <=> curr.`org_id`
      WHERE next.`event_id` IS NULL
        AND next.`org_id` IS NULL;  /* If row is in `next`, don't delete. */
     /* Insert / update next rows. */
@@ -340,10 +340,13 @@ def apply_minimized_patch(
         primary_key_columns,
     )
 
-    unchanged_count = conn.execute(
-        delete_unchanged_rows_statement(
-            db_name, prev_temp_table, next_temp_table, column_names
-        ),
+    unchanged_count = (
+        conn.execute(
+            delete_unchanged_rows_statement(
+                db_name, prev_temp_table, next_temp_table, column_names
+            ),
+        )
+        // 2
     )
 
     changed_prev_count = raw_prev_count - unchanged_count
@@ -356,6 +359,10 @@ def apply_minimized_patch(
 
     updated_count = changed_prev_count - patch_stats["deleted_count"]
     inserted_count = changed_next_count - updated_count
+
+    assert (
+        patch_stats["inserted_updated_count"] == inserted_count + updated_count * 2
+    ), "Row counts didn't add up when applying changes."
 
     return {
         "inserted_count": inserted_count,
@@ -382,7 +389,7 @@ def copy_region_statement(
     db_name: str,
     src_table_name: str,
     dest_table_name: str,
-    region: Region,
+    region: Region | None,
     column_names: list[str],
 ) -> str:
     """
@@ -399,14 +406,21 @@ def copy_region_statement(
     INSERT INTO `my_db`.`my_temp_table` (`event_id`, `title`, `updated_ts`)
     SELECT `event_id`, `title`, `updated_ts`
       FROM `my_db`.`my_table` src
-     WHERE ((`src`.`title` = 'my_fav_movie'))
+     WHERE ((`src`.`title` <=> 'my_fav_movie'))
        AND (1641769277 < `src`.`updated_ts`);
+
+    >>> print(copy_region_statement("my_db", "my_table", "my_temp_table", None, ["event_id", "title", "updated_ts"]))
+    /* Copy old data into temp table for diff'ing. */
+    INSERT INTO `my_db`.`my_temp_table` (`event_id`, `title`, `updated_ts`)
+    SELECT `event_id`, `title`, `updated_ts`
+      FROM `my_db`.`my_table` src
+     WHERE 1;
     """
     return copy_region_statement_template.format(
         column_names=escaped_column_list(column_names),
         src_db_table=escaped_db_table(db_name, src_table_name),
         dest_db_table=escaped_db_table(db_name, dest_table_name),
-        src_in_region_expr=in_region_expr(region, "src"),
+        src_in_region_expr=in_region_expr(region, "src") if region is not None else "1",
     )
 
 
@@ -416,7 +430,7 @@ def patch_target_table_region(
     table_name: str,
     next_temp_table: str,
     temp_table_spec: TableSpec,
-    region: Region,
+    region: Region | None,
 ) -> dict[str, int]:
     """
     Intelligently patch a table region to only include values in the given temporary table.
@@ -474,7 +488,7 @@ def patch_target_table_region(
     INSERT INTO `my_db`.`_my_table " _prev_MHwKkZ` (`event_id`, `title`, `updated_ts`)
     SELECT `event_id`, `title`, `updated_ts`
       FROM `my_db`.`my_table " ` src
-     WHERE ((`src`.`title` = 'my_fav_movie'))
+     WHERE ((`src`.`title` <=> 'my_fav_movie'))
        AND (1641769277 < `src`.`updated_ts`);
     SELECT COUNT(*) FROM `my_db`.`_my_table " _prev_MHwKkZ`;
     SELECT COUNT(*) FROM `my_db`.`next temp`;
@@ -482,16 +496,16 @@ def patch_target_table_region(
     DELETE prev, next
       FROM `my_db`.`_my_table " _prev_MHwKkZ` prev
       JOIN `my_db`.`next temp` next
-        ON prev.`event_id` = next.`event_id`
-       AND prev.`title` = next.`title`
-       AND prev.`updated_ts` = next.`updated_ts`;
+        ON prev.`event_id` <=> next.`event_id`
+       AND prev.`title` <=> next.`title`
+       AND prev.`updated_ts` <=> next.`updated_ts`;
     /* Delete deleted rows. */
     DELETE curr
       FROM `my_db`.`_my_table " _prev_MHwKkZ` prev
       LEFT JOIN `my_db`.`next temp` next  /* If this is NULL, delete. If not, don't delete. */
-        ON prev.`event_id` = next.`event_id`
+        ON prev.`event_id` <=> next.`event_id`
       JOIN `my_db`.`my_table " ` curr
-        ON prev.`event_id` = curr.`event_id`
+        ON prev.`event_id` <=> curr.`event_id`
      WHERE next.`event_id` IS NULL;  /* If row is in `next`, don't delete. */
     /* Insert / update next rows. */
     INSERT INTO `my_db`.`my_table " ` (`event_id`, `title`, `updated_ts`)
@@ -530,7 +544,7 @@ def patch_target_table_region(
             db_name,
             table_name,
             prev_temp_table,
-            "next temp",
+            next_temp_table,
             column_names=temp_table_spec.column_names,
             primary_key_columns=temp_table_spec.primary_key,
         )

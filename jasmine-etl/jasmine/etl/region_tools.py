@@ -123,9 +123,9 @@ def in_region_expr_intersection(region: IntersectionRegion, table_name: str):
 
     >>> region = IntersectionRegion([subregion_one, subregion_two])
     >>> print(" WHERE " + in_region_expr(region, "my_table"))
-     WHERE ((`my_table`.`event_id` = 1 AND `my_table`.`org_name` = 'my_org')
-            OR (`my_table`.`event_id` = 2 AND `my_table`.`org_name` = 'my_other_org'))
-       AND ((`my_table`.`office_name` = 'b'))
+     WHERE ((`my_table`.`event_id` <=> 1 AND `my_table`.`org_name` <=> 'my_org')
+            OR (`my_table`.`event_id` <=> 2 AND `my_table`.`org_name` <=> 'my_other_org'))
+       AND ((`my_table`.`office_name` <=> 'b'))
     """
     return "\n   AND ".join(
         "(" + in_region_expr(subregion, table_name).replace("\n", "\n    ") + ")"
@@ -138,8 +138,8 @@ def in_region_expr_discrete(region: DiscreteRegion, table_alias: str):
     """
     >>> region = DiscreteRegion(columns=["event_id", "org_name"], points=[(1, "my_org"), (2, "my_other_org")])
     >>> print(" WHERE " + in_region_expr(region, "my_table"))
-     WHERE (`my_table`.`event_id` = 1 AND `my_table`.`org_name` = 'my_org')
-        OR (`my_table`.`event_id` = 2 AND `my_table`.`org_name` = 'my_other_org')
+     WHERE (`my_table`.`event_id` <=> 1 AND `my_table`.`org_name` <=> 'my_org')
+        OR (`my_table`.`event_id` <=> 2 AND `my_table`.`org_name` <=> 'my_other_org')
 
     >>> region = DiscreteRegion(columns=["event_id", "org_name"], points=[(i, "my_org") for i in range(51)])
     >>> print(" WHERE " + in_region_expr(region, "my_table"))
@@ -154,7 +154,7 @@ def in_region_expr_discrete(region: DiscreteRegion, table_alias: str):
         return "\n    OR ".join(
             "("
             + " AND ".join(
-                f"{escaped(table_alias)}.{escaped(column_name)} = {value_expr(value)}"
+                f"{escaped(table_alias)}.{escaped(column_name)} <=> {value_expr(value)}"
                 for column_name, value in zip(region.columns, point)
             )
             + ")"
