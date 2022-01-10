@@ -129,12 +129,18 @@ export default function QueryEditor({
         refetchQueries: refetchQueries,
         variables: { queryId, queryText: editorQuery?.queryText },
         onCompleted: (data) => {
-            dispatch(
-                setNotification(`Saved view at ${originalQuery?.fullPath}.`)
-            );
-            dispatch(
-                queryEditorPartialReset({ queryText: editorQuery?.queryText })
-            );
+            if (data.update_query_text.success) {
+                dispatch(
+                    setNotification(`Saved view at ${originalQuery?.fullPath}.`)
+                );
+                dispatch(
+                    queryEditorPartialReset({
+                        queryText: editorQuery?.queryText,
+                    })
+                );
+            } else {
+                dispatch(setNotification(data.update_query_text.error));
+            }
         },
     });
 
@@ -146,13 +152,17 @@ export default function QueryEditor({
             queryPath: editorQueryPath,
         },
         onCompleted: (data) => {
-            dispatch(
-                setNotification(`Moved view to ${editorQuery?.fullPath}.`)
-            );
-            dispatch(
-                queryEditorPartialReset({ fullPath: editorQuery?.fullPath })
-            );
-            history.push(`/console/view/${editorQuery?.fullPath}`);
+            if (data.move_view.success) {
+                dispatch(
+                    setNotification(`Moved view to ${editorQuery?.fullPath}.`)
+                );
+                dispatch(
+                    queryEditorPartialReset({ fullPath: editorQuery?.fullPath })
+                );
+                history.push(`/console/view/${editorQuery?.fullPath}`);
+            } else {
+                dispatch(setNotification(data.move_view.error));
+            }
         },
     });
 
