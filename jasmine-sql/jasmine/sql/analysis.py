@@ -141,6 +141,11 @@ def query_column_names(node: ASTNode) -> list[str]:
     """
     Infer column names from an AST-represented SQL query.
 
+    WARNING: This does _not_ completely align with backends' column naming methods.
+        Only use this analysis if you explicitly rename all query columns to the ones discovered through this.
+        If you want to discover the backend-generated column names (ie, for consistency with views), check out
+        query_type_analysis.
+
     Note: This cannot currently handle table.* expressions.
         That expansion (based on schema data) can be added later.
 
