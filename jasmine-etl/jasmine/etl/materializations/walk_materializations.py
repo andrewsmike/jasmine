@@ -163,7 +163,7 @@ def step_materialization():
     if rest:
         config = loads(rest[0])
     else:
-        config = None
+        config = {}
 
     print_mat_type_state(view_id, mat_type)
     for action in actions.split(","):
