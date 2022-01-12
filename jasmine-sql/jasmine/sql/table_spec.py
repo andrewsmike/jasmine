@@ -34,7 +34,11 @@ def column_type_decl(
     ignore_defaults: bool = True,
     ignore_autoinc: bool = True,
 ) -> str:
-    attrs = [str(column_info["type"])]
+    sqla_type = column_info["type"]
+    if str(sqla_type) == "ENUM":
+        attrs = [repr(sqla_type)]
+    else:
+        attrs = [str(sqla_type)]
 
     if not column_info["nullable"]:
         attrs.append("NOT NULL")
@@ -88,7 +92,24 @@ class ForeignKey:
         )
 
 
-def next_indexed_name(names, base):
+def key_redundant(
+    keys: dict[str, list[str]], key: list[str], unique: bool = False
+) -> bool:
+    if unique:
+        # Unique key is redundant; a __less__ precise key already exists. Add as regular index.
+        return any(
+            (len(key) >= len(existing_key) and key[: len(existing_key)] == existing_key)
+            for existing_key in keys.values()
+        )
+    else:
+        # Key is redundant; a __more__ precise key already exists. Don't add.
+        return any(
+            (len(key) <= len(existing_key) and existing_key[: len(key)] == key)
+            for existing_key in keys.values()
+        )
+
+
+def next_indexed_name(names: set[str], base: str, index: int = 0):
     """
     >>> next_indexed_name({"key_1", "key_2", "key_3", "key_6"}, "key")
     'key_4'
@@ -96,6 +117,8 @@ def next_indexed_name(names, base):
     for i in range(1_000_000):
         name = f"{base}_{i+1}"
         if name not in names:
+            index -= 1
+        if index < 0:
             return name
     else:
         raise RuntimeError(f"Couldn't find a unique name. Tried 1mil. Base: {base}.")
@@ -194,6 +217,10 @@ class TableSpec:
             not untyped_columns
         ), f"Column(s) not provided with a type declaration: {untyped_columns}"
 
+        assert not (
+            set(self.unique_indices.keys()) & set(self.indices.keys())
+        ), "Key and unique key have identical name."
+
         keys = (
             [self.primary_key]
             + list(self.unique_indices.values())
@@ -223,9 +250,14 @@ class TableSpec:
         ]
 
         index_infos = inspector.get_indexes(table_name, schema=db_name)
-        index_names = {index_info["name"] for index_info in index_infos if index_info["name"]}
+        index_names = {
+            index_info["name"] for index_info in index_infos if index_info["name"]
+        }
         indices = {
-            index_info["name"] or next_indexed_name(index_names, "key"): index_info["column_names"]
+            index_info["name"]
+            or next_indexed_name(index_names, "key", index_index): index_info[
+                "column_names"
+            ]
             for index_index, index_info in enumerate(index_infos)
             if not index_info["unique"]
         }
@@ -233,10 +265,17 @@ class TableSpec:
         unique_index_infos = inspector.get_unique_constraints(
             table_name, schema=db_name
         )
+        unique_index_names = {
+            unique_index_info["name"]
+            for unique_index_info in unique_index_infos
+            if unique_index_info["name"]
+        }
         unique_indices = {
-            key_info["name"]
-            or f"unique_key_{unique_key_index}": key_info["column_names"]
-            for unique_key_index, key_info in enumerate(unique_index_infos)
+            unique_index_info["name"]
+            or next_indexed_name(
+                unique_index_names, "unique_key", unique_index_index
+            ): unique_index_info["column_names"]
+            for unique_index_index, unique_index_info in enumerate(unique_index_infos)
         }
 
         foreign_keys = [
@@ -252,6 +291,18 @@ class TableSpec:
             unique_indices=unique_indices,
             foreign_keys=foreign_keys,
         )
+
+    @property
+    def all_unique_indices(self) -> dict[str, list[str]]:
+        if self.primary_key:
+            return {
+                next_indexed_name(
+                    set(self.unique_indices.keys()), "primary_key"
+                ): self.primary_key,
+                **self.unique_indices,
+            }
+        else:
+            return self.unique_indices
 
     def with_deduped_indices(self) -> "TableSpec":
         """
@@ -280,19 +331,32 @@ class TableSpec:
             tuple(unescaped(column) for column in index)
             for index in self.indices.values()
         }
+
         unique_indices = {
+            tuple(unescaped(column) for column in index)
+            for index in self.all_unique_indices.values()
+        }
+
+        minimal_indices = {
             index
             for index in distinct_indices
             if not any(
                 (len(index) < len(bigger_index) and index == bigger_index[: len(index)])
                 for bigger_index in distinct_indices
             )
+            if not any(
+                (
+                    len(index) <= len(encapsulating_unique_index)
+                    and index == encapsulating_unique_index[: len(index)]
+                )
+                for encapsulating_unique_index in unique_indices
+            )
         }
         return replace(
             self,
             indices={
                 f"_jsmn_key_{key_index}": list(key_columns)
-                for key_index, key_columns in enumerate(sorted(unique_indices))
+                for key_index, key_columns in enumerate(sorted(minimal_indices))
             },
         )
 
@@ -392,6 +456,108 @@ class TableSpec:
             },
         )
 
+    def with_key(
+        self, key: list[str], key_name: str | None = None, unique: bool = False
+    ):
+        """
+        Add a new key while avoiding collisions.
+        If key is a strict prefix to an existing key
+
+        >>> from jasmine.sql.table_spec import example_table_spec
+        >>> from pprint import pprint
+
+        >>> pprint(example_table_spec.with_key(["name"]))
+        TableSpec(column_names=['user_id', 'name', 'parent_user_id'],
+                  ...
+                  indices={'key_1': ['name'], 'org_name': ['parent_user_id', 'name']},
+                  ...)
+
+        Don't add unnecessary keys:
+        >>> pprint(example_table_spec.with_key(["user_id"], unique=True))
+        TableSpec(...
+                  unique_indices={'unique_key_0': ['name'],
+                                  'unique_key_1': ['parent_user_id']},
+                  ...)
+        """
+        if unique and key_redundant(self.all_unique_indices, key, unique=True):
+            return self.with_key(key, key_name=key_name, unique=False)
+
+        if (not unique) and key_redundant(self.indices, key, unique=False):
+            return self
+
+        if key_name is None:
+            if unique:
+                key_name = next_indexed_name(
+                    set(self.unique_indices.keys()), base="unique_key"
+                )
+            else:
+                key_name = next_indexed_name(set(self.indices.keys()), base="key")
+
+        assert key_name is not None  # For MyPy.
+
+        if unique:
+
+            return replace(
+                self,
+                unique_indices={key_name: key, **self.unique_indices},
+            )
+        else:
+
+            return replace(
+                self,
+                indices={key_name: key, **self.indices},
+            )
+
+    def with_auto_id(
+        self, prefix: str | None = None, bigint: bool = True
+    ) -> "TableSpec":
+        """
+        Replace the current primary key with an auto_id PK and a unique key.
+
+        >>> from jasmine.sql.table_spec import example_table_spec
+        >>> from pprint import pprint
+
+        >>> pprint(example_table_spec.with_auto_id(prefix="jsmn", bigint=True))
+        TableSpec(column_names=['jsmn_auto_id', 'user_id', 'name', 'parent_user_id'],
+                  column_type_decls={'jsmn_auto_id': 'BIGINT NOT NULL AUTO_INCREMENT',
+                                     'name': 'VARCHAR(96) NOT NULL',
+                                     'parent_user_id': 'BIGINT',
+                                     'user_id': 'INTEGER NOT NULL'},
+                  primary_key=['jsmn_auto_id'],
+                  indices={'org_name': ['parent_user_id', 'name']},
+                  unique_indices={'jsmn_prev_primary_key': ['user_id'],
+                                  ...)
+        """
+        if prefix is not None:
+            auto_id_column_name = f"{prefix}_auto_id"
+        else:
+            auto_id_column_name = "auto_id"
+
+        if bigint:
+            int_type_str = "BIGINT"
+        else:
+            int_type_str = "INT"
+
+        assert "jsmn_prev_primary_key" not in self.unique_indices
+        assert (
+            auto_id_column_name not in self.column_names
+        ), f"Table already has an identically named auto_id: {auto_id_column_name}."
+
+        primary_key_index = (
+            {"jsmn_prev_primary_key": self.primary_key} if self.primary_key else {}
+        )
+
+        return replace(
+            self,
+            column_names=[auto_id_column_name] + self.column_names,
+            column_type_decls={
+                auto_id_column_name: f"{int_type_str} NOT NULL AUTO_INCREMENT",
+                **self.column_type_decls,
+            },
+            primary_key=[auto_id_column_name],
+            unique_indices={**primary_key_index, **self.unique_indices},
+        )
+
 
 example_table_spec = TableSpec(
     column_names=["user_id", "name", "parent_user_id"],
@@ -486,7 +652,7 @@ def create_staging_table_statement(
     base_table_name: str,
     base_table_spec: TableSpec,
     suffix: str | None = None,
-) -> str:
+) -> tuple[str, str]:
     """
     Create an appropriate staging table:
     - Drop foreign keys, as their semantic guarantees aren't required and they can junk up the ETL patterns.

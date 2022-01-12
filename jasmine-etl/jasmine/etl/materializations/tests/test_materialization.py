@@ -105,7 +105,7 @@ def walk_view_lifecycle(session, view_id: int):
             schedule_next_event=False,
         )
 
-    if mat is not None:
+    if mat is not None and not mat.terminal():
         do("terminate")
 
     # Verify happy-path / basic flow.
@@ -247,7 +247,7 @@ def walk_upsert_lifecycle(session, view_id: int):
             schedule_next_event=False,
         )
 
-    if mat is not None:
+    if mat is not None and not mat.terminal():
         do("terminate")
 
     # Verify happy-path / basic flow.
@@ -408,7 +408,7 @@ def walk_reload_lifecycle(session, view_id: int):
             schedule_next_event=False,
         )
 
-    if mat is not None:
+    if mat is not None and not mat.terminal():
         do("terminate")
 
     # Verify happy-path / basic flow.

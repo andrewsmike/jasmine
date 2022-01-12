@@ -82,7 +82,7 @@ type UpsertMaterializationSpec {
 
 type ReloadMaterializationSpec {
     column_type_decls: JSON
-    primary_key: [String]!
+    primary_key: [String]
     unique_keys: JSON
     keys: JSON
 }

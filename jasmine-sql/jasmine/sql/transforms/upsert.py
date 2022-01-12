@@ -13,7 +13,9 @@ from jasmine.sql.transforms.basic_statements import upsert_into_statement
 from jasmine.sql.transforms.complex_base import with_constrained_column_values
 
 
-def update_upsert_statement(db_name, table_name, query_text, timestamp_column_name):
+def update_upsert_statement(
+    db_name, table_name, query_text, timestamp_column_name, column_names=None
+):
     """
     Return an UPSERT query that takes a 'last_updated_ts_expr' format expression.
 
@@ -83,7 +85,10 @@ def update_upsert_statement(db_name, table_name, query_text, timestamp_column_na
         assert len(query.queries) == 1
         (query,) = query.queries
 
-    column_names = query_column_names(query)
+    if column_names is None:
+        column_names = query_column_names(query)
+
+    assert column_names is not None  # For MyPy.
 
     # Use placeholder expression, instead of the formatting argument, to sneak by grammatical correctness.
     timestamp_value_placeholder = "'temporary_placeholder_pattern_534324352'"

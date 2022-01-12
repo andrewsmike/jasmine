@@ -26,7 +26,7 @@ from jasmine.sql.ast_nodes import (
     UnionNode,
 )
 from jasmine.sql.parser.sql import SQLParser, children_contexts, sql_tree_from_str
-from jasmine.sql.pretty_print import PrettyPrintVisitor
+from jasmine.sql.pretty_print import PrettyPrintVisitor, pretty_printed_sql_ast
 
 
 def is_readonly_query(query: str) -> bool:
@@ -305,6 +305,166 @@ def column_ref_expr_parts(node: ParseTreeNode | None) -> tuple[str] | None:
 
         case _:
             return None
+
+    # For MyPy.
+    assert False, "Unreachable."
+
+
+def top_level_group_by_column_indices(
+    node: ASTNode, column_names: list[str] | None = None
+) -> list[int]:
+    """
+    The column indices for group by expressions.
+    Throws a ValueError if the query does not have a clean top-level GROUP BY statement.
+
+    Columns are zero-indexed.
+
+    Note: Column names _must_ be escaped before being encoded in SQL. They're not safe.
+
+    >>> from jasmine.sql.ast_nodes import sql_ast_from_str, sql_ast_repr
+
+    >>> def display_results(query_text):
+    ...     print(top_level_group_by_column_indices(sql_ast_from_str(query_text)))
+
+    Simple example:
+    >>> display_results("SELECT a, b AS my_column FROM blah GROUP BY b")
+    [1]
+
+    >>> display_results("SELECT a, b AS my_column FROM blah GROUP BY 2")
+    [1]
+
+    All top-level SELECTs need to have a consistent GROUP BY:
+    >>> display_results("SELECT a, b + l, c FROM blah GROUP BY b + l UNION SELECT 1, 2, 3 FROM dual GROUP BY 2;")
+    [1]
+
+    Inconsistent GROUP BYs clash:
+    >>> display_results("SELECT a, b + l, c FROM blah GROUP BY b + l UNION SELECT 1 AS a, 2, 3 FROM bleh GROUP BY a;")
+    Traceback (most recent call last):
+      ...
+    ValueError: Cannot infer top level GROUP BY clauses; they are inconsistent across UNIONs.
+
+
+    >>> display_results("SELECT blah.* FROM blah GROUP BY b + l")
+    Traceback (most recent call last):
+      ...
+    ValueError: Cannot infer GROUP BY column indices from 'SELECT table.*' queries.
+
+
+    >>> display_results("SELECT * FROM blah GROUP BY b + l")
+    Traceback (most recent call last):
+      ...
+    ValueError: Cannot infer top level GROUP BY columns in 'SELECT *' queries.
+
+
+    >>> display_results("SELECT abcd FROM blah GROUP BY 5 + 34")
+    Traceback (most recent call last):
+      ...
+    ValueError: Cannot infer GROUP BY columns; GROUP BY expression not SELECTed: '5 + 34'
+    """
+    match node:
+        case SqlProgram(queries=queries):
+            assert (
+                len(queries) == 1
+            ), "Attempted to find top-level GROUP BY columns of multiple queries instead of one."
+            return top_level_group_by_column_indices(
+                queries[0], column_names=column_names
+            )
+
+        case QuerySpecNode(
+            select_exprs=select_exprs,
+            select_options=select_options,
+            group_by_exprs=group_by_exprs,
+        ):
+            if select_options:
+                raise ValueError(
+                    "Cannot infer top level GROUP BY columns: select options not currently supported."
+                )
+
+            if any(
+                not isinstance(select_expr, SelectExpr) for select_expr in select_exprs
+            ):
+                raise ValueError(
+                    "Cannot infer top level GROUP BY columns in 'SELECT *' queries."
+                )
+
+            if any(
+                select_expr.select_expr_type != "expr" for select_expr in select_exprs
+            ):
+                raise ValueError(
+                    "Cannot infer GROUP BY column indices from 'SELECT table.*' queries."
+                )
+
+            if not group_by_exprs:
+                raise ValueError(
+                    "Cannot infer GROUP BY columns; no top-level GROUP BY expression."
+                )
+
+            select_expr_identifying_strs = [
+                (
+                    {pretty_printed_sql_ast(select_expr.expr), select_expr.expr_alias}
+                    | (
+                        {column_names[select_index]}
+                        if column_names is not None
+                        else set()
+                    )
+                )
+                for select_index, select_expr in enumerate(select_exprs)
+            ]
+            column_indices = []
+            for group_by_expr in group_by_exprs:
+                group_by_expr_str = pretty_printed_sql_ast(group_by_expr)
+
+                try:
+                    # Column indices are zero-indexed.
+                    column_indices.append(int(group_by_expr_str) - 1)
+                    continue
+                except Exception as e:
+                    pass
+
+                for column_index, identifying_strs in enumerate(
+                    select_expr_identifying_strs
+                ):
+                    if group_by_expr_str in identifying_strs:
+                        column_indices.append(column_index)
+                        break
+                else:
+                    raise ValueError(
+                        f"Cannot infer GROUP BY columns; GROUP BY expression not SELECTed: '{group_by_expr_str}'"
+                    )
+
+            return column_indices
+
+        case UnionNode(subqueries=subqueries):
+            subquery_column_indices = set()
+            for subquery in subqueries:
+                try:
+                    subquery_column_indices.add(
+                        tuple(
+                            top_level_group_by_column_indices(
+                                subquery, column_names=column_names
+                            )
+                        )
+                    )
+                except ValueError as e:
+                    pass
+
+            if len(subquery_column_indices) == 1:
+                (column_indices,) = subquery_column_indices
+                return list(column_indices)
+            else:
+                raise ValueError(
+                    "Cannot infer top level GROUP BY clauses; they are inconsistent across UNIONs."
+                )
+
+        case CTEOrderLimitNode(subquery=subquery):
+            return top_level_group_by_column_indices(
+                subquery, column_names=column_names
+            )
+
+        case _:
+            raise ValueError(
+                f"Could not derive top level GROUP BY columns from node of type {type(node)}."
+            )
 
     # For MyPy.
     assert False, "Unreachable."

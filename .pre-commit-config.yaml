@@ -46,7 +46,7 @@ repos:
         name: black
         stages: [commit]
         language: system
-        entry: black
+        entry: black --target-version py310
         types: [python]
         files: "^jasmine-(sql|webserver|etl|models)/"
 

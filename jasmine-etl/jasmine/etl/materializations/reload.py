@@ -2,18 +2,16 @@
 Completely reload the table at a regular interval.
 
 Config:
-- column_type_decls
-    - Future feature: autodetect type decls from simple source columns
-
-- primary_key
-- unique_keys
-- keys
+- primary_key  [Optional: Parsed from GROUP BY.]
+- unique_keys  [Optional: Unnecessary due to primary key.]
+- keys  [Optional but encouraged. No default keys.]
 
 Context:
 - last_updated: Unix timestamp (integer) of last time pulled.
 - table_spec: Table spec for the destination table.
     Includes all information about primary/unique/regular keys, types, etc
 """
+from dataclasses import replace
 from datetime import datetime
 from pprint import pformat
 
@@ -28,8 +26,9 @@ from jasmine.etl.materializations.etl_tools import (
     edit_resources,
     set_state_on_exception,
 )
+from jasmine.etl.query_type_analysis import inferred_query_table_spec
 from jasmine.etl.table_diff import patch_target_table_region
-from jasmine.sql.analysis import is_readonly_query, query_column_names
+from jasmine.sql.analysis import is_readonly_query
 from jasmine.sql.ast_nodes import sql_ast_from_str
 from jasmine.sql.table_spec import (
     TableSpec,
@@ -61,15 +60,21 @@ def verify_reload(self, session):
         view_sql
     ), "Views must contain a single read-only query each."
 
-    column_names = query_column_names(sql_ast_from_str(view_sql))
+    query_ast = sql_ast_from_str(view_sql)
 
-    table_spec = TableSpec(
-        column_names=column_names,
-        column_type_decls=self.config["column_type_decls"],
-        primary_key=self.config.get("primary_key", column_names),
+    backend = self.view.project.backend
+    table_spec = inferred_query_table_spec(backend, query_ast, require_primary_key=True)
+
+    table_spec = replace(
+        table_spec,
+        primary_key=self.config.get("primary_key", table_spec.primary_key),
         unique_indices=self.config.get("unique_keys", {}),
-        indices=self.config.get("keys", {}),
-    ).with_deduped_indices()
+        indices=self.config.get("indices", {}),
+    )
+    table_spec = table_spec.with_deduped_indices()
+    assert (
+        table_spec.primary_key
+    ), "Reload materializations require a primary key. Try adding a no-op GROUP BY clause."
 
     self.context = {
         "table_spec": table_spec,

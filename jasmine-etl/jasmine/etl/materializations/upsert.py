@@ -1,23 +1,21 @@
 """
-User config:
-
-Assertions:
-- No GROUP BYs (aggregations are incompat with this pattern)
+Assertions and limitations:
+- No non-primary-key GROUP BYs, no actual aggregations.
 - No subqueries
-
-
+- No ORDER BY, LIMITs
+- No LEFT JOINs
+- No SELECT DISTINCT, window functions, aggregating functions
+- UNIONs acceptable (TODO: distinct v all? Only distinct, right?)
 
 Config:
-- column_type_decls
-    - Future feature: autodetect type decls from simple source columns
+- primary_key  [Optional: Parsed from GROUP BY.]
+- unique_keys  [Optional: Unnecessary due to primary key.]
+- keys  [Optional but encouraged. No default keys.]
 
-- unique_keys
 - updated_ts_column_name: Updated timestamp column. Gets type from destination table.
     Treats ints and decimals as timestamps.
 
-- keys
-
-- start_timestamp: Optional start timestamp. Defaults to NOW().
+- start_timestamp  [Optional: defaults to NOW(), or only data going forward.]
 
 
 Context:
@@ -27,9 +25,8 @@ Context:
 
 TODO:
 - Think out timestamping issues D:::, timezones
-- How are ORDER BYs retained?
-- Alllll the JOIN issues
 """
+from dataclasses import replace
 from datetime import datetime
 from math import floor
 from time import time
@@ -44,7 +41,8 @@ from jasmine.etl.materializations.etl_tools import (
     edit_resources,
     set_state_on_exception,
 )
-from jasmine.sql.analysis import is_readonly_query, query_column_names, uses_subqueries
+from jasmine.etl.query_type_analysis import inferred_query_table_spec
+from jasmine.sql.analysis import is_readonly_query, uses_subqueries
 from jasmine.sql.ast_nodes import sql_ast_from_str
 from jasmine.sql.table_spec import (
     TableSpec,
@@ -67,8 +65,11 @@ def upsert_resource_names(self):
 @set_state_on_exception("rejected", (SyntaxError, AssertionError, ValueError))
 def verify_upsert(self, session):
 
-    # Leave asserting to creation.
-    # assert_names_available(self.view.project.backend, upsert_resource_names(self))
+    # No UNION DISTINCT
+    # No ORDER BYs, LIMITs _anywhere_
+    # No SELECT DISTINCT, SUM(...) OVER (....), non-redundant/non-PK GROUP BY, etc
+    # assert not top_level_filters(query_ast), "The UPSERT materialization does not support (possibly changing) WHERE clauses."
+    # Can I instead force them to never delete / update those? Nope.
 
     view_sql = self.view.spec["query_text"]
     assert is_readonly_query(
@@ -77,43 +78,32 @@ def verify_upsert(self, session):
     assert not uses_subqueries(
         view_sql
     ), "The UPSERT materialization does not support subqueries."
-    assert self.config.get(
-        "unique_keys", []
-    ), "The UPSERT materialization requires at least one primary or unique key."
-    # query_ast = sql_ast_from_str(view_sql)
-    # No UNION DISTINCT
-    # No LIMITs _anywhere_
-    # No CTEs
-    # No subquery
-    # No DISTINCT, SUM(...) OVER (....), GROUP BY, etc
-    # assert not top_level_filters(query_ast), "The UPSERT materialization does not support (possibly changing) WHERE clauses."
-    # assert not top_level_aggregations(query_ast), "The UPSERT materialization does not support (possibly changing) WHERE clauses."
 
-    column_names = query_column_names(sql_ast_from_str(view_sql))
+    query_ast = sql_ast_from_str(view_sql)
+    backend = self.view.project.backend
 
-    assert self.config["updated_ts_column_name"] in column_names
-    assert "jsmn_auto_id" not in column_names, "Cannot SELECT column with name auto_id."
+    # Infer column names and types by asking the database.
+    table_spec = inferred_query_table_spec(backend, query_ast)
 
-    start_timestamp = self.config.get("start_timestamp")
-    if start_timestamp is None:
-        start_timestamp = floor(time())
-    assert isinstance(start_timestamp, int)
-
-    table_spec = TableSpec(
-        column_names=["jsmn_auto_id"] + column_names,
-        column_type_decls={
-            **{"jsmn_auto_id": "BIGINT NOT NULL AUTO_INCREMENT"},
-            **self.config["column_type_decls"],
-        },
-        primary_key=["jsmn_auto_id"],
+    table_spec = replace(
+        table_spec,
+        primary_key=self.config.get("primary_key", table_spec.primary_key),
         unique_indices=self.config.get("unique_keys", {}),
-        indices={
-            **self.config.get("keys", {}),
-            # Inject updated_ts key, which will be removed if redundant when deduping indices.
-            # Arbitrary key that won't be in the config:
-            **{"nonexistent_key" * 10: [self.config["updated_ts_column_name"]]},
-        },
+        indices=self.config.get("indices", {}),
+    ).with_auto_id()
+    table_spec = table_spec.with_key(
+        [self.config["updated_ts_column_name"]], unique=False
     ).with_deduped_indices()
+
+    assert (
+        table_spec.primary_key
+    ), "UPSERT requires a primary key. Add one to the configuration or add a redundant GROUP BY primary_key, ... clause."
+    assert (
+        self.config["updated_ts_column_name"] in table_spec.column_names
+    ), "Updated TS column doesn't show up in query. Try adding an `... AS updated_ts` SELECT alias."
+
+    start_timestamp = self.config.get("start_timestamp", floor(time()))
+    assert isinstance(start_timestamp, int)
 
     self.context = {
         "high_water_mark": start_timestamp,
@@ -180,17 +170,21 @@ def update_upsert(self, session):
 
     upsert_path = (self.db_name, self.table_name)
 
+    table_spec = TableSpec.from_dict(self.context["table_spec"])
+
+    auto_id_column_name, *column_names = table_spec.column_names
+    assert auto_id_column_name.endswith("auto_id")
+
     updated_ts_column_name = self.config["updated_ts_column_name"]
     update_upsert_sql = update_upsert_statement(
         self.db_name,
         self.table_name,
         self.view.spec["query_text"],
         updated_ts_column_name,
+        column_names=table_spec.column_names[1:],  # Remove the auto_id.
     )
 
     last_updated_ts = self.context["high_water_mark"]
-
-    table_spec = TableSpec.from_dict(self.context["table_spec"])
 
     timestamp_decl_str = table_spec.column_type_decls[updated_ts_column_name].upper()
     if "INT" in timestamp_decl_str or "DECIMAL" in timestamp_decl_str:

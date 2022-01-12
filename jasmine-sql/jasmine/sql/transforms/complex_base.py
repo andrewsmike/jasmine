@@ -155,6 +155,50 @@ def with_constrained_column_values(
             )
 
 
+def with_limit(
+    node: ASTNode,
+    limit: int,
+) -> ASTNode:
+    """
+    Add 'LIMIT <value>' clause to a query.
+
+    >>> from jasmine.sql.ast_nodes import sql_ast_from_str
+    >>> from jasmine.sql.pretty_print import pretty_printed_sql_ast
+
+    >>> query = sql_ast_from_str("SELECT a.id, a.value + b.value FROM a JOIN b WHERE a.id > 0 ORDER BY a.id LIMIT 100")
+    >>> limited_query = with_limit(
+    ...     query,
+    ...     limit=10,
+    ... )
+    >>> print(pretty_printed_sql_ast(limited_query))
+    (
+      SELECT a.id, a.value + b.value
+        FROM a
+       INNER JOIN b
+       WHERE a.id > 0
+       ORDER BY a.id ASC
+       LIMIT 100
+    )
+     LIMIT 10;
+    """
+    if isinstance(node, SqlProgram):
+        assert (
+            len(node.queries) == 1
+        ), "Cannot apply limit to multiple queries, expected single query."
+        (node,) = node.queries
+        return SqlProgram(queries=[with_limit(node, limit)])
+    else:
+        return CTEOrderLimitNode(
+            cte_subqueries=None,
+            subquery=node,
+            order_by_clauses=None,
+            limit_options=sql_subexpr_ast(
+                str(limit),
+                "limitOption",
+            ),
+        )
+
+
 def display_transformed_query():
     sql_source_path = join(
         dirname(__file__),

@@ -222,8 +222,8 @@ def names_status_str(backend: Backend, resource_names: ResourceNames) -> str:
         `name` VARCHAR(96) NOT NULL,
         `parent_user_id` BIGINT,
         PRIMARY KEY (`user_id`),
-        UNIQUE unique_key_0 (`name`),
-        UNIQUE unique_key_1 (`parent_user_id`),
+        UNIQUE unique_key_1 (`name`),
+        UNIQUE unique_key_2 (`parent_user_id`),
         KEY org_name (`parent_user_id`, `name`),
         CONSTRAINT FOREIGN KEY (`parent_user_id`) REFERENCES `main`.`users \\" ` (`user_id`)
     );
