@@ -62,7 +62,22 @@ def set_state_on_exception(failure_state: str, error_types: tuple[Exception]):
             ), f"Failure state {failure_state} not valid for materialization type {type(materialization).__name__}"
             # TODO: Testing
             try:
-                return func(materialization, session, *args, **kwargs)
+                start_state = materialization.state
+
+                result = func(materialization, session, *args, **kwargs)
+
+                end_state = result
+
+                attempt_log_backend_event(
+                    title=f"{materialization.materialization_type} materialization successfully set to {end_state}",
+                    description=(
+                        f"Went from {start_state} to {end_state}.\n"
+                        + f"{materialization.state_machine_type.state_desc[end_state]}"
+                    ),
+                    materialization=materialization,
+                )
+                return result
+
             except error_types as e:
                 attempt_log_backend_event(
                     title="Materialization event failed",
