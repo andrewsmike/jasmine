@@ -57,6 +57,8 @@ services:
       - database
       - worker_router
       - redis
+    environment:
+      TZ: "America/New_York"
 
   backend:
     build:
@@ -75,6 +77,8 @@ services:
       - database
       - workers
       - redis
+    environment:
+      TZ: "America/New_York"
 
   nginx:
     image: nginx:stable
