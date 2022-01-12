@@ -88,6 +88,19 @@ class ForeignKey:
         )
 
 
+def next_indexed_name(names, base):
+    """
+    >>> next_indexed_name({"key_1", "key_2", "key_3", "key_6"}, "key")
+    'key_4'
+    """
+    for i in range(1_000_000):
+        name = f"{base}_{i+1}"
+        if name not in names:
+            return name
+    else:
+        raise RuntimeError(f"Couldn't find a unique name. Tried 1mil. Base: {base}.")
+
+
 # Recursive to_json, from_json methods.
 @dataclass_json
 @dataclass
@@ -194,8 +207,8 @@ class TableSpec:
             ), f"Key {key} asking for unknown column(s) {unknown_columns}"
 
     @classmethod
-    def from_sqla_inspector(cls, inspector, db_name: str, table_name: str):
-        db_name = unescaped(db_name)
+    def from_sqla_inspector(cls, inspector, db_name: str | None, table_name: str):
+        db_name = unescaped(db_name) if db_name is not None else None
         table_name = unescaped(table_name)
 
         column_infos = inspector.get_columns(table_name, schema=db_name)
@@ -210,9 +223,10 @@ class TableSpec:
         ]
 
         index_infos = inspector.get_indexes(table_name, schema=db_name)
+        index_names = {index_info["name"] for index_info in index_infos if index_info["name"]}
         indices = {
-            index_info["name"]: index_info["column_names"]
-            for index_info in index_infos
+            index_info["name"] or next_indexed_name(index_names, "key"): index_info["column_names"]
+            for index_index, index_info in enumerate(index_infos)
             if not index_info["unique"]
         }
 
@@ -518,7 +532,7 @@ def create_staging_table_statement(
 
 
 def drop_table_statement(
-    db_name: str,
+    db_name: str | None,
     table_name: str,
     idempotent: bool = True,
     temporary: bool = False,
@@ -526,6 +540,9 @@ def drop_table_statement(
     """
     >>> print(drop_table_statement("main", 'users " '))
     DROP TABLE IF EXISTS `main`.`users " `;
+
+    >>> print(drop_table_statement(None, 'users " '))
+    DROP TABLE IF EXISTS `users " `;
 
     >>> print(drop_table_statement("main", 'users " ', idempotent=False))
     DROP TABLE `main`.`users " `;

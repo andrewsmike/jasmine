@@ -38,8 +38,11 @@ def escaped(name: str) -> str:
     return f"`{name}`"
 
 
-def escaped_db_table(db_name: str, table_name: str) -> str:
-    return escaped(db_name) + "." + escaped(table_name)
+def escaped_db_table(db_name: str | None, table_name: str) -> str:
+    if db_name is not None:
+        return escaped(db_name) + "." + escaped(table_name)
+    else:
+        return escaped(table_name)
 
 
 def escaped_column_list(column_names: list[str]) -> str:
