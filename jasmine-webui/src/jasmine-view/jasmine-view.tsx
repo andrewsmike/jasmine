@@ -18,6 +18,7 @@ const viewFromPathQuery = gql`
             organization_id: $organizationId
         ) {
             view_id
+            view_type
             project {
                 name
             }
@@ -35,6 +36,7 @@ const viewFromIdQuery = gql`
     query ViewFromId($viewId: ID!) {
         view(id: $viewId) {
             view_id
+            view_type
             project {
                 name
             }
@@ -126,6 +128,7 @@ export default function JasmineView() {
         view_id: viewId,
         project: { name: projectName },
         path: viewPath,
+        view_type: queryType,
         spec: { query_text: queryText },
     } = viewData;
 
@@ -136,6 +139,7 @@ export default function JasmineView() {
                 projectName={projectName}
                 queryPath={viewPath}
                 queryText={queryText}
+                queryType={queryType}
                 refetchQueries={[
                     viewFromIdQuery,
                     viewFromPathQuery,

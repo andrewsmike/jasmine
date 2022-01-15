@@ -4,6 +4,7 @@ import Typography from "@material-ui/core/Typography";
 import ExpandMoreIcon from "@material-ui/icons/ExpandMore";
 import ExpandLessIcon from "@material-ui/icons/ExpandLess";
 import DescriptionOutlinedIcon from "@material-ui/icons/DescriptionOutlined";
+import RestoreIcon from "@material-ui/icons/Restore";
 import TreeView from "@material-ui/lab/TreeView";
 import TreeItem from "@material-ui/lab/TreeItem";
 import { useHistory } from "react-router-dom";
@@ -209,6 +210,9 @@ export default function JasmineNavBar() {
                 className={classes.viewTypeIcon}
                 color="primary"
             />
+        ),
+        history_table: (
+            <RestoreIcon className={classes.viewTypeIcon} color="primary" />
         ),
     };
 

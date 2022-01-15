@@ -87,12 +87,14 @@ export default function QueryEditor({
     projectName,
     queryPath,
     queryText,
+    queryType,
     refetchQueries,
 }: {
     queryId: number;
     projectName: string;
     queryPath: string;
     queryText: string;
+    queryType: string;
     refetchQueries: any[];
 }) {
     const classes = useStyles();
@@ -204,6 +206,7 @@ export default function QueryEditor({
                 <SqlEditor
                     code={editorQuery?.queryText || ""}
                     setCode={setEditorCode}
+                    disabled={queryType !== "query"}
                 />
                 <ViewResultPreview
                     viewId={queryId}
