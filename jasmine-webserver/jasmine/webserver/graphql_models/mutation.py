@@ -11,6 +11,9 @@ from jasmine.etl.worker_tasks import (
     view_result_preview,
 )
 from jasmine.models import Materialization, Project, User, View, new_materialization
+from jasmine.models.materializations.base import (
+    history_table_preferred_materialization_order,
+)
 from jasmine.webserver.graphql_models.query import with_sqla_session
 from jasmine.webserver.random_phrase import random_hex, random_phrase
 
@@ -94,9 +97,11 @@ type Mutation {
     create_query(project_id: ID, path: String, query_text: String): ViewResult!
     update_query_text(id: ID!, query_text: String!): ViewResult!
 
+    create_history_table(project_id: ID, source_view_id: ID, source_db_name: String, source_table_name: String): ViewResult!
+
     move_view(id: ID!, project_name: String, view_path: String): ViewResult!
     update_view_path(id: ID!, path: String!): ViewResult!
-    delete_view(id: ID!): DeleteResult!
+    delete_view(id: ID!, force_no_cleanup: Boolean): DeleteResult!
 
     preview_view_result(id: ID!): DataResult!
 
@@ -119,6 +124,22 @@ def random_view_path(project: Project):
     else:
         raise RuntimeError(
             "Too many scratch queries; retry or clear scratch/ directory."
+        )
+
+
+def history_table_path(project: Project, db_name: str, table_name: str) -> str:
+    paths = {view.path for view in project.views}
+
+    base = table_name + "_history"
+    if base not in paths:
+        return base
+
+    for i in range(MAX_ATTEMPTS):
+        if f"{base}_{i+1}" not in paths:
+            return f"{base}_{i+1}"
+    else:
+        raise RuntimeError(
+            "Too many history tables with same name to create a new one. They can be reused!"
         )
 
 
@@ -146,21 +167,21 @@ def active_materializations(view):
     return [mat for mat in view.materializations if not mat.terminal()]
 
 
-def create_query_view_materialization(session, query):
+def create_view_materialization(session, query, mat_type="view", config=None):
 
     preexisting_mats = [
-        mat for mat in query.materializations if mat.materialization_type == "view"
+        mat for mat in query.materializations if mat.materialization_type == mat_type
     ]
 
     assert (
         len(preexisting_mats) <= 1
-    ), "Multiple view materializations per view is not currently supported."
+    ), f"Multiple {mat_type} materializations per view is not currently supported."
     preexisting_mat = (preexisting_mats + [None])[0]
 
     mat = new_materialization(
         view=query,
-        mat_type_name="view",
-        config={},
+        mat_type_name=mat_type,
+        config=config or {},
         preexisting_mat=preexisting_mat,
     )
     session.add(mat)
@@ -178,11 +199,11 @@ def create_query_view_materialization(session, query):
     session.rollback()
 
 
-def terminate_query_view_materialization(session, query):
+def terminate_view_materialization(session, query, mat_type="view"):
     preexisting_mats = [
         mat
         for mat in query.materializations
-        if mat.materialization_type == "view"
+        if mat.materialization_type == mat_type
         if not mat.terminal()
     ]
 
@@ -191,7 +212,7 @@ def terminate_query_view_materialization(session, query):
 
     assert (
         len(preexisting_mats) == 1
-    ), "Multiple view materializations per view is not currently supported."
+    ), f"Multiple {mat_type} materializations per view is not currently supported."
     (preexisting_mat,) = preexisting_mats
 
     execute_materialization_event.delay(
@@ -241,11 +262,87 @@ def create_query(
     session.commit()
 
     try:
-        create_query_view_materialization(session, query)
+        create_view_materialization(session, query)
     except Exception as e:
         pass
 
     return query
+
+
+def best_history_table_base_mat(source_view: View) -> Materialization:
+    mats = active_materializations(source_view)
+    assert (
+        mats
+    ), "Source view doesn't have any materializations to attach history table to."
+
+    for mat_type in history_table_preferred_materialization_order:
+        mats_of_type = [mat for mat in mats if mat.materialization_type == mat_type]
+        if mats_of_type:
+            assert (
+                len(mats_of_type) == 1
+            ), "Cannot choose between multiple materializations of the same type."
+            (mat,) = mats_of_type
+            return mat
+    else:
+        raise ValueError(
+            "Cannot create a history table for a non-concrete materialization type."
+        )
+
+
+@mutation_obj.field("create_history_table")
+@as_wrapped_graphql_payload
+@with_sqla_session
+def create_history_table(
+    session,
+    obj,
+    info,
+    project_id: int | None = None,
+    source_view_id: int | None = None,
+    source_db_name: str = "",
+    source_table_name: str = "",
+) -> View:
+    assert source_view_id != (
+        source_db_name and source_table_name
+    ), "History tables need either a source view or a database/table."
+
+    # Temporary.
+    user = session.query(User).where(User.user_id == 1).one()
+
+    assert (
+        user.default_project_id is not None
+    ), "User must have default project configured."
+
+    if source_view_id is not None:
+        source_view = session.query(View).where(View.view_id == source_view_id).one()
+
+        mat = best_history_table_base_mat(source_view)
+
+        source_db_name, source_table_name = mat.db_name, mat.table_name
+
+    assert source_db_name is not None and source_table_name is not None
+
+    path = history_table_path(user.default_project, source_db_name, source_table_name)
+
+    history_table = View(
+        project_id=user.default_project_id,
+        view_type="history_table",
+        path=path,
+        spec={
+            "source_db_name": source_db_name,
+            "source_table_name": source_table_name,
+            "view_type": "history_table",
+        },
+    )
+
+    session.add(history_table)
+    session.commit()
+
+    try:
+        create_view_materialization(session, history_table, mat_type="history_table")
+    except Exception as e:
+        pass
+
+    return history_table
 
 
 @mutation_obj.field("update_query_text")
@@ -259,10 +356,12 @@ def update_query_text(
 
     view = session.query(View).where(View.view_id == id).one()
 
-    assert view.view_type == "query"
+    assert (
+        view.view_type == "query"
+    ), "History tables don't use queries, cannot update_query_text()."
     query = view
 
-    terminate_query_view_materialization(session, query)
+    terminate_view_materialization(session, query)
 
     assert (
         len(active_materializations(query)) == 0
@@ -273,7 +372,7 @@ def update_query_text(
     query.spec = new_spec
 
     try:
-        create_query_view_materialization(session, query)
+        create_view_materialization(session, query)
     except Exception as e:
         pass
 
@@ -288,13 +387,15 @@ def delete_view(
     obj,
     info,
     id: int = None,
+    force_no_cleanup: bool = False,
 ):
     view = session.query(View).where(View.view_id == id).one()
 
-    if view.view_type == "query":
-        terminate_query_view_materialization(session, view)
+    if view.view_type in ("query", "history_table"):
+        mat_type = {"query": "view", "history_table": "history_table"}[view.view_type]
+        terminate_view_materialization(session, view, mat_type=mat_type)
 
-    assert (
+    assert force_no_cleanup or (
         len(active_materializations(view)) == 0
     ), "Cannot delete a view with active materializations."
 
@@ -315,7 +416,9 @@ def move_view(
     view = session.query(View).where(View.view_id == id).one()
 
     if view.view_type == "query":
-        terminate_query_view_materialization(session, view)
+        terminate_view_materialization(session, view, mat_type="view")
+    elif view.view_type == "history_table":
+        terminate_view_materialization(session, view, mat_type="history_table")
 
     assert (
         len(active_materializations(view)) == 0
@@ -330,7 +433,12 @@ def move_view(
 
     if view.view_type == "query":
         try:
-            create_query_view_materialization(session, view)
+            create_view_materialization(session, view)
+        except Exception as e:
+            pass
+    elif view.view_type == "history_table":
+        try:
+            create_view_materialization(session, view, mat_type="history_table")
         except Exception as e:
             pass
 

@@ -72,6 +72,12 @@ materialization_types = [
     "reload",
 ]
 
+history_table_preferred_materialization_order = [
+    "reload",
+    "upsert",
+    "history_table",
+]
+
 # Each subclass needs to define their own State / Event types.
 # To handle this, have the parent class be generic against these.
 State = TypeVar("State")
