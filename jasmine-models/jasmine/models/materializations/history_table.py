@@ -44,7 +44,7 @@ class HistoryTableStateMachine(StateMachine[HistoryTableState, HistoryTableEvent
     nice_name: str = "History Table"
 
     # Hack so we can typecheck state values, but still have them available here.
-    states: set[HistoryTableState] = set(HistoryTableState.__args__)
+    states: set[HistoryTableState] = set(HistoryTableState.__args__)  # type: ignore
 
     state_desc: dict[State, str] = {
         "proposed": "Received request, need to verify.",
@@ -64,7 +64,7 @@ class HistoryTableStateMachine(StateMachine[HistoryTableState, HistoryTableEvent
     }
 
     # Hack so we can typecheck event values, but still have them available here.
-    events: set[HistoryTableEvent] = set(HistoryTableEvent.__args__)
+    events: set[HistoryTableEvent] = set(HistoryTableEvent.__args__)  # type: ignore
 
     state_events: dict[State, set[Event]] = {
         "proposed": {"verify", "terminate"},
