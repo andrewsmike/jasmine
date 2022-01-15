@@ -1,5 +1,6 @@
 from jasmine.models.materializations import (
     HistoryTableMaterialization,
+    IncrementalMaterialization,
     Materialization,
     ReloadMaterialization,
     UpsertMaterialization,
@@ -15,6 +16,7 @@ __all__ = [
     "Backend",
     "BackendEvent",
     "HistoryTableMaterialization",
+    "IncrementalMaterialization",
     "Materialization",
     "Organization",
     "Project",

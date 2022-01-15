@@ -507,3 +507,168 @@ def walk_reload_lifecycle(session, view_id: int):
     session.execute(text("DROP TABLE `jasmine_test`.`incremental_demo_reload`;"))
     do("terminate")
     assert mat.state == "terminated"
+
+
+def test_incremental_lifecycle():
+    with prepopulated_worker_test_backend():
+
+        # Hardcoded in test dump.
+        with app_db_session(orm_registry) as session:
+            walk_incremental_lifecycle(session, 51)
+
+
+def walk_incremental_lifecycle(session, view_id: int):
+    # Import late so mocking captures config.
+    # TODO: Make this nicer with decent config setup.
+    from jasmine.etl.worker_tasks import execute_materialization_event
+
+    view = session.query(View).get(view_id)
+    backend = view.project.backend
+    mats = [
+        mat
+        for mat in view.materializations
+        if mat.materialization_type == "incremental"
+    ]
+    mat = mats[0] if mats else None
+
+    keys = {
+        "event_id": ["event_id"],
+        "path": ["path"],
+        "description": ["description"],
+        "title": ["title"],
+        "title2": ["title", "description"],
+    }
+    column_names = [
+        "event_id",
+        "path",
+        "method",
+        "state",
+        "config",
+        "context",
+        "title",
+        "description",
+        "updated_ts",
+    ]
+
+    def refresh_mat(preexisting_mat=None):
+        config = {
+            "keys": keys,
+        }
+        mat = new_materialization(
+            view=view,
+            mat_type_name="incremental",
+            config=config,
+            preexisting_mat=preexisting_mat,
+        )
+        session.add(mat)
+        session.commit()
+        return mat
+
+    def do(event):
+        # Flush any dependencies to avoid locking issues.
+        session.commit()
+        execute_materialization_event(
+            mat.materialization_id,
+            event,
+            schedule_next_event=False,
+        )
+
+    if mat is not None and not mat.terminal():
+        do("terminate")
+
+    # Verify happy-path / basic flow.
+    mat = refresh_mat(preexisting_mat=mat)
+    assert mat.state == "proposed"
+
+    do("verify")
+    assert mat.state == "accepted"
+
+    do("create")
+    assert mat.state == "active"
+    assert table_exists(backend, "jasmine_test", "incremental_demo_incremental")
+    assert mat.context["last_updated"] is None
+
+    direct_results = set(session.execute(text(view.spec["query_text"])).fetchall())
+
+    # Adds rows to backend_events and changes state so do this a step later.
+    do("update")
+    assert mat.state == "active"
+    assert mat.context["last_updated"] is not None
+    assert (
+        mat.context["last_updated"]
+        >= (datetime.now() - timedelta(seconds=10)).timestamp()
+    )
+
+    incremental_results = set(
+        session.execute(
+            text(
+                f"SELECT {escaped_column_list(column_names)} FROM `jasmine_test`.`incremental_demo_incremental`"
+            )
+        ).fetchall()
+    )
+    assert direct_results == incremental_results
+
+    second_direct_results = set(
+        session.execute(text(view.spec["query_text"])).fetchall()
+    )
+    do("update")
+    second_incremental_results = set(
+        session.execute(
+            text(
+                f"SELECT {escaped_column_list(column_names)} FROM `jasmine_test`.`incremental_demo_incremental`"
+            )
+        ).fetchall()
+    )
+    assert second_direct_results == second_incremental_results
+
+    # Specific to backend_events.
+    assert len(incremental_results) + 1 == len(second_incremental_results)
+
+    do("terminate")
+    assert mat.state == "terminated"
+    assert not table_exists(backend, "jasmine_test", "incremental_demo_incremental")
+
+    # Verify early-termination.
+    mat = refresh_mat(mat)
+    do("verify")
+    do("terminate")
+    assert mat.state == "terminated"
+    assert not table_exists(backend, "jasmine_test", "incremental_demo_incremental")
+
+    # Verify view collion handling.
+    session.execute(
+        text("CREATE VIEW `jasmine_test`.`incremental_demo_incremental` AS SELECT 1;")
+    )
+    mat = refresh_mat(mat)
+    do("verify")
+    do("create")
+    assert mat.state == "could_not_create"
+    assert view_exists(backend, "jasmine_test", "incremental_demo_incremental")
+
+    do("terminate")
+    assert mat.state == "terminated"
+    assert view_exists(backend, "jasmine_test", "incremental_demo_incremental")
+    session.execute(text("DROP VIEW `jasmine_test`.`incremental_demo_incremental`;"))
+
+    # Verify table name collion handling.
+    session.execute(
+        text("CREATE TABLE `jasmine_test`.`incremental_demo_incremental` (pk INT);")
+    )
+    mat = refresh_mat(mat)
+    do("verify")
+    do("create")
+    assert mat.state == "could_not_create"
+    assert table_exists(backend, "jasmine_test", "incremental_demo_incremental")
+
+    do("terminate")
+    assert mat.state == "terminated"
+    assert table_exists(backend, "jasmine_test", "incremental_demo_incremental")
+    session.execute(text("DROP TABLE `jasmine_test`.`incremental_demo_incremental`;"))
+
+    # Verify manual delete handling.
+    mat = refresh_mat(mat)
+    do("verify")
+    do("create")
+    session.execute(text("DROP TABLE `jasmine_test`.`incremental_demo_incremental`;"))
+    do("terminate")
+    assert mat.state == "terminated"

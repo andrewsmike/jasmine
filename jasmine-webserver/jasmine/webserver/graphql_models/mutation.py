@@ -276,7 +276,12 @@ def best_history_table_base_mat(source_view: View) -> Materialization:
     ), "Source view doesn't have any materializations to attach history table to."
 
     for mat_type in history_table_preferred_materialization_order:
-        mats_of_type = [mat for mat in mats if mat.materialization_type == mat_type]
+        mats_of_type = [
+            mat
+            for mat in mats
+            if mat.materialization_type == mat_type
+            if mat.state == "active"
+        ]
         if mats_of_type:
             assert (
                 len(mats_of_type) == 1

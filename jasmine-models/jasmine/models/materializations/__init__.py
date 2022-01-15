@@ -4,6 +4,7 @@ from jasmine.models.materializations.base import (
     materialization_types,
 )
 from jasmine.models.materializations.history_table import HistoryTableMaterialization
+from jasmine.models.materializations.incremental import IncrementalMaterialization
 from jasmine.models.materializations.reload import ReloadMaterialization
 from jasmine.models.materializations.upsert import UpsertMaterialization
 from jasmine.models.materializations.view import ViewMaterialization
@@ -22,6 +23,7 @@ materialization_type = {
     "view": ViewMaterialization,
     "upsert": UpsertMaterialization,
     "reload": ReloadMaterialization,
+    "incremental": IncrementalMaterialization,
 }
 
 

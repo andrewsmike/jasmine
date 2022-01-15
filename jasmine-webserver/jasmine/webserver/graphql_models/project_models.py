@@ -63,6 +63,7 @@ enum MaterializationType {
     history_table
     upsert
     reload
+    incremental
 }
 
 
@@ -88,7 +89,14 @@ type ReloadMaterializationSpec {
     keys: JSON
 }
 
-union MaterializationSpec = HistoryTableMaterializationSpec | UpsertMaterializationSpec | ReloadMaterializationSpec
+type IncrementalMaterializationSpec {
+    column_type_decls: JSON
+    primary_key: [String]
+    unique_keys: JSON
+    keys: JSON
+}
+
+union MaterializationSpec = HistoryTableMaterializationSpec | UpsertMaterializationSpec | ReloadMaterializationSpec | IncrementalMaterializationSpec
 
 type Materialization {
     materialization_id: ID!
@@ -99,6 +107,7 @@ type Materialization {
     backend_events: [BackendEvent]!
 }
 """
+
 
 # Put this first to avoid typing errors in decorator pattern.
 def resolve_view_spec_type(view_spec, *_):

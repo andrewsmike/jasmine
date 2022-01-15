@@ -70,11 +70,13 @@ materialization_types = [
     "history_table",
     "upsert",
     "reload",
+    "incremental",
 ]
 
 history_table_preferred_materialization_order = [
-    "reload",
+    "incremental",
     "upsert",
+    "reload",
     "history_table",
 ]
 
