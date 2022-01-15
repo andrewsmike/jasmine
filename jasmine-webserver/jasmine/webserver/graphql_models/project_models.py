@@ -40,8 +40,9 @@ type QuerySpec {
 }
 
 type HistoryTableSpec {
-    source_table: String!
-    min_history_seconds: Int!
+    source_db_name: String!
+    source_table_name: String!
+    retention_period_seconds: Int!
     trim_frequency_seconds: Int!
 }
 
@@ -98,11 +99,13 @@ type Materialization {
     backend_events: [BackendEvent]!
 }
 """
-view_spec_type = UnionType("ViewSpec")
 
-
-@view_spec_type.type_resolver
+# Put this first to avoid typing errors in decorator pattern.
 def resolve_view_spec_type(view_spec, *_):
     return {
         "query": "QuerySpec",
+        "history_table": "HistoryTableSpec",
     }[view_spec["view_type"]]
+
+
+view_spec_type = UnionType("ViewSpec", resolve_view_spec_type)

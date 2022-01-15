@@ -19,6 +19,7 @@ HistoryTableState = Literal[
     "accepted",
     "could_not_create",
     "active",
+    "could_not_terminate",
     "terminated",
 ]
 HistoryTableEvent = Literal[
@@ -51,6 +52,7 @@ class HistoryTableStateMachine(StateMachine[HistoryTableState, HistoryTableEvent
         "accepted": "Materialization verified; need to create.",
         "could_not_create": "Failed to create materialization; aborted. See logs for details.",
         "active": "Successfully created materialization; active.",
+        "could_not_terminate": "Failed to clean up materialization; retrying. See logs for details.",
         "terminated": "Materialization terminated by user.",
     }
 
@@ -58,7 +60,6 @@ class HistoryTableStateMachine(StateMachine[HistoryTableState, HistoryTableEvent
 
     terminal_states: set[State] = {
         "bad_spec",
-        "could_not_create",
         "terminated",
     }
 
@@ -69,6 +70,8 @@ class HistoryTableStateMachine(StateMachine[HistoryTableState, HistoryTableEvent
         "proposed": {"verify", "terminate"},
         "accepted": {"create", "terminate"},
         "active": {"trim", "terminate"},
+        "could_not_create": {"terminate"},
+        "could_not_terminate": {"terminate"},
     }
 
     event_progressive_verb: dict[Event, str] = {
@@ -81,14 +84,19 @@ class HistoryTableStateMachine(StateMachine[HistoryTableState, HistoryTableEvent
         "verify": {"bad_spec", "accepted"},
         "create": {"could_not_create", "active"},
         "trim": {"active"},  # TODO: Add migration-friendly failure/restart options.
-        "terminate": {"terminated"},
+        "terminate": {"could_not_terminate", "terminated"},
     }
 
-    automatic_events: set[Event] = {"verify", "create"}
+    state_automatic_event: dict[State, Event] = {
+        "proposed": "verify",
+        "accepted": "create",
+        "could_not_create": "terminate",
+        "could_not_terminate": "terminate",  # TODO: Move to slow rescheduled / backoff
+    }
     user_events: set[Event] = {
         "terminate",
     }
-    scheduled_events: set[Event] = {"trim"}
+    scheduled_events: set[Event] = set()
 
 
 @orm_registry.mapped
@@ -100,14 +108,14 @@ class HistoryTableMaterialization(Materialization):
     config_types: dict[str, Type[Any]] = {
         "source_database": str,
         "source_table": str,
-        "min_history_seconds": int,
+        "retention_period_seconds": int,
         "trim_frequency_seconds": int,
-    }
-    config_defaults: dict[str, Any] = {
-        "min_history_seconds": 1 * DAYS,
-        "trim_frequency_seconds": 1 * HOURS,  # trim_schedule?
     }
 
     __mapper_args__ = {
         "polymorphic_identity": "history_table",
     }
+
+    @property
+    def table_name(self) -> str:
+        return self.view.spec["source_table_name"] + "_history"
