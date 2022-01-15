@@ -34,7 +34,9 @@ def new_materialization(
     assert mat_type_name in materialization_type
     mat_class = materialization_type[mat_type_name]
 
-    assert view.view_type in mat_class.acceptable_view_types
+    assert (
+        view.view_type in mat_class.acceptable_view_types
+    ), f"Cannot use {mat_type_name} strategy to materialize a {view.view_type}."
 
     start_state = mat_class.state_machine_type.start_state
     if preexisting_mat:

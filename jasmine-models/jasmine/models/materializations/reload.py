@@ -8,11 +8,6 @@ from jasmine.models.materializations.base import (
 )
 from jasmine.models.model_registry import orm_registry
 
-SECONDS = 1
-MINUTES = 60 * SECONDS
-HOURS = 60 * MINUTES
-DAYS = 24 * HOURS
-
 ReloadState = Literal[
     "proposed",
     "rejected",
@@ -112,7 +107,6 @@ class ReloadMaterialization(Materialization):
     materialization_name: str = "reload"
 
     config_types: dict[str, Type[Any]] = {}
-    config_defaults: dict[str, Any | None] = {}
 
     __mapper_args__ = {
         "polymorphic_identity": "reload",
