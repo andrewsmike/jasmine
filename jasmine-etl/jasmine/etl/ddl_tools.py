@@ -190,7 +190,15 @@ def trigger_status_str(backend: Backend, db_name: str, trigger_name: str) -> str
         return f"Trigger {escaped_db_table(db_name, trigger_name)} does not exist."
 
     with backend_engine(backend).connect() as conn:
-        (create_trigger_statement,) = conn.execute(
+        (
+            name,
+            mode,
+            create_trigger_statement,
+            charset,
+            collation,
+            db_collation,
+            created_ts,
+        ) = conn.execute(
             text(f"SHOW CREATE TRIGGER {escaped_db_table(db_name, trigger_name)};")
         ).fetchone()
         return create_trigger_statement

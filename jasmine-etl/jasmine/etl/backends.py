@@ -14,7 +14,7 @@ from jasmine.etl.app_base import sqla_uri_from_config_section
 from jasmine.models import Backend
 from jasmine.sql.analysis import is_readonly_query
 from jasmine.sql.table_spec import TableSpec
-from jasmine.sql.transforms.escaping import escaped, unescaped
+from jasmine.sql.transforms.escaping import escaped, string_literal_expr, unescaped
 
 
 class DebuggingDictCursor(DictCursor):
@@ -231,8 +231,10 @@ def trigger_exists_with_pattern(
     assert isinstance(trigger_pattern, str)
 
     with backend_engine(backend).connect() as conn:
-        conn.execute(
-            text(f"SHOW TRIGGERS IN {escaped(db_name)} LIKE %s;", trigger_pattern)
+        return bool(
+            conn.execute(
+                text(
+                    f"SHOW TRIGGERS IN {escaped(db_name)} WHERE `Trigger` LIKE {string_literal_expr(trigger_pattern)};"
+                ),
+            ).all()
         )
-
-        return conn.fetchone() is not None
