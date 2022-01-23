@@ -212,6 +212,14 @@ class TableSpec:
         """
         assert len(self.column_names) >= 1, "Table spec must have at least one column."
 
+        assert not any(
+            ("{" in column_name) or ("}" in column_name)
+            for column_name in self.column_names
+        ), (
+            "Curly brackets in column names not supported. Columns: {self.column_names}\n"
+            + "(Hint: Add an alias using 'AS column_name'.)"
+        )
+
         untyped_columns = set(self.column_names) - set(self.column_type_decls.keys())
         assert (
             not untyped_columns
@@ -558,6 +566,29 @@ class TableSpec:
             unique_indices={**primary_key_index, **self.unique_indices},
         )
 
+    def pk_table(self) -> "TableSpec":
+        """
+        >>> from jasmine.sql.table_spec import example_table_spec
+        >>> from pprint import pprint
+
+        >>> pprint(example_table_spec.pk_table())
+        TableSpec(column_names=['user_id'],
+                  column_type_decls={'user_id': 'INTEGER NOT NULL'},
+                  primary_key=['user_id'],
+                  indices={},
+                  unique_indices={},
+                  foreign_keys=[])
+        """
+        return TableSpec(
+            column_names=self.primary_key,
+            column_type_decls={
+                column_name: column_type_decl
+                for column_name, column_type_decl in self.column_type_decls.items()
+                if column_name in self.primary_key
+            },
+            primary_key=self.primary_key,
+        )
+
 
 example_table_spec = TableSpec(
     column_names=["user_id", "name", "parent_user_id"],
@@ -649,17 +680,24 @@ def create_table_statement(
 
 def create_staging_table_statement(
     base_db_name: str,
-    base_table_name: str,
+    base_table_name: str | None,
     base_table_spec: TableSpec,
     suffix: str | None = None,
+    real_table: bool = False,
 ) -> tuple[str, str]:
     """
     Create an appropriate staging table:
-    - Drop foreign keys, as their semantic guarantees aren't required and they can junk up the ETL patterns.
+    - Drop foreign keys, as their semantic guarantees aren't required and they can junk up the
+        ETL patterns.
     - Replace foreign keys with alternatives, so all reverse-lookups stay performant.
     - Allow suffix for easy debugging, but randomize random table name.
         TODO: Cache randomly generated table names during session to avoid collisions.
     - Drop any defaults / generated columns / whatnot.
+
+    Note: The kwarg `real_table=True` can force this method to create a real table.
+        This is sometimes necessary, as MySQL doesn't allow temp tables to be reused within a
+        query, and this can be _incredibly_ problematic. Be aware that may flush your commit, and you
+        must drop it using drop_table_statement(..., temporary=False).
 
     TODO: Preserve coalation and charset.
 
@@ -684,16 +722,28 @@ def create_staging_table_statement(
     );
     """
     if suffix is None:
-        suffix = "tmp"
+        suffix = ""
+    else:
+        suffix = f"_{suffix}"
+
+    assert suffix is not None  # For MyPy.
+
+    if base_table_name is None:
+        base_table_name = "unnamed_table"
+
+    assert base_table_name is not None  # For MyPy.
 
     random_suffix = "".join(choices(ascii_letters + digits, k=6))
-    randomized_name = f"_{base_table_name}_{suffix}_{random_suffix}"
+    if real_table:
+        randomized_name = f"_jsmn_tmp_{base_table_name}{suffix}_{random_suffix}"
+    else:
+        randomized_name = f"_{base_table_name}{suffix}_{random_suffix}"
 
     return randomized_name, create_table_statement(
         base_db_name,
         randomized_name,
         base_table_spec.without_constraints(keep_unique_keys=True),
-        temporary=True,
+        temporary=not real_table,
     )
 
 

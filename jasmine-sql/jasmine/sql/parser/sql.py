@@ -88,7 +88,11 @@ def sql_tree_from_str(query: str) -> ParseTree:
 
 
 ParseTreePath = list[int | str]
-def parse_tree_get(parse_tree: ParseTree | None, path: ParseTreePath) -> ParseTree | None:
+
+
+def parse_tree_get(
+    parse_tree: ParseTree | None, path: ParseTreePath
+) -> ParseTree | None:
     if parse_tree is None:
         return None
 
@@ -98,13 +102,14 @@ def parse_tree_get(parse_tree: ParseTree | None, path: ParseTreePath) -> ParseTr
     next_step, *remaining_path = path
 
     if isinstance(next_step, int):
-        if hasattr(parse_tree, children) and len(parse_tree.children) > next_step:
+        if hasattr(parse_tree, "children") and len(parse_tree.children) > next_step:
             next_child = parse_tree.children[next_step]
         else:
             return None
+
     elif isinstance(next_step, str):
         next_child_func = getattr(parse_tree, next_step, None)
-        if next_child_func == None:
+        if next_child_func is None:
             return None
         next_child = next_child_func()
     else:
@@ -112,10 +117,16 @@ def parse_tree_get(parse_tree: ParseTree | None, path: ParseTreePath) -> ParseTr
 
     return parse_tree_get(next_child, remaining_path)
 
-def parse_tree_assert_get(parse_tree: ParseTree | None, path: ParseTreePath) -> ParseTree:
+
+def parse_tree_assert_get(
+    parse_tree: ParseTree | None, path: ParseTreePath
+) -> ParseTree:
     result = parse_tree_get(parse_tree, path)
-    assert result is not None, f"Expected to find parse tree at path {path}, found nothing."
+    assert (
+        result is not None
+    ), f"Expected to find parse tree at path {path}, found nothing."
     return result
+
 
 def sql_tree_paren_str(tree: ParseTree) -> str:
     """

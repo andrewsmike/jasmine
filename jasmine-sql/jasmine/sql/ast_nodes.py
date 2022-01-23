@@ -180,7 +180,9 @@ def identifier_needs_escaping(text):
     if text not in _ident_needs_escaping_cache:
         try:
             ast = sql_subexpr_ast(text, "identifier")
-            _ident_needs_escaping_cache[text] = not (isinstance(ast, Identifier) and ast.text == text)
+            _ident_needs_escaping_cache[text] = not (
+                isinstance(ast, Identifier) and ast.text == text
+            )
         except Exception as e:
             _ident_needs_escaping_cache[text] = True
 
@@ -204,6 +206,7 @@ class ColumnRef(ASTNode):
 
     If table_ref.db_name is None, table_name may be an alias.
     """
+
     table_ref: TableRef | None
     column_name: str
 
@@ -852,19 +855,27 @@ def column_ref_sql_ast(parse_tree: SQLParser.ColumnRefContext) -> ASTNode:
     parse_tree = parse_tree.fieldIdentifier()
     possible_identifiers = [
         parse_tree_get(parse_tree, ["qualifiedIdentifier", "identifier"]),
-        parse_tree_get(parse_tree, ["qualifiedIdentifier", "dotIdentifier", "identifier"]),
+        parse_tree_get(
+            parse_tree, ["qualifiedIdentifier", "dotIdentifier", "identifier"]
+        ),
         parse_tree_get(parse_tree, ["dotIdentifier", "identifier"]),
     ]
-    identifiers = [ident_text(identifier) for identifier in possible_identifiers if identifier is not None]
+    identifiers = [
+        ident_text(identifier)
+        for identifier in possible_identifiers
+        if identifier is not None
+    ]
     column_name = table_name = db_name = None
     if len(identifiers) == 1:
-        column_name, = identifiers
+        (column_name,) = identifiers
     elif len(identifiers) == 2:
         table_name, column_name = identifiers
     elif len(identifiers) == 3:
         db_name, table_name, column_name = identifiers
     else:
-        raise ValueError(f"Unexpected number of identifiers for ColumnRef rule: {identifiers}")
+        raise ValueError(
+            f"Unexpected number of identifiers for ColumnRef rule: {identifiers}"
+        )
 
     return ColumnRef(
         table_ref=TableRef(db_name=db_name, table_name=table_name),
@@ -1364,7 +1375,9 @@ def sql_subexpr_ast(sql_subexpr: str, expr_type_str: str):
     return sql_ast(parse_tree)
 
 
-def all_ast_nodes(ast_node: ASTNode, node_type: Type[ASTNode] | None = None) -> Iterable[ASTNode]:
+def all_ast_nodes(
+    ast_node: ASTNode, node_type: Type[ASTNode] | None = None
+) -> Iterable[ASTNode]:
     """
     Get all ASTNodes within an AST.
     >>> from pprint import pprint
@@ -1427,6 +1440,8 @@ def all_ast_nodes(ast_node: ASTNode, node_type: Type[ASTNode] | None = None) -> 
         for field_child_value in field_children_values:
             if isinstance(field_child_value, ASTNode):
                 yield from all_ast_nodes(field_child_value, node_type=node_type)
+
+
 # TODO:
 # - WITH CTE, UNION, ORDER BY, LIMIT [CHECK]
 # - Incremental improvements: caps'ing symbols, [converting implicit joins to explicit], [reordering ON clauses].

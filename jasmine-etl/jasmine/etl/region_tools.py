@@ -15,6 +15,7 @@ from typing import Any
 
 from jasmine.sql.transforms.escaping import (
     escaped,
+    escaped_db_table,
     escaped_table_column_list,
     string_literal_expr,
 )
@@ -49,6 +50,20 @@ class DiscreteRegion(Region):
 
     columns: list[str]
     points: list[tuple[Value, ...]]
+
+
+@dataclass
+class TempTableDiscreteRegion(Region):
+    """
+    IN (SELECT * FROM temp_table) clause.
+    This assumes column_names are in the same order as the columns in the temp table.
+
+    See in_region_expr_temp_table_discrete for an example.
+    """
+
+    columns: list[str]
+    temp_db_name: str
+    temp_table_name: str
 
 
 @dataclass
@@ -166,6 +181,21 @@ def in_region_expr_discrete(region: DiscreteRegion, table_alias: str):
             for point in region.points
         )
         return f"({escaped_table_column_list(table_alias, region.columns)}) IN ({points_expr})"
+
+
+@in_region_expr.register
+def in_region_expr_temp_table_discrete(
+    region: TempTableDiscreteRegion, table_alias: str
+):
+    """
+    >>> region = TempTableDiscreteRegion(columns=["event_id", "org_name"], temp_db_name="my db ' ", temp_table_name="temp my_table's_pks")
+    >>> print(" WHERE " + in_region_expr(region, "my_table"))
+     WHERE (`my_table`.`event_id`, `my_table`.`org_name`) IN (SELECT * FROM `my db ' `.`temp my_table's_pks`)
+    """
+    return (
+        f"({escaped_table_column_list(table_alias, region.columns)}) \n"
+        + f"IN (SELECT * FROM {escaped_db_table(region.temp_db_name, region.temp_table_name)})"
+    )
 
 
 @in_region_expr.register

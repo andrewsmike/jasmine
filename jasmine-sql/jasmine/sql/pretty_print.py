@@ -964,9 +964,9 @@ class PrettyPrintVisitor:
         return ".".join(
             escaped_identifier(part)
             for part in [
-                    node.table_ref.db_name,
-                    node.table_ref.table_name,
-                    node.column_name,
+                node.table_ref.db_name,
+                node.table_ref.table_name,
+                node.column_name,
             ]
             if part is not None
         )
