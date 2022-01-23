@@ -197,8 +197,8 @@ FOR EACH ROW
             {event_ts_column}
         )
         VALUES (
-            'INSERT_UPDATE',
-            {new_columns_str},
+            'DELETE_UPDATE',
+            {old_columns_str},
             UNIX_TIMESTAMP()
         );
         INSERT INTO {history_table} (
@@ -207,8 +207,8 @@ FOR EACH ROW
             {event_ts_column}
         )
         VALUES (
-            'DELETE_UPDATE',
-            {old_columns_str},
+            'INSERT_UPDATE',
+            {new_columns_str},
             UNIX_TIMESTAMP()
         );
     END
