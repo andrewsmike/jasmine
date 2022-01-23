@@ -1,3 +1,18 @@
+"""
+Once ETLs have determined what they want a table (or a chunk of a table) to look like, they need to
+patch the table to reflect the new values.
+
+This involves:
+- Only make _necessary_ changes; don't update any rows that haven't changed.
+    - This reduces load, locking, and prevents updated timestamps / CDCs / etcs from picking up on no-op changes.
+- Delete rows that have been removed.
+- Insert rows that have been added.
+- Update rows that have changed.
+
+This module automates these tasks in an efficient manner using temporary tables and temp-table-diffing logic.
+It also collects useful statistics for debugging purposes, and is generally more reliable than implementing
+hand-rolled versions for each ETL.
+"""
 from jasmine.etl.region_tools import Region, in_region_expr
 from jasmine.sql.table_spec import (
     TableSpec,
@@ -59,9 +74,7 @@ DELETE prev, next
   FROM {prev_db_table} prev
   JOIN {next_db_table} next
     ON {prev_next_columns_equal_expr};
-"""[
-    1:-1
-]
+""".strip()
 
 
 def delete_unchanged_rows_statement(
@@ -166,9 +179,7 @@ DELETE curr
   JOIN {curr_db_table} curr
     ON {prev_curr_pk_equal_expr}
  WHERE {next_pk_is_null_expr};  /* If row is in `next`, don't delete. */
-"""[
-    1:-1
-]
+""".strip()
 
 
 def patch_deleted_rows_statement(format_args: dict[str, str]) -> str:
@@ -196,9 +207,7 @@ INSERT INTO {curr_db_table} ({column_list})
 SELECT {column_list}
   FROM {next_db_table} next
     ON DUPLICATE KEY UPDATE {column_value_updates};
-"""[
-    1:-1
-]
+""".strip()
 
 
 def patch_inserted_updated_rows_statement(format_args):
@@ -380,9 +389,7 @@ INSERT INTO {dest_db_table} ({column_names})
 SELECT {column_names}
   FROM {src_db_table} src
  WHERE {src_in_region_expr};
-"""[
-    1:-1
-]
+""".strip()
 
 
 def copy_region_statement(
