@@ -11,7 +11,7 @@ The sql_ast() function visits ParseTrees and encodes them as AST nodes using the
 from dataclasses import dataclass, fields
 from functools import cache, singledispatch
 from pprint import pformat
-from typing import Iterator, Literal, Optional, Type, TypeAlias, cast
+from typing import Iterable, Literal, Optional, Type, TypeAlias, cast
 
 from antlr4.ParserRuleContext import ParserRuleContext
 from antlr4.tree.Tree import TerminalNodeImpl
@@ -20,6 +20,7 @@ from jasmine.sql.parser.sql import (
     ParseTree,
     SQLParser,
     children_contexts,
+    parse_tree_get,
     sql_parser_from_str,
     sql_tree_from_file,
     sql_tree_from_str,
@@ -169,14 +170,17 @@ def identifier_needs_escaping(text):
     True
     >>> identifier_needs_escaping("UPDATE")
     True
+
+    >>> identifier_needs_escaping("column ")
+    True
     """
     # TODO: Replace with custom caching decorator?
     global _ident_needs_escaping_cache
 
     if text not in _ident_needs_escaping_cache:
         try:
-            sql_subexpr_ast(text, "identifier")
-            _ident_needs_escaping_cache[text] = False
+            ast = sql_subexpr_ast(text, "identifier")
+            _ident_needs_escaping_cache[text] = not (isinstance(ast, Identifier) and ast.text == text)
         except Exception as e:
             _ident_needs_escaping_cache[text] = True
 
@@ -191,6 +195,17 @@ class TableRef(ASTNode):
 
     db_name: str | None
     table_name: str
+
+
+@dataclass
+class ColumnRef(ASTNode):
+    """
+    Reference to a table column.
+
+    If table_ref.db_name is None, table_name may be an alias.
+    """
+    table_ref: TableRef | None
+    column_name: str
 
 
 @dataclass
@@ -831,6 +846,32 @@ def table_wild_sql_ast(parse_tree: SQLParser.TableWildContext) -> ASTNode:
     return TableRef(db_name=db_name, table_name=table_name)
 
 
+@sql_ast.register
+def column_ref_sql_ast(parse_tree: SQLParser.ColumnRefContext) -> ASTNode:
+
+    parse_tree = parse_tree.fieldIdentifier()
+    possible_identifiers = [
+        parse_tree_get(parse_tree, ["qualifiedIdentifier", "identifier"]),
+        parse_tree_get(parse_tree, ["qualifiedIdentifier", "dotIdentifier", "identifier"]),
+        parse_tree_get(parse_tree, ["dotIdentifier", "identifier"]),
+    ]
+    identifiers = [ident_text(identifier) for identifier in possible_identifiers if identifier is not None]
+    column_name = table_name = db_name = None
+    if len(identifiers) == 1:
+        column_name, = identifiers
+    elif len(identifiers) == 2:
+        table_name, column_name = identifiers
+    elif len(identifiers) == 3:
+        db_name, table_name, column_name = identifiers
+    else:
+        raise ValueError(f"Unexpected number of identifiers for ColumnRef rule: {identifiers}")
+
+    return ColumnRef(
+        table_ref=TableRef(db_name=db_name, table_name=table_name),
+        column_name=column_name,
+    )
+
+
 def sql_ast_identifiers_from_list(
     identifier_list: SQLParser.IdentifierListContext,
 ) -> list[ASTNode]:
@@ -931,7 +972,7 @@ def joined_table_table_join_args(joined_table: SQLParser.JoinedTableContext) -> 
 
 def table_joins(
     node: JoinTreeNodeContext, context_join_args: dict | None = None
-) -> Iterator[TableJoin]:
+) -> Iterable[TableJoin]:
     """
     Iterate over the table JOIN tree left-to-right and generate flat TableJoin entries.
 
@@ -1323,6 +1364,69 @@ def sql_subexpr_ast(sql_subexpr: str, expr_type_str: str):
     return sql_ast(parse_tree)
 
 
+def all_ast_nodes(ast_node: ASTNode, node_type: Type[ASTNode] | None = None) -> Iterable[ASTNode]:
+    """
+    Get all ASTNodes within an AST.
+    >>> from pprint import pprint
+
+    >>> example_query = \"\"\"
+    ...     SELECT my_table.*, a, bleh.c, db.bleh.c
+    ...       FROM db.my_table abcd
+    ...       LEFT JOIN my_other_table `my_table `
+    ...         ON `my_table `.a = db.my_table.lmn
+    ...        AND `my_table `.n = abcd.q
+    ...        AND p = q
+    ...      WHERE i = j
+    ... \"\"\"
+    >>> pprint(list(all_ast_nodes(sql_ast_from_str(example_query))))
+    [SqlProgram(queries=[QuerySpecNode(select_options=[],
+                                       select_exprs=[SelectExpr(select_expr_type='table_star',
+                                                                expr=None,
+     ...
+     ParseTreeNode(base_node=<jasmine.sql.parser.SQLParser.SQLParser.SimpleExprColumnRefContext object at ...>,
+                   children=[ColumnRef(table_ref=TableRef(db_name=None,
+                                                          table_name=None),
+                                       column_name='j')]),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name=None), column_name='j'),
+     TableRef(db_name=None, table_name=None)]
+
+    >>> pprint(list(all_ast_nodes(sql_ast_from_str(example_query), node_type=ColumnRef)))
+    [ColumnRef(table_ref=TableRef(db_name=None, table_name=None), column_name='a'),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name='bleh'),
+               column_name='c'),
+     ColumnRef(table_ref=TableRef(db_name='db', table_name='bleh'),
+               column_name='c'),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name='my_table '),
+               column_name='a'),
+     ColumnRef(table_ref=TableRef(db_name='db', table_name='my_table'),
+               column_name='lmn'),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name='my_table '),
+               column_name='n'),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name='abcd'),
+               column_name='q'),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name=None), column_name='p'),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name=None), column_name='q'),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name=None), column_name='i'),
+     ColumnRef(table_ref=TableRef(db_name=None, table_name=None), column_name='j')]
+    """
+    if node_type is None or isinstance(ast_node, node_type):
+        yield ast_node
+
+    for field in fields(ast_node):
+        field_value = getattr(ast_node, field.name)
+        match field_value:
+            case dict():
+                field_children_values = field_value.values()
+            case list():
+                field_children_values = field_value
+            case ASTNode():
+                field_children_values = [field_value]
+            case _:
+                field_children_values = []
+
+        for field_child_value in field_children_values:
+            if isinstance(field_child_value, ASTNode):
+                yield from all_ast_nodes(field_child_value, node_type=node_type)
 # TODO:
 # - WITH CTE, UNION, ORDER BY, LIMIT [CHECK]
 # - Incremental improvements: caps'ing symbols, [converting implicit joins to explicit], [reordering ON clauses].

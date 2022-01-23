@@ -120,6 +120,7 @@ from antlr4.tree.Tree import ParseTree, TerminalNodeImpl
 
 from jasmine.sql.ast_nodes import (
     ASTNode,
+    ColumnRef,
     CTEOrderLimitNode,
     CTESubqueryNode,
     Identifier,
@@ -951,6 +952,22 @@ class PrettyPrintVisitor:
         return ".".join(
             escaped_identifier(part)
             for part in [node.db_name, node.table_name]
+            if part is not None
+        )
+
+    @pretty_print_inline.register
+    @pretty_print_multiline.register
+    def pretty_print_column_ref(
+        self,
+        node: ColumnRef,
+    ) -> str:
+        return ".".join(
+            escaped_identifier(part)
+            for part in [
+                    node.table_ref.db_name,
+                    node.table_ref.table_name,
+                    node.column_name,
+            ]
             if part is not None
         )
 

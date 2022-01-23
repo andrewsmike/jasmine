@@ -87,6 +87,36 @@ def sql_tree_from_str(query: str) -> ParseTree:
     return sql_tree_from_stream(InputStream(query))
 
 
+ParseTreePath = list[int | str]
+def parse_tree_get(parse_tree: ParseTree | None, path: ParseTreePath) -> ParseTree | None:
+    if parse_tree is None:
+        return None
+
+    if len(path) == 0:
+        return parse_tree
+
+    next_step, *remaining_path = path
+
+    if isinstance(next_step, int):
+        if hasattr(parse_tree, children) and len(parse_tree.children) > next_step:
+            next_child = parse_tree.children[next_step]
+        else:
+            return None
+    elif isinstance(next_step, str):
+        next_child_func = getattr(parse_tree, next_step, None)
+        if next_child_func == None:
+            return None
+        next_child = next_child_func()
+    else:
+        raise ValueError(f"Invalid parse_tree path spec: {path}")
+
+    return parse_tree_get(next_child, remaining_path)
+
+def parse_tree_assert_get(parse_tree: ParseTree | None, path: ParseTreePath) -> ParseTree:
+    result = parse_tree_get(parse_tree, path)
+    assert result is not None, f"Expected to find parse tree at path {path}, found nothing."
+    return result
+
 def sql_tree_paren_str(tree: ParseTree) -> str:
     """
     ANTLR default pretty printed parse tree.
