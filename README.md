@@ -7,8 +7,10 @@ Jasmine Web: Putting the 'T' in 'ETL'.
 Jasmine Web is a web-app and backend service that automatically translates your SQL queries into optimized ETL patterns with managed lifecycles.
 Jasmine uses a variety of ETL strategies, along with a SQL manipulation library, to make your analyses easy, near-realtime, and performant.
 
-Warning: Jasmine has a solid foundation and does things no other library offers, but it is still in pre-alpha and we provide no guarantees of anything. It could delete all of your production data. Use at your own risk.
-I believe this data engineering strategy will eat the world, but I haven't had the free time to build a _complete_ product around it yet.
+*Warning*: Jasmine has a solid foundation and does things no other library offers, but it is still in pre-alpha and we provide no guarantees of anything. It could delete all of your production data. Use at your own risk.
+I believe incremental-ETL will eat the world, but I haven't had the free time to build a reasonably full product around it yet.
+
+*License*: Jasmine is released under the Apache 2 license found in LICENSE.txt.
 
 Screenshots
 ===========
