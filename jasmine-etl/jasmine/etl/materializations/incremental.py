@@ -167,6 +167,21 @@ def terminate_incremental(self, session):
 
 
 def update_incremental(self, session):
+    """
+    This is the most complicated ETL in all of Jasmine.
+    It finds a sufficiently small timestep and runs the following two stages:
+    - Find out which regions of the table need to be updated.
+    - Update those regions.
+
+    The second step mirrors the logic in the reload ETL, but with a region constraint.
+
+    The first step involves:
+    - Finding the backing source tables.
+    - Finding their history tables (these must exist to perform this style of ETL.)
+    - Deriving some temp results that describe the historical state of each source table.
+    - Deriving some temp results that describe the chunks of the source table that have been updated.
+    - For each source table,
+    """
 
     backend = self.view.project.backend
 
@@ -188,6 +203,7 @@ def update_incremental(self, session):
                 column_names=temp_table_spec.column_names,
             )
         )
+
         # Update the entire table simultaneously.
         stats = patch_target_table_region(
             conn,

@@ -9,6 +9,7 @@ from jasmine.etl.backends import backend_conn
 from jasmine.etl.materializations import materialization_event_funcs
 from jasmine.etl.sqla_tools import with_sqla_first_arg, with_sqla_session
 from jasmine.models import Materialization, View
+from jasmine.sql.transforms.escaping import escaped_db_table
 
 MINUTES = 60
 HOURS = 60 * MINUTES
@@ -76,8 +77,20 @@ def log_backend_event(title: str):
 # )
 def view_result_preview(session, view):  # timed_lock=None
     assert view is not None, "Unknown view: Try reloading."
+    if view.view_type == "history_table":
+        mats = [mat for mat in view.materializations if mat.state == "active"]
+        assert (
+            len(mats) > 0
+        ), "Cannot preview this history table: no backing materialization found."
+
+        query_text = (
+            f"SELECT * FROM {escaped_db_table(mats[0].db_name, mats[0].table_name)}"
+        )
+    else:
+        query_text = view.spec["query_text"]
+
     with backend_conn(view.project.backend, readonly=True) as ro_conn:
-        ro_conn.execute(view.spec["query_text"])
+        ro_conn.execute(query_text)
         return ro_conn.fetchall()
 
 
@@ -92,13 +105,13 @@ def add_regular_scheduling_event(sender, **kwargs):
 @with_sqla_session
 def update_all_materializations(session):
     active_mats = (
-        session.query(Materialization)
-        .where(Materialization.state == "active")
-        .where(Materialization.materialization_type != "view")
-        .all()
+        session.query(Materialization).where(Materialization.state == "active").all()
     )
     for mat in active_mats:
-        execute_materialization_event.s(mat.materialization_id, "update").apply_async()
+        if "update" in mat.state_machine_type.state_events[mat.state]:
+            execute_materialization_event.s(
+                mat.materialization_id, "update"
+            ).apply_async()
 
 
 def unschedule_materialization(session, materialization):

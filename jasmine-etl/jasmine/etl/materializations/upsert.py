@@ -184,7 +184,9 @@ def update_upsert(self, session):
         column_names=table_spec.column_names[1:],  # Remove the auto_id.
     )
 
-    last_updated_ts = self.context["high_water_mark"]
+    last_updated_ts = self.context["high_water_mark"] - self.config.get(
+        "overlap_seconds", 5 * 60
+    )
 
     timestamp_decl_str = table_spec.column_type_decls[updated_ts_column_name].upper()
     if "INT" in timestamp_decl_str or "DECIMAL" in timestamp_decl_str:

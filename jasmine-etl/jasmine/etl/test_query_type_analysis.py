@@ -74,7 +74,7 @@ expected_view_table_spec_with_pk = TableSpec(
         "context": "JSON",
         "description": "LONGTEXT",
         "event_id": "BIGINT NOT NULL",
-        "method": "VARCHAR(32)",
+        "method": "VARCHAR(40)",
         "path": "VARCHAR(453)",
         "state": "VARCHAR(64)",
         "title": "VARCHAR(256) NOT NULL",

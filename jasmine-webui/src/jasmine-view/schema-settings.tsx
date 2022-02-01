@@ -34,7 +34,7 @@ const createHistoryTable = gql`
 `;
 
 const deleteView = gql`
-    mutation deleteView($viewId: ID!, $force: boolean!) {
+    mutation deleteView($viewId: ID!, $force: Boolean!) {
         delete_view(id: $viewId, force_no_cleanup: $force) {
             success
             error
